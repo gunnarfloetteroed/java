@@ -21,10 +21,11 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.filebased;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,13 +44,17 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 
 	// -------------------- CONSTANTS --------------------
 
+	private final String executionFolder;
+
 	private final String advanceSimulationCommand;
 
 	private final String newStateFileName;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public FileBasedSimulator(final String advanceSimulationCommand, final String newStateFileName) {
+	public FileBasedSimulator(final String executionFolder, final String advanceSimulationCommand,
+			final String newStateFileName) {
+		this.executionFolder = executionFolder;
 		this.advanceSimulationCommand = advanceSimulationCommand;
 		this.newStateFileName = newStateFileName;
 	}
@@ -60,7 +65,7 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 		final Process proc;
 		final int exitVal;
 		try {
-			proc = Runtime.getRuntime().exec(this.advanceSimulationCommand);
+			proc = Runtime.getRuntime().exec(this.advanceSimulationCommand, null, new File(this.executionFolder));
 			exitVal = proc.waitFor();
 			if (exitVal != 0) {
 				throw new RuntimeException("Simulation terminated with exit code " + exitVal + ".");
@@ -74,7 +79,8 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 		final List<Double> numbers = new LinkedList<>();
 		try {
 			String line;
-			final BufferedReader reader = new BufferedReader(new FileReader(this.newStateFileName));
+			final BufferedReader reader = new BufferedReader(
+					new FileReader(new File(this.executionFolder, this.newStateFileName)));
 			while ((line = reader.readLine()) != null) {
 				line = line.trim();
 				numbers.add(Double.parseDouble(line));

@@ -16,7 +16,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities.math;
 
 import java.io.Serializable;
@@ -51,8 +51,7 @@ public class Vector implements Serializable {
 			throw new IllegalArgumentException("data must not be null");
 		}
 		if (data.length < 1) {
-			throw new IllegalArgumentException(
-					"dimension must be strictly positive");
+			throw new IllegalArgumentException("dimension must be strictly positive");
 		}
 		this.data = data;
 		this.immutable = immutable;
@@ -168,8 +167,7 @@ public class Vector implements Serializable {
 	 */
 	public Vector copyEnlarged(final int enlargement) {
 		if (enlargement < 0) {
-			throw new IllegalArgumentException(
-					"negative enlargment is not possible");
+			throw new IllegalArgumentException("negative enlargment is not possible");
 		}
 		final Vector result = new Vector(this.data.length + enlargement);
 		System.arraycopy(this.data, 0, result.data, 0, this.data.length);
@@ -198,15 +196,13 @@ public class Vector implements Serializable {
 
 	private void checkImmutable() {
 		if (this.immutable) {
-			throw new UnsupportedOperationException(
-					"immutable Vector cannot be changed");
+			throw new UnsupportedOperationException("immutable Vector cannot be changed");
 		}
 	}
 
 	public void copy(final Vector other) {
 		this.checkImmutable();
-		System.arraycopy(other.data, 0, this.data, 0,
-				Math.min(this.size(), other.size()));
+		System.arraycopy(other.data, 0, this.data, 0, Math.min(this.size(), other.size()));
 	}
 
 	public void fill(final double value) {
@@ -264,8 +260,8 @@ public class Vector implements Serializable {
 	public void add(final Vector other, final double weight) {
 		this.checkImmutable();
 		if (this.size() != other.size()) {
-			throw new IllegalArgumentException(
-					"vectors must be of same dimensions");
+			throw new IllegalArgumentException("vectors must be of same dimensions: this.size()=" + this.size()
+					+ ", other.size()=" + other.size());
 		}
 		for (int i = 0; i < this.size(); i++)
 			this.add(i, weight * other.get(i));
@@ -383,8 +379,7 @@ public class Vector implements Serializable {
 	 */
 	public double innerProd(final Vector other) {
 		if (this.size() != other.size()) {
-			throw new IllegalArgumentException(
-					"vectors must be of same dimensions");
+			throw new IllegalArgumentException("vectors must be of same dimensions");
 		}
 		double result = 0;
 		for (int i = 0; i < this.size(); i++) {
@@ -486,8 +481,7 @@ public class Vector implements Serializable {
 	}
 
 	// TODO NEW, untested
-	public static Vector newUniformLowerUpper(final Vector lower,
-			final Vector upper, final Random rnd) {
+	public static Vector newUniformLowerUpper(final Vector lower, final Vector upper, final Random rnd) {
 		final Vector result = new Vector(lower.size());
 		for (int i = 0; i < result.size(); i++) {
 			final double u = rnd.nextDouble();
@@ -496,12 +490,10 @@ public class Vector implements Serializable {
 		return result;
 	}
 
-	public static Vector newUniformCenterWidth(final Vector center,
-			final Vector width, final Random rnd) {
+	public static Vector newUniformCenterWidth(final Vector center, final Vector width, final Random rnd) {
 		final Vector result = new Vector(center.size());
 		for (int i = 0; i < result.size(); i++) {
-			result.set(i,
-					center.get(i) + (rnd.nextDouble() - 0.5) * width.get(i));
+			result.set(i, center.get(i) + (rnd.nextDouble() - 0.5) * width.get(i));
 		}
 		return result;
 	}
@@ -579,8 +571,7 @@ public class Vector implements Serializable {
 	public Vector newLeaveOneOut(final int leaveOutIndex) {
 		final double[] newData = new double[this.size() - 1];
 		System.arraycopy(this.data, 0, newData, 0, leaveOutIndex);
-		System.arraycopy(this.data, leaveOutIndex + 1, newData, leaveOutIndex,
-				this.size() - (leaveOutIndex + 1));
+		System.arraycopy(this.data, leaveOutIndex + 1, newData, leaveOutIndex, this.size() - (leaveOutIndex + 1));
 		return new Vector(newData);
 	}
 
@@ -633,8 +624,7 @@ public class Vector implements Serializable {
 		final Vector result = args[0].copy();
 		for (int argIndex = 1; argIndex < args.length; argIndex++) {
 			for (int i = 0; i < result.size(); i++) {
-				result.data[i] = Math.min(result.data[i],
-						args[argIndex].data[i]);
+				result.data[i] = Math.min(result.data[i], args[argIndex].data[i]);
 			}
 		}
 		return result;
@@ -645,8 +635,7 @@ public class Vector implements Serializable {
 		final Vector result = args[0].copy();
 		for (int argIndex = 1; argIndex < args.length; argIndex++) {
 			for (int i = 0; i < result.size(); i++) {
-				result.data[i] = Math.max(result.data[i],
-						args[argIndex].data[i]);
+				result.data[i] = Math.max(result.data[i], args[argIndex].data[i]);
 			}
 		}
 		return result;
@@ -655,26 +644,24 @@ public class Vector implements Serializable {
 	// TODO NEW
 	public void constrain(final Vector min, final Vector max) {
 		for (int i = 0; i < this.size(); i++) {
-			this.data[i] = MathHelpers.projectOnInterval(this.data[i],
-					min.data[i], max.data[i]);
+			this.data[i] = MathHelpers.projectOnInterval(this.data[i], min.data[i], max.data[i]);
 		}
 	}
 
 	// TODO NEW
 	public String toStringCSV() {
-		final StringBuffer result = new StringBuffer(
-				Double.toString(this.data[0]));
+		final StringBuffer result = new StringBuffer(Double.toString(this.data[0]));
 		for (int i = 1; i < this.data.length; i++) {
 			result.append(",");
 			result.append(Double.toString(this.data[i]));
 		}
 		return result.toString();
 	}
-	
+
 	// TODO NEW
 	public double[] toArray() {
 		final double[] result = new double[this.data.length];
-		System.arraycopy(this.data, 0, result, 0, this.data.length);		
+		System.arraycopy(this.data, 0, result, 0, this.data.length);
 		return result;
 	}
 }

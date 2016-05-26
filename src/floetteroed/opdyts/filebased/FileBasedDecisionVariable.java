@@ -21,9 +21,10 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.filebased;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
@@ -40,21 +41,25 @@ public class FileBasedDecisionVariable implements DecisionVariable {
 
 	private final String decisionVariableId;
 
+	private final String executionFolder;
+
 	private final String newDecisionVariableFileName;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public FileBasedDecisionVariable(final String decisionVariableId, final String decisionVariableFileName) {
+	public FileBasedDecisionVariable(final String decisionVariableId, final String executionFolder,
+			final String decisionVariableFileName) {
 		this.decisionVariableId = decisionVariableId;
+		this.executionFolder = executionFolder;
 		this.newDecisionVariableFileName = decisionVariableFileName;
 	}
 
 	// -------------------- FILE-BASED FUNCTIONALITY --------------------
 
-	public void writeToNewDecisionVariableFile(final String fileName) {
+	public void writeToNewDecisionVariableFile(final String folder, final String fileName) {
 		try {
-			final PrintWriter writer = new PrintWriter(fileName);
-			writer.println(this.decisionVariableId);
+			final PrintWriter writer = new PrintWriter(new File(folder, fileName));
+			writer.print(this.decisionVariableId);
 			writer.flush();
 			writer.close();
 		} catch (FileNotFoundException e) {
@@ -66,6 +71,13 @@ public class FileBasedDecisionVariable implements DecisionVariable {
 
 	@Override
 	public void implementInSimulation() {
-		this.writeToNewDecisionVariableFile(this.newDecisionVariableFileName);
+		this.writeToNewDecisionVariableFile(this.executionFolder, this.newDecisionVariableFileName);
+	}
+
+	// -------------------- OVERRIDING OF Object --------------------
+
+	@Override
+	public String toString() {
+		return this.decisionVariableId;
 	}
 }

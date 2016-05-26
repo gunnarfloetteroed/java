@@ -42,6 +42,8 @@ public class FileBasedDecisionVariableRandomzier implements DecisionVariableRand
 
 	// -------------------- CONSTANTS --------------------
 
+	private final String executionFolder;
+
 	private final String createNewDecisionVariablesCommand;
 
 	private final String originalDecisionVariableFileName;
@@ -50,8 +52,10 @@ public class FileBasedDecisionVariableRandomzier implements DecisionVariableRand
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public FileBasedDecisionVariableRandomzier(final String createNewDecisionVariablesCommand,
-			final String originalDecisionVariableFileName, final String newDecisionVariablesFileName) {
+	public FileBasedDecisionVariableRandomzier(final String executionFolder,
+			final String createNewDecisionVariablesCommand, final String originalDecisionVariableFileName,
+			final String newDecisionVariablesFileName) {
+		this.executionFolder = executionFolder;
 		this.createNewDecisionVariablesCommand = createNewDecisionVariablesCommand;
 		this.originalDecisionVariableFileName = originalDecisionVariableFileName;
 		this.newDecisionVariablesFileName = newDecisionVariablesFileName;
@@ -64,18 +68,20 @@ public class FileBasedDecisionVariableRandomzier implements DecisionVariableRand
 			FileBasedDecisionVariable originalDecisionVariable) {
 
 		if (originalDecisionVariable != null) {
-			originalDecisionVariable.writeToNewDecisionVariableFile(this.originalDecisionVariableFileName);
+			originalDecisionVariable.writeToNewDecisionVariableFile(this.executionFolder,
+					this.originalDecisionVariableFileName);
 		} else {
-			final File file = new File(this.originalDecisionVariableFileName);
-			if (file.exists()) {
-				file.delete();
-			}
+//			final File file = new File(this.executionFolder, this.originalDecisionVariableFileName);
+//			if (file.exists()) {
+//				file.delete();
+//			}
 		}
 
 		final Process proc;
 		final int exitVal;
 		try {
-			proc = Runtime.getRuntime().exec(this.createNewDecisionVariablesCommand);
+			proc = Runtime.getRuntime().exec(this.createNewDecisionVariablesCommand, null,
+					new File(this.executionFolder));
 			exitVal = proc.waitFor();
 			if (exitVal != 0) {
 				throw new RuntimeException("Decision variable generation terminated with exit code " + exitVal + ".");
@@ -87,9 +93,11 @@ public class FileBasedDecisionVariableRandomzier implements DecisionVariableRand
 		final List<FileBasedDecisionVariable> result = new LinkedList<>();
 		try {
 			String line;
-			final BufferedReader reader = new BufferedReader(new FileReader(this.newDecisionVariablesFileName));
+			final BufferedReader reader = new BufferedReader(
+					new FileReader(new File(this.executionFolder, this.newDecisionVariablesFileName)));
 			while ((line = reader.readLine()) != null) {
-				result.add(new FileBasedDecisionVariable(line.trim(), this.originalDecisionVariableFileName));
+				result.add(new FileBasedDecisionVariable(line.trim(), this.executionFolder,
+						this.originalDecisionVariableFileName));
 			}
 			reader.close();
 		} catch (Exception e) {
