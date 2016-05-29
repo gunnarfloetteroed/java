@@ -4,9 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>bioroute</groupId>
+    <groupId>floetteroed.bioroute</groupId>
     <artifactId>bioroute</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/matsim/matsim/bioroute</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -35,9 +46,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>floetteroed</groupId>
-            <artifactId>utilities</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>floetteroed.utilities</groupId>
+            <artifactId>floetteroed-utilities</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

@@ -4,9 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>floetteroed</groupId>
-    <artifactId>utilities</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <groupId>floetteroed.utilities</groupId>
+    <artifactId>floetteroed-utilities</artifactId>
+    <version>1.0.0</version>
+    <licenses>
+        <license>
+            <name>GNU General Public License</name>
+        </license>
+    </licenses>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/matsim/matsim/floetteroed-utilities</url>
+        </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -29,6 +41,18 @@
                         <Xmaxerrs>100</Xmaxerrs>
                     </compilerArguments>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

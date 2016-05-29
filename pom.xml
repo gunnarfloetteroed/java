@@ -5,9 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>floetteroed</groupId>
-    <artifactId>gunnarstuff</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>floetteroed</artifactId>
+    <version>1.0</version>
     <packaging>pom</packaging>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <modules>
         <module>cadyts</module>
