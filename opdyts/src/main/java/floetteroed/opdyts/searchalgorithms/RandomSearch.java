@@ -104,6 +104,119 @@ public class RandomSearch<U extends DecisionVariable> {
 	private String outerIterationLogFileName = null;
 
 	// -------------------- CONSTRUCTION --------------------
+	private static void assertTrue( boolean condition ) {
+		if ( !condition ) {
+			throw new RuntimeException( "something is wrong; follow stack trace" ) ;
+		}
+	}
+	private static void assertNotNull( Object object ) {
+		assertTrue( object != null ) ;
+	}
+	
+	public static final class Builder<U extends DecisionVariable> {
+		private Simulator<U> simulator = null ;
+		private DecisionVariableRandomizer<U> randomizer = null ;
+		private U initialDecisionVariable = null ;
+		private ConvergenceCriterion convergenceCriterion = null ;
+		private int maxIterations = 10 ;
+		private int maxTransitions = Integer.MAX_VALUE ;
+		private int populationSize = 10 ;
+		private Random rnd = new Random(4711) ;
+		private boolean interpolate = true ;
+		private ObjectiveFunction objectiveFunction = null ;
+		private boolean includeCurrentBest = false ;
+		
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U> setSimulator(Simulator<U> simulator) {
+			this.simulator = simulator ;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setRandomizer(DecisionVariableRandomizer<U> randomizer) {
+			this.randomizer = randomizer;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setInitialDecisionVariable(U initialDecisionVariable) {
+			this.initialDecisionVariable = initialDecisionVariable;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setConvergenceCriterion(ConvergenceCriterion convergenceCriterion) {
+			this.convergenceCriterion = convergenceCriterion;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setMaxIterations(int maxIterations) {
+			this.maxIterations = maxIterations;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setMaxTransitions(int maxTransitions) {
+			this.maxTransitions = maxTransitions;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setPopulationSize(int populationSize) {
+			this.populationSize = populationSize;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setRnd(Random rnd) {
+			this.rnd = rnd;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setInterpolate(boolean interpolate) {
+			this.interpolate = interpolate;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setObjectiveFunction(ObjectiveFunction objectiveFunction) {
+			this.objectiveFunction = objectiveFunction;
+			return this ;
+		}
+		/**
+		 * For default value see code of {@link RandomSearch.Builder}.
+		 */
+		public final Builder<U>  setIncludeCurrentBest(boolean includeCurrentBest) {
+			this.includeCurrentBest = includeCurrentBest;
+			return this ;
+		}
+		public final RandomSearch<U> build() {
+			assertNotNull( simulator ) ;
+			assertNotNull( randomizer ) ;
+			assertNotNull( initialDecisionVariable ) ;
+			assertNotNull( convergenceCriterion ) ;
+			assertTrue( maxIterations > 0) ;
+			assertTrue( maxTransitions > 0) ;
+			assertTrue( populationSize > 0 ) ;
+			assertNotNull( rnd ) ;
+			assertNotNull( objectiveFunction ) ;
+			return new RandomSearch<>( simulator, randomizer, initialDecisionVariable, convergenceCriterion, maxIterations,
+					maxTransitions, populationSize, rnd, interpolate, objectiveFunction, includeCurrentBest ) ;
+		}
+	}
 
 	public RandomSearch(final Simulator<U> simulator, final DecisionVariableRandomizer<U> randomizer,
 			final U initialDecisionVariable, final ConvergenceCriterion convergenceCriterion, final int maxIterations,
@@ -124,18 +237,30 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	// -------------------- SETTERS AND GETTERS --------------------
 
+	/**
+	 * Set opdyts log file name.  Default is "null".
+	 */
 	public void setLogFileName(final String logFileName) {
 		this.logFileName = logFileName;
 	}
 
+	/**
+	 * Set opdyts convergence tracking file name.  Default is "null".
+	 */
 	public void setConvergenceTrackingFileName(final String convergenceTrackingFileName) {
 		this.convergenceTrackingFileName = convergenceTrackingFileName;
 	}
 
+	/**
+	 * Set opdyts outer iteration log file name.  Default is "null".
+	 */
 	public void setOuterIterationLogFileName(final String outerIterationLogFileName) {
 		this.outerIterationLogFileName = outerIterationLogFileName;
 	}
 
+	/**
+	 * Essentially, switch on opdyts logging.
+	 */
 	public void setLogPath(String path) {
 		new File(path).mkdirs();		
 		this.setLogFileName(Paths.get(path, "opdyts.log").toString());
