@@ -37,7 +37,11 @@ public interface DecisionVariable {
 	/**
 	 * Implements the effect of this decision variable in the simulation,
 	 * meaning that the next simulation transition is according to this decision
-	 * variable.
+	 * variable.  
+	 * <br/><br/>
+	 * Notes:<ul>
+	 * <li> This needs to influence the simulation in each iteration, not just at the start iterations. </li>
+	 * </ul>
 	 */
 	public void implementInSimulation();
 
