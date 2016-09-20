@@ -265,7 +265,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		new File(path).mkdirs();		
 		this.setLogFileName(Paths.get(path, "opdyts.log").toString());
 		this.setConvergenceTrackingFileName(Paths.get(path, "opdyts.con").toString());
-		this.setOuterIterationLogFileName(Paths.get(path, "optyts.sum").toString());
+		this.setOuterIterationLogFileName(Paths.get(path, "opdyts.sum").toString());
 	}
 
 	public void setMaxTotalMemory(final int maxTotalMemory) {
