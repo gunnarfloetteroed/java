@@ -63,7 +63,9 @@ public class SelfTuner {
 
 	private double uniformityGapWeight = 0.0;
 
-	private boolean noisySystem = false;
+	private boolean noisySystem = true;
+	
+	private double weightScale = 1.0;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -74,15 +76,19 @@ public class SelfTuner {
 	public void setNoisySystem(final boolean noisySystem) {
 		this.noisySystem = noisySystem;
 	}
+	
+	public void setWeightScale(final double weightScale) {
+		this.weightScale = weightScale;
+	}
 
 	// -------------------- GETTERS --------------------
 
 	public double getEquilibriumGapWeight() {
-		return this.equilibriumGapWeight;
+		return (this.weightScale * this.equilibriumGapWeight);
 	}
 
 	public double getUniformityGapWeight() {
-		return this.uniformityGapWeight;
+		return (this.weightScale * this.uniformityGapWeight);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
