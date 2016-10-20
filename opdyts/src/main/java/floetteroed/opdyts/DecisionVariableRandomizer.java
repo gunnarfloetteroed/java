@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts;
 
 import java.util.Collection;
@@ -38,15 +38,20 @@ import java.util.Collection;
  */
 public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 
-	// /**
-	// * @return a completely random decision variable (uniform to the extent
-	// * possible)
-	// */
-	// public U newRandomDecisionVariable();
-
 	/**
-	 * @return two random variations of decisionVariable; these are symmetric
-	 *         ("positive and negative") to the extent possible
+	 * The result should contain at least one random variation of
+	 * decisionVariable.
+	 * <p>
+	 * It is, however, recommended to implement one of the following sampling
+	 * strategies:
+	 * <ul>
+	 * <li>Return two random variations of decisionVariable that are symmetric (
+	 * "positive and negative") to the extent possible.
+	 * <li>Return an even larger number of decision variable variations (up to
+	 * the total number of candidate decision variables specified in
+	 * RandomSearch) by some experimental plan.
+	 * </ul>
+	 * <p>
 	 */
 	public Collection<U> newRandomVariations(final U decisionVariable);
 
