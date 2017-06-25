@@ -369,7 +369,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.run(0.0, 0.0, selfTuner);
 	}
 
-	private void run(double equilibriumGapWeight, double uniformityGapWeight, SelfTuner weightOptimizer) {
+	public void run(double equilibriumGapWeight, double uniformityGapWeight, SelfTuner weightOptimizer) {
 
 		int totalTransitionCnt = 0;
 
