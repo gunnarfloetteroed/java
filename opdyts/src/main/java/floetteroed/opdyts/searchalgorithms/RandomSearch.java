@@ -89,6 +89,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private final boolean includeCurrentBest;
 
+	private final int warmupIterations;
+
 	private int maxTotalMemory = Integer.MAX_VALUE;
 
 	private int maxMemoryPerTrajectory = Integer.MAX_VALUE;
@@ -104,7 +106,7 @@ public class RandomSearch<U extends DecisionVariable> {
 	private String outerIterationLogFileName = null;
 
 	// -------------------- CONSTRUCTION --------------------
-	
+
 	private static void assertTrue(boolean condition) {
 		if (!condition) {
 			throw new RuntimeException("something is wrong; follow stack trace");
@@ -119,10 +121,11 @@ public class RandomSearch<U extends DecisionVariable> {
 	 * 
 	 * @author Kai Nagel
 	 *
-	 * @param <U> the decision variable type
+	 * @param <U>
+	 *            the decision variable type
 	 */
 	public static final class Builder<U extends DecisionVariable> {
-		
+
 		private Simulator<U> simulator = null;
 		private DecisionVariableRandomizer<U> randomizer = null;
 		private U initialDecisionVariable = null;
@@ -134,6 +137,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		private boolean interpolate = true;
 		private ObjectiveFunction objectiveFunction = null;
 		private boolean includeCurrentBest = false;
+		private int warmupIterations = 1;
 
 		/**
 		 * See {@link Simulator}.
@@ -162,8 +166,9 @@ public class RandomSearch<U extends DecisionVariable> {
 		}
 
 		/**
-		 * The starting point of the search. The initial simulation configuration
-		 * should be such the simulation is converged given this decision variable.
+		 * The starting point of the search. The initial simulation
+		 * configuration should be such the simulation is converged given this
+		 * decision variable.
 		 * 
 		 * For default value see code of {@link RandomSearch.Builder}.
 		 */
@@ -220,9 +225,9 @@ public class RandomSearch<U extends DecisionVariable> {
 		}
 
 		/**
-		 * How many candidate decision variables are to be created. 
-		 * Based on empirical experience, the more the better. 
-		 * Available memory defines an upper limit.
+		 * How many candidate decision variables are to be created. Based on
+		 * empirical experience, the more the better. Available memory defines
+		 * an upper limit.
 		 * 
 		 * For default value see code of {@link RandomSearch.Builder}.
 		 */
@@ -240,7 +245,8 @@ public class RandomSearch<U extends DecisionVariable> {
 		}
 
 		/**
-		 * For all practical purposes, keep this "true". "false" is only for debugging.
+		 * For all practical purposes, keep this "true". "false" is only for
+		 * debugging.
 		 * 
 		 * For default value see code of {@link RandomSearch.Builder}.
 		 */
@@ -262,13 +268,19 @@ public class RandomSearch<U extends DecisionVariable> {
 
 		/**
 		 * If the currently best decision variable is to be included in the set
-		 * of new candidate decision variables. More an experimental feature, better
-		 * keep it "false".
+		 * of new candidate decision variables. More an experimental feature,
+		 * better keep it "false".
 		 * 
 		 * For default value see code of {@link RandomSearch.Builder}.
 		 */
 		public final Builder<U> setIncludeCurrentBest(boolean includeCurrentBest) {
 			this.includeCurrentBest = includeCurrentBest;
+			return this;
+		}
+
+		// TODO NEW
+		public final Builder<U> setWarmupIterations(int warmupIterations) {
+			this.warmupIterations = warmupIterations;
 			return this;
 		}
 
@@ -282,16 +294,18 @@ public class RandomSearch<U extends DecisionVariable> {
 			assertTrue(populationSize > 0);
 			assertNotNull(rnd);
 			assertNotNull(objectiveFunction);
+			assertTrue(warmupIterations > 0);
 			return new RandomSearch<>(simulator, randomizer, initialDecisionVariable, convergenceCriterion,
 					maxIterations, maxTransitions, populationSize, rnd, interpolate, objectiveFunction,
-					includeCurrentBest);
+					includeCurrentBest, warmupIterations);
 		}
 	}
 
 	public RandomSearch(final Simulator<U> simulator, final DecisionVariableRandomizer<U> randomizer,
 			final U initialDecisionVariable, final ConvergenceCriterion convergenceCriterion, final int maxIterations,
 			final int maxTransitions, final int populationSize, final Random rnd, final boolean interpolate,
-			final ObjectiveFunction objectBasedObjectiveFunction, final boolean includeCurrentBest) {
+			final ObjectiveFunction objectBasedObjectiveFunction, final boolean includeCurrentBest,
+			final int warmupIterations) {
 		this.simulator = simulator;
 		this.randomizer = randomizer;
 		this.initialDecisionVariable = initialDecisionVariable;
@@ -303,6 +317,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.interpolate = interpolate;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
 		this.includeCurrentBest = includeCurrentBest;
+		this.warmupIterations = warmupIterations;
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -421,7 +436,8 @@ public class RandomSearch<U extends DecisionVariable> {
 				final ParallelTrajectorySampler<U> sampler;
 				sampler = new ParallelTrajectorySampler<>(candidates, this.objectBasedObjectiveFunction,
 						this.convergenceCriterion, this.rnd, equilibriumGapWeight, uniformityGapWeight, (it > 0),
-						this.maxTotalMemory, this.maxMemoryPerTrajectory, this.maintainAllTrajectories);
+						this.maxTotalMemory, this.maxMemoryPerTrajectory, this.maintainAllTrajectories,
+						this.warmupIterations);
 
 				if (this.logFileName != null) {
 
