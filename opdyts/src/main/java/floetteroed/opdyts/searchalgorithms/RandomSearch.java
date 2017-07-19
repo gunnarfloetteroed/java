@@ -91,6 +91,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private final int warmupIterations;
 
+	private final boolean useAllWarmupIterations;
+
 	private int maxTotalMemory = Integer.MAX_VALUE;
 
 	private int maxMemoryPerTrajectory = Integer.MAX_VALUE;
@@ -138,6 +140,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		private ObjectiveFunction objectiveFunction = null;
 		private boolean includeCurrentBest = false;
 		private int warmupIterations = 1;
+		private boolean useAllWarmupIterations = false;
 
 		/**
 		 * See {@link Simulator}.
@@ -284,6 +287,12 @@ public class RandomSearch<U extends DecisionVariable> {
 			return this;
 		}
 
+		// TODO NEW
+		public final Builder<U> setUseAllWarmupIterations(boolean useAllWarmupIterations) {
+			this.useAllWarmupIterations = useAllWarmupIterations;
+			return this;
+		}
+
 		public final RandomSearch<U> build() {
 			assertNotNull(simulator);
 			assertNotNull(randomizer);
@@ -297,7 +306,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			assertTrue(warmupIterations > 0);
 			return new RandomSearch<>(simulator, randomizer, initialDecisionVariable, convergenceCriterion,
 					maxIterations, maxTransitions, populationSize, rnd, interpolate, objectiveFunction,
-					includeCurrentBest, warmupIterations);
+					includeCurrentBest, warmupIterations, useAllWarmupIterations);
 		}
 	}
 
@@ -305,7 +314,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			final U initialDecisionVariable, final ConvergenceCriterion convergenceCriterion, final int maxIterations,
 			final int maxTransitions, final int populationSize, final Random rnd, final boolean interpolate,
 			final ObjectiveFunction objectBasedObjectiveFunction, final boolean includeCurrentBest,
-			final int warmupIterations) {
+			final int warmupIterations, final boolean useAllWarmupIterations) {
 		this.simulator = simulator;
 		this.randomizer = randomizer;
 		this.initialDecisionVariable = initialDecisionVariable;
@@ -318,6 +327,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
 		this.includeCurrentBest = includeCurrentBest;
 		this.warmupIterations = warmupIterations;
+		this.useAllWarmupIterations = useAllWarmupIterations;
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -437,7 +447,7 @@ public class RandomSearch<U extends DecisionVariable> {
 				sampler = new ParallelTrajectorySampler<>(candidates, this.objectBasedObjectiveFunction,
 						this.convergenceCriterion, this.rnd, equilibriumGapWeight, uniformityGapWeight, (it > 0),
 						this.maxTotalMemory, this.maxMemoryPerTrajectory, this.maintainAllTrajectories,
-						this.warmupIterations);
+						this.warmupIterations, this.useAllWarmupIterations);
 
 				if (this.logFileName != null) {
 

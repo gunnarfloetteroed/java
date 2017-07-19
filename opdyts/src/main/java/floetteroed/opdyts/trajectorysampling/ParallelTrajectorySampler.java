@@ -79,7 +79,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 	private final double uniformityWeight;
 
 	// TODO NEW. Default number of warm-up iterations is one (minimum value)!
-	private Map<U, Integer> decisionVariable2remainingWarmupIterations = new LinkedHashMap<>();
+	private final Map<U, Integer> decisionVariable2remainingWarmupIterations = new LinkedHashMap<>();
+
+	private final boolean useAllWarmupIterations;
 
 	// further program control parameters
 
@@ -110,8 +112,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 			final ObjectiveFunction objectBasedObjectiveFunction, final ConvergenceCriterion convergenceCriterion,
 			final Random rnd, final double equilibriumWeight, final double uniformityWeight,
 			final boolean appendToLogFile, final int maxTotalMemory, final int maxMemoryPerTrajectory,
-			final boolean maintainAllTrajectories, final int warmupIterations) {
+			final boolean maintainAllTrajectories, final int warmupIterations, final boolean useAllWarmupIterations) {
 		// >>> NEW >>>
+		this.useAllWarmupIterations = useAllWarmupIterations;
 		for (U decisionVariable : decisionVariables) {
 			this.decisionVariable2remainingWarmupIterations.put(decisionVariable, warmupIterations);
 		}
@@ -241,10 +244,13 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 		 * both the fromState and the initialState being null.)
 		 * 
 		 * If the currentDecisionVariable is not null, a full transition has
-		 * been observed that can now be processed.
+		 * been observed that can now be processed. If it is processed depends
+		 * on if it is a warm-up iteration and what the configuration for using
+		 * such iterations is.
 		 */
 
-		if (this.currentDecisionVariable != null) {
+		if ((this.currentDecisionVariable != null) && (this.useAllWarmupIterations
+				|| (this.decisionVariable2remainingWarmupIterations.get(this.currentDecisionVariable) == null))) {
 
 			/*
 			 * Memorize the most recently observed transition.
@@ -255,19 +261,21 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 			/*
 			 * Check for convergence.
 			 */
-			final ConvergenceCriterionResult convergenceResult = this.convergenceCriterion.evaluate(
-					this.allTransitionSequences.getTransitions(this.currentDecisionVariable),
-					this.allTransitionSequences.additionCnt(this.currentDecisionVariable));
-			if (convergenceResult.converged) {
-				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
-						this.allTransitionSequences.getAllTransitionsInInsertionOrder(), this.equilibriumWeight,
-						this.uniformityWeight);
-				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
-						this.allTransitionSequences.getTransitions(this.currentDecisionVariable).getLast(),
-						convergenceResult.finalObjectiveFunctionValue, this.samplingStages == null ? null
-								: this.samplingStages.get(samplingStages.size() - 1).transition2lastSolutionView());
-				this.samplingStages.add(samplingStage);
-				this.decisionVariable2convergenceResult.put(this.currentDecisionVariable, convergenceResult);
+			if (this.decisionVariable2remainingWarmupIterations.size() == 0) {
+				final ConvergenceCriterionResult convergenceResult = this.convergenceCriterion.evaluate(
+						this.allTransitionSequences.getTransitions(this.currentDecisionVariable),
+						this.allTransitionSequences.additionCnt(this.currentDecisionVariable));
+				if (convergenceResult.converged) {
+					samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
+							this.allTransitionSequences.getAllTransitionsInInsertionOrder(), this.equilibriumWeight,
+							this.uniformityWeight);
+					samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
+							this.allTransitionSequences.getTransitions(this.currentDecisionVariable).getLast(),
+							convergenceResult.finalObjectiveFunctionValue, this.samplingStages == null ? null
+									: this.samplingStages.get(samplingStages.size() - 1).transition2lastSolutionView());
+					this.samplingStages.add(samplingStage);
+					this.decisionVariable2convergenceResult.put(this.currentDecisionVariable, convergenceResult);
+				}
 			}
 		}
 
