@@ -287,7 +287,7 @@ public class MultiTrajectorySampler<U extends DecisionVariable> implements Traje
 					this.uniformityWeight);
 			final SamplingStage<U> samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 					this.allTransitionSequences.getTransitions(this.currentDecisionVariable).getLast(),
-					convergenceResult.finalObjectiveFunctionValue, this.samplingStages == null ? null
+					convergenceResult.finalObjectiveFunctionValue, (this.samplingStages.size() == 0) ? null
 							: this.samplingStages.get(samplingStages.size() - 1).transition2lastSolutionView());
 			this.samplingStages.add(samplingStage);
 			this.statisticsWriter.writeToFile(samplingStage);
