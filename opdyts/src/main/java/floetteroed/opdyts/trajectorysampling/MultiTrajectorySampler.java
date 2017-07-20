@@ -210,8 +210,6 @@ public class MultiTrajectorySampler<U extends DecisionVariable> implements Traje
 		Logger.getLogger(this.getClass().getName()).info("Trajectory sampling iteration " + this.totalTransitionCnt);
 
 		/*
-		 * (1) Process the most recent transition.
-		 * 
 		 * If the currentDecisionVariable is null then one has just observed the
 		 * first simulator transition after initialization; not much can be
 		 * learned from that. (The currentDecisionVariable being null implies
