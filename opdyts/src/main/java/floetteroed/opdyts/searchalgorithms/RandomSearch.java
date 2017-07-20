@@ -44,7 +44,7 @@ import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
-import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
+import floetteroed.opdyts.trajectorysampling.MultiTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.Transition;
@@ -443,8 +443,8 @@ public class RandomSearch<U extends DecisionVariable> {
 				outerIterationStats = new OuterIterationStatistics(System.currentTimeMillis(), it + 1,
 						totalTransitionCnt, equilibriumGapWeight, uniformityGapWeight);
 
-				final ParallelTrajectorySampler<U> sampler;
-				sampler = new ParallelTrajectorySampler<>(candidates, this.objectBasedObjectiveFunction,
+				final MultiTrajectorySampler<U> sampler;
+				sampler = new MultiTrajectorySampler<>(candidates, this.objectBasedObjectiveFunction,
 						this.convergenceCriterion, this.rnd, equilibriumGapWeight, uniformityGapWeight, (it > 0),
 						this.maxTotalMemory, this.maxMemoryPerTrajectory, this.maintainAllTrajectories,
 						this.warmupIterations, this.useAllWarmupIterations);

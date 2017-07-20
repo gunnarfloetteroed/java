@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.Collections;
@@ -40,8 +40,7 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public class SingleTrajectorySampler<U extends DecisionVariable> implements
-		TrajectorySampler<U> {
+public class SingleTrajectorySampler<U extends DecisionVariable> implements TrajectorySampler<U> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -51,7 +50,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private final ConvergenceCriterion convergenceCriterion;
 
-	private boolean initialized = false;
+	// private boolean initialized = false;
 
 	private ConvergenceCriterionResult convergenceResult = null;
 
@@ -63,8 +62,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public SingleTrajectorySampler(final U decisionVariable,
-			final ObjectiveFunction objectiveFunction,
+	public SingleTrajectorySampler(final U decisionVariable, final ObjectiveFunction objectiveFunction,
 			final ConvergenceCriterion convergenceCriterion) {
 		this.decisionVariable = decisionVariable;
 		this.objectiveFunction = objectiveFunction;
@@ -95,34 +93,32 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 		return this.decisionVariable;
 	}
 
-	@Override
-	public void initialize() {
-		if (this.initialized) {
-			throw new RuntimeException(
-					"Create new instance instead of re-initializing.");
-		}
-		this.initialized = true;
-		this.decisionVariable.implementInSimulation();
-	}
+	// @Override
+	// public void initialize() {
+	// if (this.initialized) {
+	// throw new RuntimeException(
+	// "Create new instance instead of re-initializing.");
+	// }
+	// this.initialized = true;
+	// this.decisionVariable.implementInSimulation();
+	// }
 
 	@Override
 	public void afterIteration(SimulatorState newState) {
 		this.totalTransitionCnt++;
 		if (this.fromState != null) {
 			if (this.transitionSequence == null) {
-				this.transitionSequence = new TransitionSequence<U>(
-						this.fromState, this.decisionVariable, newState,
+				this.transitionSequence = new TransitionSequence<U>(this.fromState, this.decisionVariable, newState,
 						this.objectiveFunction.value(newState));
 			} else {
-				this.transitionSequence.addTransition(this.fromState,
-						this.decisionVariable, newState,
+				this.transitionSequence.addTransition(this.fromState, this.decisionVariable, newState,
 						this.objectiveFunction.value(newState));
 			}
-			this.convergenceResult = this.convergenceCriterion.evaluate(
-					this.transitionSequence.getTransitions(),
+			this.convergenceResult = this.convergenceCriterion.evaluate(this.transitionSequence.getTransitions(),
 					this.transitionSequence.additionCnt());
 		}
 		this.fromState = newState;
+		this.decisionVariable.implementInSimulation();
 	}
 
 	@Override
@@ -136,8 +132,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	}
 
 	@Override
-	public void addStatistic(final String logFileName,
-			final Statistic<SamplingStage<U>> statistic) {
+	public void addStatistic(final String logFileName, final Statistic<SamplingStage<U>> statistic) {
 		throw new UnsupportedOperationException();
 	}
 

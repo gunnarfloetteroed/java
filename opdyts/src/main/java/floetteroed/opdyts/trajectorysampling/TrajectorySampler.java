@@ -58,14 +58,6 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	public void setStandardLogFileName(String logFileName);
 
 	/**
-	 * Call once before the simulation is started. This implements a randomly
-	 * selected decision variable in the simulation, with the objective to
-	 * enable a first simulation transition.
-	 * 
-	 */
-	public void initialize();
-
-	/**
 	 * To be called once after each simulation iteration. Registers the
 	 * simulation state reached after that iteration and implements a new trial
 	 * decision variable in the simulation.

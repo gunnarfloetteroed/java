@@ -59,14 +59,11 @@ import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
  * @author Gunnar Flötteröd
  *
  */
-public class ParallelTrajectorySampler<U extends DecisionVariable> implements TrajectorySampler<U> {
+public class MultiTrajectorySampler<U extends DecisionVariable> implements TrajectorySampler<U> {
 
 	// -------------------- MEMBERS --------------------
 
 	// set during construction
-
-	// TODO replaced by by decisionVariables2remainingWarmupIterations
-	// private final Set<U> decisionVariablesToBeTriedOut;
 
 	private final ObjectiveFunction objectiveFunction;
 
@@ -78,9 +75,10 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 
 	private final double uniformityWeight;
 
-	// TODO NEW. Default number of warm-up iterations is one (minimum value)!
+	// minimum value is one per decision variable
 	private final Map<U, Integer> decisionVariable2remainingWarmupIterations = new LinkedHashMap<>();
 
+	// if set to false, only the last warm-up iteration is used
 	private final boolean useAllWarmupIterations;
 
 	// further program control parameters
@@ -91,13 +89,12 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 
 	private int totalTransitionCnt = 0;
 
-	// private boolean initialized = false;
-
 	private TransitionSequenceSet<U> allTransitionSequences;
 
-	// TODO NEW. Needed to reset warm-up trajectories.
+	// the common initial state of all simulation trajectories
 	private SimulatorState initialState = null;
 
+	// the previously visited state
 	private SimulatorState fromState = null;
 
 	private U currentDecisionVariable = null;
@@ -108,20 +105,16 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public ParallelTrajectorySampler(final Set<? extends U> decisionVariables,
-			final ObjectiveFunction objectBasedObjectiveFunction, final ConvergenceCriterion convergenceCriterion,
-			final Random rnd, final double equilibriumWeight, final double uniformityWeight,
-			final boolean appendToLogFile, final int maxTotalMemory, final int maxMemoryPerTrajectory,
-			final boolean maintainAllTrajectories, final int warmupIterations, final boolean useAllWarmupIterations) {
-		// >>> NEW >>>
+	public MultiTrajectorySampler(final Set<? extends U> decisionVariables, final ObjectiveFunction objectiveFunction,
+			final ConvergenceCriterion convergenceCriterion, final Random rnd, final double equilibriumWeight,
+			final double uniformityWeight, final boolean appendToLogFile, final int maxTotalMemory,
+			final int maxMemoryPerTrajectory, final boolean maintainAllTrajectories, final int warmupIterations,
+			final boolean useAllWarmupIterations) {
 		this.useAllWarmupIterations = useAllWarmupIterations;
 		for (U decisionVariable : decisionVariables) {
 			this.decisionVariable2remainingWarmupIterations.put(decisionVariable, warmupIterations);
 		}
-		// this.decisionVariablesToBeTriedOut = new
-		// LinkedHashSet<U>(decisionVariables);
-		// <<< NEW <<<
-		this.objectiveFunction = objectBasedObjectiveFunction;
+		this.objectiveFunction = objectiveFunction;
 		this.convergenceCriterion = convergenceCriterion;
 		this.rnd = rnd;
 		this.equilibriumWeight = equilibriumWeight;
@@ -161,7 +154,6 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 
 	public int getTotalTransitionCnt() {
 		return this.totalTransitionCnt;
-		// return this.allTransitionSequences.size();
 	}
 
 	@Override
@@ -195,48 +187,30 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 		return this.allTransitionSequences.additionCnt(decisionVariable);
 	}
 
-	public StatisticsMultiWriter<SamplingStage<U>> getStatisticsWriter() {
-		return this.statisticsWriter;
-	}
-
 	// -------------------- IMPLEMENTATION --------------------
-
-	/*
-	 * TODO Obsolete. But consider possible side effects:
-	 *
-	 * (1) When afterIteration(..) is called for the first time,
-	 * currentDecisionVariable is null.
-	 * 
-	 * (2) The simulation needs to ensure that a sensible initial decision
-	 * variable is set by default. This should be the decision variable of which
-	 * variations are to be tried out (i.e. in some sense the current
-	 * "mean decision variable".
-	 */
-
-	public void initialize() {
-		// if (this.initialized) {
-		// throw new RuntimeException("Cannot re-initialize an instance of " +
-		// this.getClass().getSimpleName()
-		// + ". Create a new instance instead.");
-		// } else {
-		// this.initialized = true;
-		// }
-		// this.currentDecisionVariable =
-		// MathHelpers.draw(this.decisionVariablesToBeTriedOut, this.rnd);
-		// this.currentDecisionVariable.implementInSimulation();
-	}
 
 	public void afterIteration(final SimulatorState newState) {
 
+		/*
+		 * When this function is called for the first time, all of the following
+		 * variables are null: currentDecisionVariable, initialState, fromState.
+		 * 
+		 * Implications:
+		 * 
+		 * The simulation needs to ensure that a sensible initial decision
+		 * variable is used. This should be the decision variable of which
+		 * variations are to be tried out (i.e. the "mean" decision variable).
+		 * 
+		 * Since currentDecisionVariable, initialState, fromState are
+		 * initialized with null values only at construction time, instances of
+		 * this class cannot be recycled.
+		 */
+
 		this.totalTransitionCnt++;
-
-		Logger.getLogger(this.getClass().getName()).info("Trajectory sampling iteration " + this.samplingStages.size());
-
-		TransitionSequencesAnalyzer<U> samplingStageEvaluator = null;
-		SamplingStage<U> samplingStage = null;
+		Logger.getLogger(this.getClass().getName()).info("Trajectory sampling iteration " + this.totalTransitionCnt);
 
 		/*
-		 * Process the most recent transition.
+		 * (1) Process the most recent transition.
 		 * 
 		 * If the currentDecisionVariable is null then one has just observed the
 		 * first simulator transition after initialization; not much can be
@@ -244,39 +218,17 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 		 * both the fromState and the initialState being null.)
 		 * 
 		 * If the currentDecisionVariable is not null, a full transition has
-		 * been observed that can now be processed. If it is processed depends
-		 * on if it is a warm-up iteration and what the configuration for using
-		 * such iterations is.
+		 * been observed that can now be memorized for (later) processing. If
+		 * this is done depends on if it is a warm-up iteration and what the
+		 * configuration for using such iterations is.
 		 */
 
 		if ((this.currentDecisionVariable != null) && (this.useAllWarmupIterations
 				|| (this.decisionVariable2remainingWarmupIterations.get(this.currentDecisionVariable) == null))) {
 
-			/*
-			 * Memorize the most recently observed transition.
-			 */
 			this.allTransitionSequences.addTransition(this.fromState, this.currentDecisionVariable, newState,
 					this.objectiveFunction.value(newState));
 
-			/*
-			 * Check for convergence.
-			 */
-			if (this.decisionVariable2remainingWarmupIterations.size() == 0) {
-				final ConvergenceCriterionResult convergenceResult = this.convergenceCriterion.evaluate(
-						this.allTransitionSequences.getTransitions(this.currentDecisionVariable),
-						this.allTransitionSequences.additionCnt(this.currentDecisionVariable));
-				if (convergenceResult.converged) {
-					samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
-							this.allTransitionSequences.getAllTransitionsInInsertionOrder(), this.equilibriumWeight,
-							this.uniformityWeight);
-					samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
-							this.allTransitionSequences.getTransitions(this.currentDecisionVariable).getLast(),
-							convergenceResult.finalObjectiveFunctionValue, this.samplingStages == null ? null
-									: this.samplingStages.get(samplingStages.size() - 1).transition2lastSolutionView());
-					this.samplingStages.add(samplingStage);
-					this.decisionVariable2convergenceResult.put(this.currentDecisionVariable, convergenceResult);
-				}
-			}
 		}
 
 		/*
@@ -319,92 +271,33 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements Tr
 
 		} else {
 
-			// Ready to create the next sampling stage.
+			// Warm-up phase is over.
 
-			if (samplingStageEvaluator == null) {
-				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
-						this.allTransitionSequences.getAllTransitionsInInsertionOrder(), this.equilibriumWeight,
-						this.uniformityWeight);
-				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
-						this.allTransitionSequences.getTransitions(this.currentDecisionVariable).getLast(), null,
-						this.samplingStages.size() == 0 ? null
-								: this.samplingStages.get(samplingStages.size() - 1).transition2lastSolutionView());
-				this.samplingStages.add(samplingStage);
+			// Check for convergence.
+			final ConvergenceCriterionResult convergenceResult = this.convergenceCriterion.evaluate(
+					this.allTransitionSequences.getTransitions(this.currentDecisionVariable),
+					this.allTransitionSequences.additionCnt(this.currentDecisionVariable));
+			if (convergenceResult.converged) {
+				this.decisionVariable2convergenceResult.put(this.currentDecisionVariable, convergenceResult);
 			}
 
+			// Process the most recent sampling stage.
+			final TransitionSequencesAnalyzer<U> samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
+					this.allTransitionSequences.getAllTransitionsInInsertionOrder(), this.equilibriumWeight,
+					this.uniformityWeight);
+			final SamplingStage<U> samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
+					this.allTransitionSequences.getTransitions(this.currentDecisionVariable).getLast(),
+					convergenceResult.finalObjectiveFunctionValue, this.samplingStages == null ? null
+							: this.samplingStages.get(samplingStages.size() - 1).transition2lastSolutionView());
+			this.samplingStages.add(samplingStage);
 			this.statisticsWriter.writeToFile(samplingStage);
 
-			/*
-			 * Decide what decision variable to use in the next iteration; set
-			 * the simulation to the last state visited by the corresponding
-			 * sampling trajectory.
-			 */
+			// Decide what to do next.
 			this.currentDecisionVariable = samplingStage.drawDecisionVariable(this.rnd);
 			this.fromState = this.allTransitionSequences.getLastState(this.currentDecisionVariable);
 			this.fromState.implementInSimulation();
 			this.currentDecisionVariable.implementInSimulation();
 
 		}
-
-		// >>>>>>>>>> OLD >>>>>>>>>>
-
-		// if (this.decisionVariablesToBeTriedOut.size() > 0) {
-		//
-		// /*
-		// * There still are untried decision variables, pick one.
-		// */
-		// this.currentDecisionVariable =
-		// drawAndRemove(this.decisionVariablesToBeTriedOut, this.rnd);
-		//
-		// /*
-		// * All untried decision variables are evaluated starting from the
-		// * same state. This initial state is the first state ever registered
-		// * here.
-		// */
-		// if (this.fromState == null) {
-		// this.fromState = newState;
-		// } else {
-		// this.fromState.implementInSimulation();
-		// }
-		// this.currentDecisionVariable.implementInSimulation();
-		// this.statisticsWriter.writeToFile(null, EquilibriumGapWeight.LABEL,
-		// Double.toString(this.equilibriumWeight),
-		// UniformityGapWeight.LABEL, Double.toString(this.uniformityWeight));
-		//
-		// } else {
-		//
-		// /*
-		// * Create the next sampling stage.
-		// */
-		//
-		// if (samplingStageEvaluator == null) {
-		// samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
-		// this.allTransitionSequences.getAllTransitionsInInsertionOrder(),
-		// this.equilibriumWeight,
-		// this.uniformityWeight);
-		// samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
-		// this.allTransitionSequences.getTransitions(this.currentDecisionVariable).getLast(),
-		// null,
-		// this.samplingStages.size() == 0 ? null
-		// : this.samplingStages.get(samplingStages.size() -
-		// 1).transition2lastSolutionView());
-		// this.samplingStages.add(samplingStage);
-		// }
-		//
-		// this.statisticsWriter.writeToFile(samplingStage);
-		//
-		// /*
-		// * Decide what decision variable to use in the next iteration; set
-		// * the simulation to the last state visited by the corresponding
-		// * sampling trajectory.
-		// */
-		// this.currentDecisionVariable =
-		// samplingStage.drawDecisionVariable(this.rnd);
-		// this.fromState =
-		// this.allTransitionSequences.getLastState(this.currentDecisionVariable);
-		// this.fromState.implementInSimulation();
-		// this.currentDecisionVariable.implementInSimulation();
-		//
-		// }
 	}
 }

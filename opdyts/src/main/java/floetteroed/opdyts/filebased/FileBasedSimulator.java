@@ -102,7 +102,7 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 	@Override
 	public SimulatorState run(final TrajectorySampler<FileBasedDecisionVariable> evaluator,
 			final SimulatorState initialState) {
-		evaluator.initialize();
+		// evaluator.initialize();
 		FileBasedSimulatorState newState = null;
 		while (!evaluator.foundSolution()) {
 			this.advanceSimulation();
