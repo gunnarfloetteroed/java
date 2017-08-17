@@ -48,19 +48,19 @@ public class VisLink extends AbstractLink<VisNode, VisLink> {
 
 	// -------------------- WRITE ACCESS --------------------
 
-	void setLanes(final int lanes) {
+	public void setLanes(final int lanes) {
 		this.lanes = lanes;
 	}
 
-	void setLength_m(final double length_m) {
+	public void setLength_m(final double length_m) {
 		this.length_m = length_m;
 	}
 
-	void setVisible(final boolean visible) {
+	public void setVisible(final boolean visible) {
 		this.visible = visible;
 	}
 
-	void setTransform(final AffineTransform transform) {
+	public void setTransform(final AffineTransform transform) {
 		this.transform = transform;
 	}
 

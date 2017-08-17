@@ -52,37 +52,37 @@ public class VisNetwork extends AbstractNetwork<VisNode, VisLink> {
 
 	// -------------------- WRITE ACCESS --------------------
 
-	void setMinEasting(final double minEasting) {
+	public void setMinEasting(final double minEasting) {
 		this.minEasting = minEasting;
 	}
 
-	void setMaxEasting(final double maxEasting) {
+	public void setMaxEasting(final double maxEasting) {
 		this.maxEasting = maxEasting;
 	}
 
-	void setMinNorthing(final double minNorthing) {
+	public void setMinNorthing(final double minNorthing) {
 		this.minNorthing = minNorthing;
 	}
 
-	void setMaxNorthing(final double maxNorthing) {
+	public void setMaxNorthing(final double maxNorthing) {
 		this.maxNorthing = maxNorthing;
 	}
 
 	// -------------------- READ ACCESS --------------------
 
-	double getMinEasting() {
+	public double getMinEasting() {
 		return this.minEasting;
 	}
 
-	double getMaxEasting() {
+	public double getMaxEasting() {
 		return this.maxEasting;
 	}
 
-	double getMinNorthing() {
+	public double getMinNorthing() {
 		return this.minNorthing;
 	}
 
-	double getMaxNorthing() {
+	public double getMaxNorthing() {
 		return this.maxNorthing;
 	}
 

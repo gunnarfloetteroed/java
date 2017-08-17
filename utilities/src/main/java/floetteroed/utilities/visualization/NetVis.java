@@ -168,7 +168,7 @@ public class NetVis {
 		return result;
 	}
 
-	static AffineTransform newLinear2PlaneTransform(final VisLink link) {
+	public static AffineTransform newLinear2PlaneTransform(final VisLink link) {
 
 		final double startEasting = link.getFromNode().getEasting();
 		final double startNorthing = link.getFromNode().getNorthing();

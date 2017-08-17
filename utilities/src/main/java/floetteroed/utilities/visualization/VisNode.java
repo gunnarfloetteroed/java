@@ -26,7 +26,7 @@ import floetteroed.utilities.networks.construction.AbstractNode;
  * @author Gunnar Flötteröd
  *
  */
-class VisNode extends AbstractNode<VisNode, VisLink> {
+public class VisNode extends AbstractNode<VisNode, VisLink> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -41,21 +41,21 @@ class VisNode extends AbstractNode<VisNode, VisLink> {
 
 	// -------------------- WRITE ACCESS --------------------
 
-	void setEasting(final double easting) {
+	public void setEasting(final double easting) {
 		this.easting = easting;
 	}
 	
-	void setNorthing(final double northing) {
+	public void setNorthing(final double northing) {
 		this.northing = northing;
 	}
 	
 	// -------------------- READ ACCESS --------------------
 
-	double getEasting() {
+	public double getEasting() {
 		return this.easting;
 	}
 	
-	double getNorthing() {
+	public double getNorthing() {
 		return this.northing;
 	}	
 	
