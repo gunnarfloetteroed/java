@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.searchalgorithms;
 
 import static java.lang.Math.abs;
@@ -64,19 +64,19 @@ public class SelfTuner {
 	private double uniformityGapWeight = 0.0;
 
 	private boolean noisySystem = true;
-	
+
 	private double weightScale = 1.0;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public SelfTuner(final double inertia) {
-		this.inertia = Math.sqrt(inertia);
+		this.inertia = inertia;
 	}
 
 	public void setNoisySystem(final boolean noisySystem) {
 		this.noisySystem = noisySystem;
 	}
-	
+
 	public void setWeightScale(final double weightScale) {
 		this.weightScale = weightScale;
 	}
@@ -93,36 +93,30 @@ public class SelfTuner {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	private void addMeasurements(final Regression regr,
-			final List<Double> equilGaps, final List<Double> unifGaps,
-			final List<Double> avgObjFctVals, final double finalObjFctVal) {
+	private void addMeasurements(final Regression regr, final List<Double> equilGaps, final List<Double> unifGaps,
+			final List<Double> avgObjFctVals, final double finalObjFctVal, final double dataWeight) {
 		for (int k = 0; k < avgObjFctVals.size(); k++) {
 			final Vector x = new Vector(regr.getDimension());
 			{
 				int i = 0;
 				if (equilGaps != null) {
-					x.set(i++, this.inertia * equilGaps.get(k));
+					x.set(i++, dataWeight * equilGaps.get(k));
 				}
 				if (unifGaps != null) {
-					x.set(i, this.inertia * unifGaps.get(k));
+					x.set(i, dataWeight * unifGaps.get(k));
 				}
 			}
-			regr.update(x, this.inertia
-					* abs(avgObjFctVals.get(k) - finalObjFctVal));
+			regr.update(x, dataWeight * abs(avgObjFctVals.get(k) - finalObjFctVal));
 		}
 	}
 
 	private void fit(final boolean useEquilGap, final boolean useUnifGap) {
-		int dim = (useEquilGap ? 1 : 0);
-		if (useUnifGap) {
-			dim++;
-		}
+		final int dim = (useEquilGap ? 1 : 0) + (useUnifGap ? 1 : 0);
 		final Regression regr = new Regression(1.0, dim);
 		for (int i = 0; i < this.equililibriumGaps.size(); i++) {
-			this.addMeasurements(regr,
-					(useEquilGap ? this.equililibriumGaps.get(i) : null),
-					(useUnifGap ? this.uniformityGaps.get(i) : null),
-					this.avgObjFctVals.get(i), this.finalObjFctVals.get(i));
+			this.addMeasurements(regr, (useEquilGap ? this.equililibriumGaps.get(i) : null),
+					(useUnifGap ? this.uniformityGaps.get(i) : null), this.avgObjFctVals.get(i),
+					this.finalObjFctVals.get(i), Math.pow(this.inertia, i * 0.5));
 		}
 		int i = 0;
 		if (useEquilGap) {
@@ -137,8 +131,8 @@ public class SelfTuner {
 		}
 	}
 
-	public <U extends DecisionVariable> void update(
-			final List<SamplingStage<U>> stages, final double newFinalObjFctVal) {
+	public <U extends DecisionVariable> void update(final List<SamplingStage<U>> stages,
+			final double newFinalObjFctVal) {
 
 		final List<Double> newEquilibriumGaps = new ArrayList<>(stages.size());
 		final List<Double> newUniformityGaps = new ArrayList<>(stages.size());
@@ -146,8 +140,7 @@ public class SelfTuner {
 		for (int k = 0; k < stages.size(); k++) {
 			newEquilibriumGaps.add(stages.get(k).getEquilibriumGap());
 			newUniformityGaps.add(stages.get(k).getUniformityGap());
-			newAvgObjFctVals.add(stages.get(k)
-					.getOriginalObjectiveFunctionValue());
+			newAvgObjFctVals.add(stages.get(k).getOriginalObjectiveFunctionValue());
 		}
 		this.equililibriumGaps.addFirst(newEquilibriumGaps);
 		this.uniformityGaps.addFirst(newUniformityGaps);
@@ -175,8 +168,7 @@ public class SelfTuner {
 		this.equilibriumGapWeight = Math.max(0.0, this.equilibriumGapWeight);
 		this.uniformityGapWeight = Math.max(0.0, this.uniformityGapWeight);
 
-		Logger.getLogger(this.getClass().getName()).info(
-				"v=" + this.equilibriumGapWeight + ", w="
-						+ this.uniformityGapWeight);
+		Logger.getLogger(this.getClass().getName())
+				.info("v=" + this.equilibriumGapWeight + ", w=" + this.uniformityGapWeight);
 	}
 }

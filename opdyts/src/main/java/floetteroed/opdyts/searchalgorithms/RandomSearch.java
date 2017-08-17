@@ -95,7 +95,7 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private double initialUniformityGapWeight = 0.0;
 
-	private SelfTuner selfTuner = new SelfTuner(0.95);
+	private SelfTuner selfTuner = new SelfTuner(0.9);
 
 	private int maxTotalMemory = Integer.MAX_VALUE;
 
