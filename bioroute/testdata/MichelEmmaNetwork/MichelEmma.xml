@@ -7,12 +7,6 @@ xsi:noNamespaceSchemaLocation='bioroute.xsd'
 >
 <bounds minlat="50.0" minlon="-32.0" maxlat="51.0" maxlon="-30.0"/>
 
-<!-- Gunnar added the following node -->
-<node id="origin" lat="50" lon="-30.15"/>
-
-<!-- Gunnar added the following node -->
-<node id="destination" lat="50.8" lon="-30.95"/>
-
 <node id="1" lat="50" lon="-30.15"/>
 <node id="2" lat="50.2" lon="-30"/>
 <node id="3" lat="50.4" lon="-30"/>
@@ -51,20 +45,6 @@ xsi:noNamespaceSchemaLocation='bioroute.xsd'
 <node id="36" lat="50.3" lon="-31.15"/>
 <node id="37" lat="50.7" lon="-31.35"/>
 <node id="38" lat="50.8" lon="-30.95"/>
-
-<!-- Gunnar added the following way -->
-<way id="origin1">
-<nd ref="origin"/>
-<nd ref="1"/>
-</way>
-
-<!--  Gunnar added the following way -->
-<way id="38destination">
-<nd ref="38"/>
-<nd ref="destination"/>
-</way>
-
-
 
 
 <way id="23">
