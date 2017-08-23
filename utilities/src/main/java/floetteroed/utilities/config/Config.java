@@ -156,7 +156,8 @@ public class Config {
 
 	public String get(final int index, final List<String> keys) {
 		final List<String> list = this.getList(keys);
-		if (list != null) {
+		// TODO added size check 2017-08-23
+		if ((list != null) && (index < list.size())) {
 			return list.get(index);
 		} else {
 			return null;
