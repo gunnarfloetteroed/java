@@ -254,6 +254,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		U bestDecisionVariable = this.initialDecisionVariable;
 		Double bestObjectiveFunctionValue = null;
 		SimulatorState newInitialState = null;
+		SimulatorState bestInitialState = null;
 
 		for (int it = 0; it < this.maxIterations && totalTransitionCnt < this.maxTransitions; it++) {
 
@@ -339,7 +340,7 @@ public class RandomSearch<U extends DecisionVariable> {
 					sampler.setStandardLogFileName(this.logFileName);
 				}
 
-				newInitialState = this.simulator.run(sampler, newInitialState);
+				newInitialState = this.simulator.run(sampler, bestInitialState);
 				newBestDecisionVariable = sampler.getDecisionVariable2convergenceResultView().keySet().iterator()
 						.next();
 				newBestObjectiveFunctionValue = sampler.getDecisionVariable2convergenceResultView()
@@ -413,7 +414,8 @@ public class RandomSearch<U extends DecisionVariable> {
 					}
 				}
 
-				final SimulatorState thisRoundsInitialState = newInitialState;
+//				final SimulatorState thisRoundsInitialState = newInitialState;
+				final SimulatorState thisRoundsInitialState = bestInitialState; //plz check this. Amit Dec'17
 
 				newBestDecisionVariable = null;
 				newBestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
@@ -442,6 +444,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			if (bestObjectiveFunctionValue == null || newBestObjectiveFunctionValue < bestObjectiveFunctionValue) {
 				bestDecisionVariable = newBestDecisionVariable;
 				bestObjectiveFunctionValue = newBestObjectiveFunctionValue;
+				bestInitialState = newInitialState;
 			}
 			totalTransitionCnt += transitionsPerIteration;
 
