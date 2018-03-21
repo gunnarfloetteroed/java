@@ -27,6 +27,7 @@ package floetteroed.opdyts.trajectorysampling;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
@@ -201,9 +202,9 @@ public class FrankWolfe {
 			residual = Math.abs(linearObjFctApprox.value(this.point)
 					- this.value);
 
-//			Logger.getLogger(this.getClass().getName()).info(
-//					"it " + it + ": val = " + this.value + ", residual="
-//							+ residual);
+			Logger.getLogger(this.getClass().getName()).info(
+					"it " + it + ": val = " + this.value + ", residual="
+							+ residual);
 
 		} while ((residual > this.eps) && (it < this.maxIts));
 	}
