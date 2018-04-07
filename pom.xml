@@ -10,14 +10,14 @@
     <packaging>pom</packaging>
 
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <!-- <maven.deploy.skip>true</maven.deploy.skip>  -->
+        <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
     <modules>
         <module>cadyts</module>
         <module>opdyts</module>
         <module>bioroute</module>
-        
         <module>utilities</module>
     </modules>
 
