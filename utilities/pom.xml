@@ -9,14 +9,13 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <!-- <maven.deploy.skip>true</maven.deploy.skip>  -->
-        <maven.deploy.skip>false</maven.deploy.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <distributionManagement>
         <repository>
             <id>bintray</id>
-            <url>https://api.bintray.com/maven/matsim/matsim/bioroute</url>
+            <url>https://api.bintray.com/maven/matsim/matsim/utilities</url>
         </repository>
     </distributionManagement>
 
