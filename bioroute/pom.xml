@@ -46,16 +46,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>floetteroed.utilities</groupId>
-            <artifactId>floetteroed-utilities</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.4.1</version>
         </dependency>
 
+        <dependency>
+        	<groupId>com.github.gunnarfloetteroed.java</groupId>
+        	<artifactId>floetteroed-utilities</artifactId>
+        	<version>master-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
