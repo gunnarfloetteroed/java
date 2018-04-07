@@ -6,7 +6,7 @@
 
     <groupId>floetteroed.opdyts</groupId>
     <artifactId>opdyts</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>master-SNAPSHOT</version>
     <licenses>
         <license>
             <name>GNU General Public License</name>

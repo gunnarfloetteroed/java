@@ -6,7 +6,7 @@
 
     <groupId>floetteroed.cadyts</groupId>
     <artifactId>cadyts</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>master-SNAPSHOT</version>
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
