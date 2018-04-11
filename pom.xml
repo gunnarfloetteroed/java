@@ -6,7 +6,7 @@
 
     <groupId>floetteroed</groupId>
     <artifactId>floetteroed</artifactId>
-    <version>1.0</version>
+    <version>master-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
