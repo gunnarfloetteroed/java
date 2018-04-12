@@ -16,7 +16,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities;
 
 import java.io.Serializable;
@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import floetteroed.utilities.math.MathHelpers;
-
-
 
 /**
  * 
@@ -55,19 +53,16 @@ public class DynamicData<K> implements Serializable {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public DynamicData(final int startTime_s, final int binSize_s,
-			final int binCnt) {
+	public DynamicData(final int startTime_s, final int binSize_s, final int binCnt) {
 
 		// CHECK
 
 		if (binSize_s <= 0) {
-			throw new IllegalArgumentException(
-					"binSize_s must be strictly positive");
+			throw new IllegalArgumentException("binSize_s must be strictly positive");
 		}
 
 		if (binCnt <= 0) {
-			throw new IllegalArgumentException(
-					"binCnt must be strictly positive");
+			throw new IllegalArgumentException("binCnt must be strictly positive");
 		}
 
 		// CONTINUE
@@ -75,6 +70,11 @@ public class DynamicData<K> implements Serializable {
 		this.startTime_s = startTime_s;
 		this.binSize_s = binSize_s;
 		this.binCnt = binCnt;
+	}
+
+	// TODO also use TimeDiscretization internally
+	public DynamicData(final TimeDiscretization timeDiscr) {
+		this(timeDiscr.getStartTime_s(), timeDiscr.getBinSize_s(), timeDiscr.getBinCnt());
 	}
 
 	// -------------------- BASIC CONTENT ACCESS --------------------
@@ -162,9 +162,8 @@ public class DynamicData<K> implements Serializable {
 
 		double result = 0;
 		for (int bin = startBin; bin <= endBin; bin++) {
-			final double weight = MathHelpers.overlap(binStart_s(bin),
-					binStart_s(bin) + getBinSize_s(), startTime_s, endTime_s)
-					/ this.getBinSize_s();
+			final double weight = MathHelpers.overlap(binStart_s(bin), binStart_s(bin) + getBinSize_s(), startTime_s,
+					endTime_s) / this.getBinSize_s();
 			result += weight * dataArray[bin];
 		}
 		return result;
@@ -182,10 +181,8 @@ public class DynamicData<K> implements Serializable {
 	 *            the end time in seconds (exclusive)
 	 * 
 	 */
-	public double getAverage(final K key, final int startTime_s,
-			final int endTime_s) {
-		final double binCnt = ((double) (endTime_s - startTime_s))
-				/ this.getBinSize_s();
+	public double getAverage(final K key, final int startTime_s, final int endTime_s) {
+		final double binCnt = ((double) (endTime_s - startTime_s)) / this.getBinSize_s();
 		return this.getSum(key, startTime_s, endTime_s) / binCnt;
 	}
 
@@ -197,8 +194,7 @@ public class DynamicData<K> implements Serializable {
 	public void overrideWithNonZeros(final DynamicData<K> source) {
 		for (Map.Entry<K, double[]> sourceEntry : source.data.entrySet()) {
 			final K key = sourceEntry.getKey();
-			final double[] newValue = MathHelpers.override(this.data.get(key),
-					sourceEntry.getValue(), false);
+			final double[] newValue = MathHelpers.override(this.data.get(key), sourceEntry.getValue(), false);
 			this.data.put(key, newValue);
 		}
 	}
@@ -208,16 +204,14 @@ public class DynamicData<K> implements Serializable {
 			return;
 		}
 		if (newBinCnt <= 0) {
-			throw new IllegalArgumentException(
-					"binCnt must be strictly positive");
+			throw new IllegalArgumentException("binCnt must be strictly positive");
 		}
 		final List<K> allKeys = new ArrayList<K>(this.data.keySet()); // fast
 		for (K key : allKeys) {
 			final double[] oldArray = this.data.get(key);
 			if (oldArray != null) {
 				final double[] newArray = new double[newBinCnt];
-				System.arraycopy(oldArray, 0, newArray, 0, Math.min(
-						this.binCnt, newBinCnt));
+				System.arraycopy(oldArray, 0, newArray, 0, Math.min(this.binCnt, newBinCnt));
 				this.data.put(key, newArray);
 			}
 		}
