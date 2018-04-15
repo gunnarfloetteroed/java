@@ -1,7 +1,5 @@
 package floetteroed.utilities;
 
-import floetteroed.utilities.Time;
-
 /**
  * 
  * @author Gunnar Flötteröd
@@ -51,6 +49,11 @@ public class TimeDiscretization {
 	// TODO NEW
 	public int getBinEndTime_s(final int bin) {
 		return this.getBinStartTime_s(bin + 1);
+	}
+
+	// TODO NEW
+	public int getEndTime_s() {
+		return this.getBinStartTime_s(this.binCnt);
 	}
 
 	@Override
