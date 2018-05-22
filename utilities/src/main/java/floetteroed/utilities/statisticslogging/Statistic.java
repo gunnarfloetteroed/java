@@ -16,7 +16,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities.statisticslogging;
 
 /**
@@ -28,6 +28,14 @@ package floetteroed.utilities.statisticslogging;
  *
  */
 public interface Statistic<D extends Object> {
+
+	public static String toString(Object arg) {
+		if (arg == null) {
+			return "";
+		} else {
+			return arg.toString();
+		}
+	}
 
 	public String label();
 
