@@ -20,10 +20,6 @@
 package floetteroed.utilities.visualization;
 
 import floetteroed.utilities.networks.construction.AbstractNetworkFactory;
-import floetteroed.utilities.networks.construction.NetworkContainer;
-import floetteroed.utilities.networks.containerloaders.MATSimNetworkContainerLoader;
-import floetteroed.utilities.networks.containerloaders.OpenStreetMapNetworkContainerLoader;
-import floetteroed.utilities.networks.containerloaders.SUMONetworkContainerLoader;
 
 /**
  * 

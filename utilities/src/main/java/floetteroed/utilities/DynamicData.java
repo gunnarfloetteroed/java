@@ -217,4 +217,15 @@ public class DynamicData<K> implements Serializable {
 		}
 		this.binCnt = newBinCnt;
 	}
+	
+	// TODO NEW
+	public double sumOfEntries2() {
+		double result = 0;
+		for (double[] array : this.data.values()) {
+			for (double val : array) {
+				result += val * val;
+			}
+		}
+		return result;
+	}
 }

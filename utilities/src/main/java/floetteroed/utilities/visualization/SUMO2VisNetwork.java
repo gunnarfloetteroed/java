@@ -22,6 +22,7 @@ package floetteroed.utilities.visualization;
 import static java.lang.Double.parseDouble;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.networks.construction.NetworkPostprocessor;
 
