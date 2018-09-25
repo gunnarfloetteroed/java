@@ -30,8 +30,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +44,6 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.trajectorysampling.MultiTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
-import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.Transition;
 import floetteroed.utilities.statisticslogging.Statistic;
 import floetteroed.utilities.statisticslogging.StatisticsWriter;
@@ -147,7 +144,7 @@ public class RandomSearch<U extends DecisionVariable> {
 	// ------------------------------------------------------------
 
 	private boolean maintainAllTrajectories = true;
-		
+
 	public void setMaintainAllTrajectories(final boolean maintainAllTrajectories) {
 		this.maintainAllTrajectories = maintainAllTrajectories;
 	}
@@ -290,170 +287,172 @@ public class RandomSearch<U extends DecisionVariable> {
 
 			final OuterIterationStatistics outerIterationStats;
 
-			if (true) {
+			// if (true) {
 
-				/*
-				 * >>>>>>>>>>>>>>>>>>>> PARALLEL SAMPLING >>>>>>>>>>>>>>>>>>>>
-				 */
+			/*
+			 * >>>>>>>>>>>>>>>>>>>> PARALLEL SAMPLING >>>>>>>>>>>>>>>>>>>>
+			 */
 
-				outerIterationStats = new OuterIterationStatistics(System.currentTimeMillis(), it + 1,
-						totalTransitionCnt, equilibriumGapWeight, uniformityGapWeight);
+			outerIterationStats = new OuterIterationStatistics(System.currentTimeMillis(), it + 1, totalTransitionCnt,
+					equilibriumGapWeight, uniformityGapWeight);
 
-				final MultiTrajectorySampler<U> sampler;
-				sampler = new MultiTrajectorySampler<>(candidates, this.objectiveFunction, this.convergenceCriterion,
-						this.rnd, equilibriumGapWeight, uniformityGapWeight, (it > 0), this.maxTotalMemory,
-						this.maxMemoryPerTrajectory, this.maintainAllTrajectories, this.warmupIterations,
-						this.useAllWarmupIterations);
+			final MultiTrajectorySampler<U> sampler;
+			sampler = new MultiTrajectorySampler<>(candidates, this.objectiveFunction, this.convergenceCriterion,
+					this.rnd, equilibriumGapWeight, uniformityGapWeight, (it > 0), this.maxTotalMemory,
+					this.maxMemoryPerTrajectory, this.maintainAllTrajectories, this.warmupIterations,
+					this.useAllWarmupIterations);
 
-				if (this.logFileName != null) {
+			if (this.logFileName != null) {
 
-					sampler.addStatistic(this.logFileName, new TimeStampStatistic<SamplingStage<U>>());
+				sampler.addStatistic(this.logFileName, new TimeStampStatistic<SamplingStage<U>>());
 
-					final int currentIt = it; // inner class requires final
-					sampler.addStatistic(this.logFileName, new Statistic<SamplingStage<U>>() {
-						@Override
-						public String label() {
-							return RANDOM_SEARCH_ITERATION;
+				final int currentIt = it; // inner class requires final
+				sampler.addStatistic(this.logFileName, new Statistic<SamplingStage<U>>() {
+					@Override
+					public String label() {
+						return RANDOM_SEARCH_ITERATION;
+					}
+
+					@Override
+					public String value(final SamplingStage<U> data) {
+						return Integer.toString(currentIt);
+					}
+				});
+
+				final String currentBestDecisionVariable = bestDecisionVariable.toString();
+				sampler.addStatistic(this.logFileName, new Statistic<SamplingStage<U>>() {
+					@Override
+					public String label() {
+						return BEST_OVERALL_DECISION_VARIABLE;
+					}
+
+					@Override
+					public String value(final SamplingStage<U> data) {
+						return currentBestDecisionVariable;
+					}
+				});
+
+				final Double currentBestObjectiveFunctionValue = bestObjectiveFunctionValue;
+				sampler.addStatistic(this.logFileName, new Statistic<SamplingStage<U>>() {
+					@Override
+					public String label() {
+						return BEST_OVERALL_SOLUTION;
+					}
+
+					@Override
+					public String value(final SamplingStage<U> data) {
+						if (currentBestObjectiveFunctionValue == null) {
+							return "";
+						} else {
+							return Double.toString(currentBestObjectiveFunctionValue);
 						}
+					}
+				});
 
-						@Override
-						public String value(final SamplingStage<U> data) {
-							return Integer.toString(currentIt);
-						}
-					});
+				sampler.setStandardLogFileName(this.logFileName);
+			}
 
-					final String currentBestDecisionVariable = bestDecisionVariable.toString();
-					sampler.addStatistic(this.logFileName, new Statistic<SamplingStage<U>>() {
-						@Override
-						public String label() {
-							return BEST_OVERALL_DECISION_VARIABLE;
-						}
+			// newInitialState = this.simulator.run(sampler, newInitialState);
+			newInitialState = this.simulator.run(sampler, bestInitialState);
+			newBestDecisionVariable = sampler.getDecisionVariable2convergenceResultView().keySet().iterator().next();
+			newBestObjectiveFunctionValue = sampler.getDecisionVariable2convergenceResultView()
+					.get(newBestDecisionVariable).finalObjectiveFunctionValue;
+			transitionsPerIteration = sampler.getTotalTransitionCnt();
 
-						@Override
-						public String value(final SamplingStage<U> data) {
-							return currentBestDecisionVariable;
-						}
-					});
-
-					final Double currentBestObjectiveFunctionValue = bestObjectiveFunctionValue;
-					sampler.addStatistic(this.logFileName, new Statistic<SamplingStage<U>>() {
-						@Override
-						public String label() {
-							return BEST_OVERALL_SOLUTION;
-						}
-
-						@Override
-						public String value(final SamplingStage<U> data) {
-							if (currentBestObjectiveFunctionValue == null) {
-								return "";
-							} else {
-								return Double.toString(currentBestObjectiveFunctionValue);
-							}
-						}
-					});
-
-					sampler.setStandardLogFileName(this.logFileName);
-				}
-
-				// newInitialState = this.simulator.run(sampler, newInitialState);
-				newInitialState = this.simulator.run(sampler, bestInitialState);
-				newBestDecisionVariable = sampler.getDecisionVariable2convergenceResultView().keySet().iterator()
-						.next();
-				newBestObjectiveFunctionValue = sampler.getDecisionVariable2convergenceResultView()
-						.get(newBestDecisionVariable).finalObjectiveFunctionValue;
-				transitionsPerIteration = sampler.getTotalTransitionCnt();
-
-				if (this.convergenceTrackingFileName != null) {
-					try {
-						if (!new File(this.convergenceTrackingFileName).exists()) {
-							final PrintWriter writer = new PrintWriter(this.convergenceTrackingFileName);
-							writer.println(
-									"Raw Objective Function Value\tAveraged Objective Function Value\tConverged");
-							writer.flush();
-							writer.close();
-						}
-						final BufferedWriter writer = new BufferedWriter(
-								new FileWriter(this.convergenceTrackingFileName, true));
-						final List<Transition<U>> transitions = sampler.getTransitions(newBestDecisionVariable);
-						for (int i = 0; i < transitions.size(); i++) {
-							final ConvergenceCriterionResult convRes = this.convergenceCriterion.evaluate(
-									transitions.subList(0, i + 1), sampler.additionCnt(newBestDecisionVariable));
-							writer.write(transitions.get(i).getToStateObjectiveFunctionValue() + "\t"
-									+ (convRes.finalObjectiveFunctionValue != null ? convRes.finalObjectiveFunctionValue
-											: "")
-									+ "\t" + convRes.converged);
-							writer.newLine();
-						}
+			if (this.convergenceTrackingFileName != null) {
+				try {
+					if (!new File(this.convergenceTrackingFileName).exists()) {
+						final PrintWriter writer = new PrintWriter(this.convergenceTrackingFileName);
+						writer.println("Raw Objective Function Value\tAveraged Objective Function Value\tConverged");
 						writer.flush();
 						writer.close();
-					} catch (IOException e) {
-						Logger.getLogger(this.getClass().getName()).warning(e.getMessage());
 					}
-				}
-
-				if (selfTuner != null) { // TODO is never null, remove local weight variables
-					selfTuner.update(sampler.getSamplingStages(), sampler.getDecisionVariable2convergenceResultView()
-							.get(newBestDecisionVariable).finalObjectiveFunctionValue);
-					equilibriumGapWeight = selfTuner.getEquilibriumGapWeight();
-					uniformityGapWeight = selfTuner.getUniformityGapWeight();
-				}
-
-				/*
-				 * <<<<<<<<<<<<<<<<<<<< PARALLEL SAMPLING <<<<<<<<<<<<<<<<<<<<
-				 */
-
-			} else {
-
-				/*
-				 * >>>>>>>>>>>>>>>>>>>> SEQUENTIAL SAMPLING >>>>>>>>>>>>>>>>>>>>
-				 */
-
-				outerIterationStats = new OuterIterationStatistics(System.currentTimeMillis(), it + 1,
-						totalTransitionCnt, null, null);
-
-				if (bestObjectiveFunctionValue != null) {
-					try {
-						final PrintWriter logWriter = new PrintWriter(
-								new BufferedWriter(new FileWriter(this.logFileName, true)));
-						logWriter.print((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
-								.format(new Date(System.currentTimeMillis())) + "\t");
-						logWriter.print(it + "\t");
-						logWriter.print(totalTransitionCnt + "\t");
-						logWriter.print(bestObjectiveFunctionValue + "\t");
-						logWriter.println(bestDecisionVariable);
-						logWriter.flush();
-						logWriter.close();
-					} catch (IOException e) {
-						throw new RuntimeException(e);
+					final BufferedWriter writer = new BufferedWriter(
+							new FileWriter(this.convergenceTrackingFileName, true));
+					final List<Transition<U>> transitions = sampler.getTransitions(newBestDecisionVariable);
+					for (int i = 0; i < transitions.size(); i++) {
+						final ConvergenceCriterionResult convRes = this.convergenceCriterion
+								.evaluate(transitions.subList(0, i + 1), sampler.additionCnt(newBestDecisionVariable));
+						writer.write(transitions.get(i).getToStateObjectiveFunctionValue() + "\t"
+								+ (convRes.finalObjectiveFunctionValue != null ? convRes.finalObjectiveFunctionValue
+										: "")
+								+ "\t" + convRes.converged);
+						writer.newLine();
 					}
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					Logger.getLogger(this.getClass().getName()).warning(e.getMessage());
 				}
-
-				// final SimulatorState thisRoundsInitialState = newInitialState;
-				final SimulatorState thisRoundsInitialState = bestInitialState;
-
-				newBestDecisionVariable = null;
-				newBestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
-
-				for (U candidate : candidates) {
-					final SingleTrajectorySampler<U> singleSampler;
-					singleSampler = new SingleTrajectorySampler<>(candidate, this.objectiveFunction,
-							this.convergenceCriterion);
-					final SimulatorState candidateInitialState = this.simulator.run(singleSampler,
-							thisRoundsInitialState);
-					final double candidateObjectiveFunctionValue = singleSampler
-							.getDecisionVariable2convergenceResultView().get(candidate).finalObjectiveFunctionValue;
-					if (candidateObjectiveFunctionValue < newBestObjectiveFunctionValue) {
-						newBestDecisionVariable = candidate;
-						newBestObjectiveFunctionValue = candidateObjectiveFunctionValue;
-						newInitialState = candidateInitialState;
-					}
-					transitionsPerIteration += singleSampler.getTotalTransitionCnt();
-				}
-
-				/*
-				 * <<<<<<<<<<<<<<<<<<<< SEQUENTIAL SAMPLING <<<<<<<<<<<<<<<<<<<<
-				 */
 			}
+
+			if (selfTuner != null) { // TODO is never null, remove local weight variables
+				selfTuner.update(sampler.getSamplingStages(), sampler.getDecisionVariable2convergenceResultView()
+						.get(newBestDecisionVariable).finalObjectiveFunctionValue);
+				equilibriumGapWeight = selfTuner.getEquilibriumGapWeight();
+				uniformityGapWeight = selfTuner.getUniformityGapWeight();
+			}
+
+			/*
+			 * <<<<<<<<<<<<<<<<<<<< PARALLEL SAMPLING <<<<<<<<<<<<<<<<<<<<
+			 */
+
+			// }
+			// else {
+			//
+			// /*
+			// * >>>>>>>>>>>>>>>>>>>> SEQUENTIAL SAMPLING >>>>>>>>>>>>>>>>>>>>
+			// */
+			//
+			// outerIterationStats = new
+			// OuterIterationStatistics(System.currentTimeMillis(), it + 1,
+			// totalTransitionCnt, null, null);
+			//
+			// if (bestObjectiveFunctionValue != null) {
+			// try {
+			// final PrintWriter logWriter = new PrintWriter(
+			// new BufferedWriter(new FileWriter(this.logFileName, true)));
+			// logWriter.print((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+			// .format(new Date(System.currentTimeMillis())) + "\t");
+			// logWriter.print(it + "\t");
+			// logWriter.print(totalTransitionCnt + "\t");
+			// logWriter.print(bestObjectiveFunctionValue + "\t");
+			// logWriter.println(bestDecisionVariable);
+			// logWriter.flush();
+			// logWriter.close();
+			// } catch (IOException e) {
+			// throw new RuntimeException(e);
+			// }
+			// }
+			//
+			// // final SimulatorState thisRoundsInitialState = newInitialState;
+			// final SimulatorState thisRoundsInitialState = bestInitialState;
+			//
+			// newBestDecisionVariable = null;
+			// newBestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
+			//
+			// for (U candidate : candidates) {
+			// final SingleTrajectorySampler<U> singleSampler;
+			// singleSampler = new SingleTrajectorySampler<>(candidate,
+			// this.objectiveFunction,
+			// this.convergenceCriterion);
+			// final SimulatorState candidateInitialState =
+			// this.simulator.run(singleSampler,
+			// thisRoundsInitialState);
+			// final double candidateObjectiveFunctionValue = singleSampler
+			// .getDecisionVariable2convergenceResultView().get(candidate).finalObjectiveFunctionValue;
+			// if (candidateObjectiveFunctionValue < newBestObjectiveFunctionValue) {
+			// newBestDecisionVariable = candidate;
+			// newBestObjectiveFunctionValue = candidateObjectiveFunctionValue;
+			// newInitialState = candidateInitialState;
+			// }
+			// transitionsPerIteration += singleSampler.getTotalTransitionCnt();
+			// }
+			//
+			// /*
+			// * <<<<<<<<<<<<<<<<<<<< SEQUENTIAL SAMPLING <<<<<<<<<<<<<<<<<<<<
+			// */
+			// }
 
 			if (bestObjectiveFunctionValue == null || newBestObjectiveFunctionValue < bestObjectiveFunctionValue) {
 				bestDecisionVariable = newBestDecisionVariable;

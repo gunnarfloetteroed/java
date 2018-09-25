@@ -49,27 +49,6 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 
 	// ------------------------------------------------------------
 
-	private DecisionVariableRandomizer<U> decisionVariableRandomizer = null;
-
-	/**
-	 * Very problem-specific: given a decision variable, create trial variations
-	 * thereof. These variations should be large enough to yield a measurable change
-	 * in objective function value but they should still be relatively small (in the
-	 * sense of a local search).
-	 * 
-	 * From the experiments performed so far, it appears as if the number of trial
-	 * decision variables should be as large as memory allows.
-	 *
-	 * For default value see code of {@link RandomSearchBuilder}.
-	 */
-	public final RandomSearchBuilder<U> setDecisionVariableRandomizer(
-			final DecisionVariableRandomizer<U> decisionVariableRandomizer) {
-		this.decisionVariableRandomizer = decisionVariableRandomizer;
-		return this;
-	}
-
-	// ------------------------------------------------------------
-
 	private ConvergenceCriterion convergenceCriterion = null;
 
 	/**
@@ -105,13 +84,34 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 		this.selfTuner = selfTuner;
 		return this;
 	}
-	
+
 	// ------------------------------------------------------------
 
 	private Random random = null;
-	
+
 	public final RandomSearchBuilder<U> setRandom(final Random rnd) {
 		this.random = rnd;
+		return this;
+	}
+
+	// ------------------------------------------------------------
+
+	private DecisionVariableRandomizer<U> decisionVariableRandomizer = null;
+
+	/**
+	 * Very problem-specific: given a decision variable, create trial variations
+	 * thereof. These variations should be large enough to yield a measurable change
+	 * in objective function value but they should still be relatively small (in the
+	 * sense of a local search).
+	 * 
+	 * From the experiments performed so far, it appears as if the number of trial
+	 * decision variables should be as large as memory allows.
+	 *
+	 * For default value see code of {@link RandomSearchBuilder}.
+	 */
+	public final RandomSearchBuilder<U> setDecisionVariableRandomizer(
+			final DecisionVariableRandomizer<U> decisionVariableRandomizer) {
+		this.decisionVariableRandomizer = decisionVariableRandomizer;
 		return this;
 	}
 
@@ -132,9 +132,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 
 	// ------------------------------------------------------------
 
-	public static final int DEFAULT_MAXOPTIMIZATIONSTAGES = Integer.MAX_VALUE;
-
-	private int maxOptimizationStages = DEFAULT_MAXOPTIMIZATIONSTAGES;
+	private Integer maxOptimizationStages = null;
 
 	/**
 	 * Maximum number of random search stages.
@@ -148,9 +146,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 
 	// ------------------------------------------------------------
 
-	public static final int DEFAULT_MAXSIMULATIONTRANSITIONS = Integer.MAX_VALUE;
-
-	private int maxSimulationTransitions = DEFAULT_MAXSIMULATIONTRANSITIONS;
+	private Integer maxSimulationTransitions = null;
 
 	/**
 	 * Maximum total number of evaluated simulator transitions.
@@ -162,78 +158,36 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 		return this;
 	}
 
-	// /**
-	// * How many candidate decision variables are to be created. Based on empirical
-	// * experience, the more the better. Available memory defines an upper limit.
-	// *
-	// * For default value see code of {@link RandomSearch.Builder}.
-	// */
-	// public final RandomSearchBuilder<U> setPopulationSize(int populationSize) {
-	// this.populationSize = populationSize;
-	// return this;
-	// }
-
-	// /**
-	// * For default value see code of {@link RandomSearch.Builder}.
-	// */
-	// public final RandomSearchBuilder<U> setRnd(Random rnd) {
-	// this.rnd = rnd;
-	// return this;
-	// }
-
-	// /**
-	// * For all practical purposes, keep this "true". "false" is only for
-	// * debugging.
-	// *
-	// * For default value see code of {@link RandomSearch.Builder}.
-	// */
-	// public final RandomSearchBuilder<U> setInterpolate(boolean interpolate) {
-	// this.interpolate = interpolate;
-	// return this;
-	// }
-
-	// /**
-	// * If the currently best decision variable is to be included in the set of
-	// * new candidate decision variables. More an experimental feature, better
-	// * keep it "false".
-	// *
-	// * For default value see code of {@link RandomSearch.Builder}.
-	// */
-	// public final RandomSearchBuilder<U> setIncludeCurrentBest(boolean
-	// includeCurrentBest) {
-	// this.includeCurrentBest = includeCurrentBest;
-	// return this;
-	// }
-
-	// public final RandomSearchBuilder<U> setWarmupIterations(int
-	// warmupIterations) {
-	// this.warmupIterations = warmupIterations;
-	// return this;
-	// }
-
-	// public final RandomSearchBuilder<U> setUseAllWarmupIterations(boolean
-	// useAllWarmupIterations) {
-	// this.useAllWarmupIterations = useAllWarmupIterations;
-	// return this;
-	// }
+	// ============================================================
 
 	public final RandomSearch<U> build() {
+
 		assertImplemented(this.simulator, Simulator.class);
 		assertImplemented(this.convergenceCriterion, ConvergenceCriterion.class);
 		assertImplemented(this.objectiveFunction, ObjectiveFunction.class);
 		assertImplemented(this.selfTuner, SelfTuner.class);
 		assertImplemented(this.random, Random.class);
 		assertImplemented(this.decisionVariableRandomizer, DecisionVariableRandomizer.class);
-		assertNotNull(this.initialDecisionVariable, "the initial decision variable is null");
+		assertNotNull(this.initialDecisionVariable, "The initial decision variable is null.");
 
-		assertTrue(this.maxOptimizationStages > 0,
-				"the maximum number of optimization stages is not strictly positive");
-		assertTrue(this.maxSimulationTransitions > 0,
-				"the maximum number of simulation transitions is not strictly positive");
+		assertTrue((this.maxOptimizationStages != null) || (this.maxSimulationTransitions != null),
+				"Neither the maximum number of optimization stages nor "
+						+ "the maximum number of simulation transitions is specified.");
+		if (this.maxOptimizationStages == null) {
+			this.maxOptimizationStages = Integer.MAX_VALUE;
+		} else {
+			assertTrue(this.maxOptimizationStages > 0,
+					"The maximum number of optimization stages is not strictly positive.");
+		}
+		if (this.maxSimulationTransitions == null) {
+			this.maxSimulationTransitions = Integer.MAX_VALUE;
+		} else {
+			assertTrue(this.maxSimulationTransitions > 0,
+					"The maximum number of simulation transitions is not strictly positive.");
+		}
 
-		return new RandomSearch<>(simulator, convergenceCriterion, objectiveFunction, 
-				selfTuner, random,
-				decisionVariableRandomizer,
-				initialDecisionVariable, maxOptimizationStages, maxSimulationTransitions);
+		return new RandomSearch<>(this.simulator, this.convergenceCriterion, this.objectiveFunction, this.selfTuner,
+				this.random, this.decisionVariableRandomizer, this.initialDecisionVariable, this.maxOptimizationStages,
+				this.maxSimulationTransitions);
 	}
 }

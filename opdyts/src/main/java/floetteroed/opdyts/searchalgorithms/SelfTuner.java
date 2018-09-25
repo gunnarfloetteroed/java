@@ -45,6 +45,18 @@ public class SelfTuner {
 
 	// ==================== PROGRAM CONTROL PARAMETERS ====================
 
+	public static final double DEFAULT_INITIALEQUILIBRIUMGAPWEIGHT = 0.0;
+
+	// can only be changed in constructor
+	private double equilibriumGapWeight = DEFAULT_INITIALEQUILIBRIUMGAPWEIGHT;
+
+	public static final double DEFAULT_INITIALUNIFORMITYGAPWEIGHT = 0.0;
+
+	// can only be changed in constructor
+	private double uniformityGapWeight = DEFAULT_INITIALUNIFORMITYGAPWEIGHT;
+
+	// ------------------------------------------------------------
+
 	public static final boolean DEFAULT_NOISYSYSTEM = true;
 
 	private boolean noisySystem = DEFAULT_NOISYSYSTEM;
@@ -87,13 +99,7 @@ public class SelfTuner {
 	// most recent ones first
 	private final LinkedList<Double> finalObjFctVals = new LinkedList<>();
 
-	public static final double DEFAULT_INITIALEQUILIBRIUMGAPWEIGHT = 0.0;
-	private double equilibriumGapWeight = DEFAULT_INITIALEQUILIBRIUMGAPWEIGHT;
-
-	public static final double DEFAULT_INITIALUNIFORMITYGAPWEIGHT = 0.0;
-	private double uniformityGapWeight = DEFAULT_INITIALUNIFORMITYGAPWEIGHT;
-
-	// -------------------- CONSTRUCTION --------------------
+	// ==================== CONSTRUCTION ====================
 
 	public SelfTuner() {
 	}
@@ -103,7 +109,7 @@ public class SelfTuner {
 		this.uniformityGapWeight = initialUniformityGapWeight;
 	}
 
-	// -------------------- GETTERS --------------------
+	// ==================== RESULT ACCESS ====================
 
 	public double getEquilibriumGapWeight() {
 		return (this.weightScale * this.equilibriumGapWeight);
@@ -113,7 +119,7 @@ public class SelfTuner {
 		return (this.weightScale * this.uniformityGapWeight);
 	}
 
-	// -------------------- IMPLEMENTATION --------------------
+	// ==================== IMPLEMENTATION ====================
 
 	private void addMeasurements(final Regression regr, final List<Double> equilGaps, final List<Double> unifGaps,
 			final List<Double> avgObjFctVals, final double finalObjFctVal, final double dataWeight) {
