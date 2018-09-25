@@ -43,9 +43,37 @@ import floetteroed.utilities.math.Vector;
  */
 public class SelfTuner {
 
-	// -------------------- MEMBERS --------------------
+	// ==================== PROGRAM CONTROL PARAMETERS ====================
 
-	final double inertia;
+	public static final boolean DEFAULT_NOISYSYSTEM = true;
+
+	private boolean noisySystem = DEFAULT_NOISYSYSTEM;
+
+	public void setNoisySystem(final boolean noisySystem) {
+		this.noisySystem = noisySystem;
+	}
+
+	// ------------------------------------------------------------
+
+	public static final double DEFAULT_SELFTUNINGINERTIA = 0.9;
+
+	private double inertia = DEFAULT_SELFTUNINGINERTIA;
+
+	public void setInertia(final double inertia) {
+		this.inertia = inertia;
+	}
+
+	// ------------------------------------------------------------
+
+	public static final double DEFAULT_SELFTUNINGSCALE = 1.0;
+
+	private double weightScale = DEFAULT_SELFTUNINGSCALE;
+
+	public void setWeightScale(final double weightScale) {
+		this.weightScale = weightScale;
+	}
+
+	// ==================== MEMBERS ====================
 
 	// most recent ones first
 	private final LinkedList<List<Double>> equililibriumGaps = new LinkedList<>();
@@ -59,26 +87,20 @@ public class SelfTuner {
 	// most recent ones first
 	private final LinkedList<Double> finalObjFctVals = new LinkedList<>();
 
-	private double equilibriumGapWeight = 0.0;
+	public static final double DEFAULT_INITIALEQUILIBRIUMGAPWEIGHT = 0.0;
+	private double equilibriumGapWeight = DEFAULT_INITIALEQUILIBRIUMGAPWEIGHT;
 
-	private double uniformityGapWeight = 0.0;
-
-	private boolean noisySystem = true;
-
-	private double weightScale = 1.0;
+	public static final double DEFAULT_INITIALUNIFORMITYGAPWEIGHT = 0.0;
+	private double uniformityGapWeight = DEFAULT_INITIALUNIFORMITYGAPWEIGHT;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public SelfTuner(final double inertia) {
-		this.inertia = inertia;
+	public SelfTuner() {
 	}
 
-	public void setNoisySystem(final boolean noisySystem) {
-		this.noisySystem = noisySystem;
-	}
-
-	public void setWeightScale(final double weightScale) {
-		this.weightScale = weightScale;
+	public SelfTuner(final double initialEquilibriumGapWeight, final double initialUniformityGapWeight) {
+		this.equilibriumGapWeight = initialEquilibriumGapWeight;
+		this.uniformityGapWeight = initialUniformityGapWeight;
 	}
 
 	// -------------------- GETTERS --------------------

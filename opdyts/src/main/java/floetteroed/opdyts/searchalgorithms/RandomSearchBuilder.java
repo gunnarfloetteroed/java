@@ -1,5 +1,7 @@
 package floetteroed.opdyts.searchalgorithms;
 
+import java.util.Random;
+
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -8,130 +10,168 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 /**
  * 
  * @author Kai Nagel
+ * @author Gunnar
  *
  * @param <U>
  *            the decision variable type
  */
 public class RandomSearchBuilder<U extends DecisionVariable> {
 
-	private Simulator<U> simulator = null;
-	private DecisionVariableRandomizer<U> randomizer = null;
-	private U initialDecisionVariable = null;
-	private ConvergenceCriterion convergenceCriterion = null;
-	private int maxIterations = 10;
-	private int maxTransitions = Integer.MAX_VALUE;
-	private int populationSize = 10;
-	// private Random rnd = new Random(4711);
-	// private boolean interpolate = true;
-	private ObjectiveFunction objectiveFunction = null;
-	// private boolean includeCurrentBest = false;
-	// private int warmupIterations = 1;
-	// private boolean useAllWarmupIterations = false;
+	// -------------------- HELPERS --------------------
 
-	private static void assertTrue(boolean condition) {
+	private static void assertTrue(final boolean condition, final String errorMsg) {
 		if (!condition) {
-			throw new RuntimeException("something is wrong; follow stack trace");
+			throw new RuntimeException(errorMsg);
 		}
 	}
 
-	private static void assertNotNull(Object object) {
-		assertTrue(object != null);
+	private static void assertNotNull(final Object object, final String errorMsg) {
+		assertTrue(object != null, errorMsg);
 	}
+
+	private static <C> void assertImplemented(final C object, final Class<C> clazz) {
+		assertNotNull(object, clazz.getSimpleName() + " is not implemented.");
+	}
+
+	// ==================== PARAMETER DEFINITIONS ====================
+
+	private Simulator<U> simulator = null;
 
 	/**
 	 * See {@link Simulator}.
 	 * 
-	 * For default value see code of {@link RandomSearch.Builder}.
+	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setSimulator(Simulator<U> simulator) {
+	public final RandomSearchBuilder<U> setSimulator(final Simulator<U> simulator) {
 		this.simulator = simulator;
 		return this;
 	}
 
+	// ------------------------------------------------------------
+
+	private DecisionVariableRandomizer<U> decisionVariableRandomizer = null;
+
 	/**
 	 * Very problem-specific: given a decision variable, create trial variations
-	 * thereof. These variations should be large enough to yield a measurable
-	 * change in objective function value but they should still be relatively
-	 * small (in the sense of a local search).
+	 * thereof. These variations should be large enough to yield a measurable change
+	 * in objective function value but they should still be relatively small (in the
+	 * sense of a local search).
 	 * 
-	 * From the experiments performed so far, it appears as if the number of
-	 * trial decision variables should be as large as memory allows.
+	 * From the experiments performed so far, it appears as if the number of trial
+	 * decision variables should be as large as memory allows.
 	 *
-	 * For default value see code of {@link RandomSearch.Builder}.
+	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setRandomizer(DecisionVariableRandomizer<U> randomizer) {
-		this.randomizer = randomizer;
+	public final RandomSearchBuilder<U> setDecisionVariableRandomizer(
+			final DecisionVariableRandomizer<U> decisionVariableRandomizer) {
+		this.decisionVariableRandomizer = decisionVariableRandomizer;
 		return this;
 	}
 
-	/**
-	 * The starting point of the search. The initial simulation configuration
-	 * should be such the simulation is converged given this decision variable.
-	 * 
-	 * For default value see code of {@link RandomSearch.Builder}.
-	 */
-	public final RandomSearchBuilder<U> setInitialDecisionVariable(U initialDecisionVariable) {
-		this.initialDecisionVariable = initialDecisionVariable;
-		return this;
-	}
+	// ------------------------------------------------------------
+
+	private ConvergenceCriterion convergenceCriterion = null;
 
 	/**
 	 * Defines the convergence criterion.
-	 * 
-	 * This requires to set (i) the number of iterations until the simulation
-	 * has converged and (ii) the number of iterations over which to average to
-	 * get rid of the simulation noise.
-	 * 
-	 * (i) The number of iterations until the simulation has converged is
-	 * relative to the amount of variability in the decision variable
-	 * randomization. Let X be any decision variable and Y be a random variation
-	 * thereof. Let the simulation start with a converged plans file obtained
-	 * with decision variable X. The number of iterations must then be large
-	 * enough to reach a new converged state for any decision variable Y.
-	 * 
-	 * (ii) The number of iterations over which to average should be large
-	 * enough to make the remaining simulation noise small compared to the
-	 * expected difference between the objective function values of any decision
-	 * variable and its random variation.
 	 *
-	 * For default value see code of {@link RandomSearch.Builder}.
+	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setConvergenceCriterion(ConvergenceCriterion convergenceCriterion) {
+	public final RandomSearchBuilder<U> setConvergenceCriterion(final ConvergenceCriterion convergenceCriterion) {
 		this.convergenceCriterion = convergenceCriterion;
 		return this;
 	}
 
+	// ------------------------------------------------------------
+
+	private ObjectiveFunction objectiveFunction = null;
+
 	/**
-	 * Maximum number of random search iterations.
+	 * The objective function: a quantitative measure of what one wants to achieve.
+	 * To be minimized.
 	 * 
-	 * For default value see code of {@link RandomSearch.Builder}.
+	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setMaxIterations(int maxIterations) {
-		this.maxIterations = maxIterations;
+	public final RandomSearchBuilder<U> setObjectiveFunction(final ObjectiveFunction objectiveFunction) {
+		this.objectiveFunction = objectiveFunction;
 		return this;
 	}
+
+	// ------------------------------------------------------------
+
+	private SelfTuner selfTuner = null;
+
+	public final RandomSearchBuilder<U> setSelfTuner(final SelfTuner selfTuner) {
+		this.selfTuner = selfTuner;
+		return this;
+	}
+	
+	// ------------------------------------------------------------
+
+	private Random random = null;
+	
+	public final RandomSearchBuilder<U> setRandom(final Random rnd) {
+		this.random = rnd;
+		return this;
+	}
+
+	// ------------------------------------------------------------
+
+	private U initialDecisionVariable = null;
+
+	/**
+	 * The starting point of the search. The initial simulation configuration should
+	 * be such the simulation is converged given this decision variable.
+	 * 
+	 * For default value see code of {@link RandomSearchBuilder}.
+	 */
+	public final RandomSearchBuilder<U> setInitialDecisionVariable(final U initialDecisionVariable) {
+		this.initialDecisionVariable = initialDecisionVariable;
+		return this;
+	}
+
+	// ------------------------------------------------------------
+
+	public static final int DEFAULT_MAXOPTIMIZATIONSTAGES = Integer.MAX_VALUE;
+
+	private int maxOptimizationStages = DEFAULT_MAXOPTIMIZATIONSTAGES;
+
+	/**
+	 * Maximum number of random search stages.
+	 * 
+	 * For default value see code of {@link RandomSearchBuilder}.
+	 */
+	public final RandomSearchBuilder<U> setMaxOptimizationStages(int maxOptimizationStages) {
+		this.maxOptimizationStages = maxOptimizationStages;
+		return this;
+	}
+
+	// ------------------------------------------------------------
+
+	public static final int DEFAULT_MAXSIMULATIONTRANSITIONS = Integer.MAX_VALUE;
+
+	private int maxSimulationTransitions = DEFAULT_MAXSIMULATIONTRANSITIONS;
 
 	/**
 	 * Maximum total number of evaluated simulator transitions.
 	 * 
-	 * For default value see code of {@link RandomSearch.Builder}.
+	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setMaxTransitions(int maxTransitions) {
-		this.maxTransitions = maxTransitions;
+	public final RandomSearchBuilder<U> setMaxSimulationTransitions(int maxSimulationTransitions) {
+		this.maxSimulationTransitions = maxSimulationTransitions;
 		return this;
 	}
 
-	/**
-	 * How many candidate decision variables are to be created. Based on
-	 * empirical experience, the more the better. Available memory defines an
-	 * upper limit.
-	 * 
-	 * For default value see code of {@link RandomSearch.Builder}.
-	 */
-	public final RandomSearchBuilder<U> setPopulationSize(int populationSize) {
-		this.populationSize = populationSize;
-		return this;
-	}
+	// /**
+	// * How many candidate decision variables are to be created. Based on empirical
+	// * experience, the more the better. Available memory defines an upper limit.
+	// *
+	// * For default value see code of {@link RandomSearch.Builder}.
+	// */
+	// public final RandomSearchBuilder<U> setPopulationSize(int populationSize) {
+	// this.populationSize = populationSize;
+	// return this;
+	// }
 
 	// /**
 	// * For default value see code of {@link RandomSearch.Builder}.
@@ -151,17 +191,6 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	// this.interpolate = interpolate;
 	// return this;
 	// }
-
-	/**
-	 * The objective function: a quantitative measure of what one wants to
-	 * achieve. To be minimized.
-	 * 
-	 * For default value see code of {@link RandomSearch.Builder}.
-	 */
-	public final RandomSearchBuilder<U> setObjectiveFunction(ObjectiveFunction objectiveFunction) {
-		this.objectiveFunction = objectiveFunction;
-		return this;
-	}
 
 	// /**
 	// * If the currently best decision variable is to be included in the set of
@@ -189,15 +218,22 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	// }
 
 	public final RandomSearch<U> build() {
-		assertNotNull(simulator);
-		assertNotNull(randomizer);
-		assertNotNull(initialDecisionVariable);
-		assertNotNull(convergenceCriterion);
-		assertTrue(maxIterations > 0);
-		assertTrue(maxTransitions > 0);
-		assertTrue(populationSize > 0);
-		assertNotNull(objectiveFunction);
-		return new RandomSearch<>(simulator, randomizer, initialDecisionVariable, convergenceCriterion, maxIterations,
-				maxTransitions, populationSize, objectiveFunction);
+		assertImplemented(this.simulator, Simulator.class);
+		assertImplemented(this.convergenceCriterion, ConvergenceCriterion.class);
+		assertImplemented(this.objectiveFunction, ObjectiveFunction.class);
+		assertImplemented(this.selfTuner, SelfTuner.class);
+		assertImplemented(this.random, Random.class);
+		assertImplemented(this.decisionVariableRandomizer, DecisionVariableRandomizer.class);
+		assertNotNull(this.initialDecisionVariable, "the initial decision variable is null");
+
+		assertTrue(this.maxOptimizationStages > 0,
+				"the maximum number of optimization stages is not strictly positive");
+		assertTrue(this.maxSimulationTransitions > 0,
+				"the maximum number of simulation transitions is not strictly positive");
+
+		return new RandomSearch<>(simulator, convergenceCriterion, objectiveFunction, 
+				selfTuner, random,
+				decisionVariableRandomizer,
+				initialDecisionVariable, maxOptimizationStages, maxSimulationTransitions);
 	}
 }

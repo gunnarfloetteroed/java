@@ -59,7 +59,7 @@ import floetteroed.utilities.statisticslogging.TimeStampStatistic;
  */
 public class RandomSearch<U extends DecisionVariable> {
 
-	// -------------------- CONSTANTS --------------------
+	// -------------------- LABELS FOR LOGGING --------------------
 
 	public static final String RANDOM_SEARCH_ITERATION = "Random Search Iteration";
 
@@ -67,72 +67,94 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	public static final String BEST_OVERALL_SOLUTION = "Best Overall Solution";
 
-	// members without obvious default values -> set in constructor
+	// --------------- MEMBERS WITHOUT SENSIBLE DEFAULT VALUES ---------------
 
 	private final Simulator<U> simulator;
 
-	private final DecisionVariableRandomizer<U> randomizer;
-
-	private final U initialDecisionVariable;
-
 	private final ConvergenceCriterion convergenceCriterion;
-
-	private final int maxIterations;
-
-	private final int maxTransitions;
-
-	private final int populationSize;
 
 	private final ObjectiveFunction objectiveFunction;
 
-	// members with sensible default values
+	private final SelfTuner selfTuner;
 
-	private int warmupIterations = 1;
+	private final Random rnd;
 
-	private boolean useAllWarmupIterations = false;
+	private final DecisionVariableRandomizer<U> decisionVariableRandomizer;
 
-	private double initialEquilibriumGapWeight = 0.0;
+	private final U initialDecisionVariable;
 
-	private double initialUniformityGapWeight = 0.0;
+	private final int maxOptimizationStages;
 
-	private SelfTuner selfTuner = new SelfTuner(0.9);
-
-	private int maxTotalMemory = Integer.MAX_VALUE;
-
-	private int maxMemoryPerTrajectory = Integer.MAX_VALUE;
-
-	private boolean maintainAllTrajectories = true;
-
-	private boolean includeCurrentBest = false;
-
-	private boolean interpolate = true;
-
-	private Random rnd = new Random();
-
-	// -------------------- MEMBERS --------------------
-
-	private String logFileName = null;
-
-	private String convergenceTrackingFileName = null;
-
-	private String outerIterationLogFileName = null;
+	private final int maxSimulationTransitions;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RandomSearch(final Simulator<U> simulator, final DecisionVariableRandomizer<U> randomizer,
-			final U initialDecisionVariable, final ConvergenceCriterion convergenceCriterion, final int maxIterations,
-			final int maxTransitions, final int populationSize, final ObjectiveFunction objectiveFunction) {
+	public RandomSearch(final Simulator<U> simulator, final ConvergenceCriterion convergenceCriterion,
+			final ObjectiveFunction objectiveFunction, final SelfTuner selfTuner, final Random rnd,
+			final DecisionVariableRandomizer<U> decisionVariableRandomizer, final U initialDecisionVariable,
+			final int maxOptimizationStages, final int maxSimulationTransitions) {
 		this.simulator = simulator;
-		this.randomizer = randomizer;
-		this.initialDecisionVariable = initialDecisionVariable;
 		this.convergenceCriterion = convergenceCriterion;
-		this.maxIterations = maxIterations;
-		this.maxTransitions = maxTransitions;
-		this.populationSize = populationSize;
 		this.objectiveFunction = objectiveFunction;
+		this.selfTuner = selfTuner;
+		this.rnd = rnd;
+		this.decisionVariableRandomizer = decisionVariableRandomizer;
+		this.initialDecisionVariable = initialDecisionVariable;
+		this.maxOptimizationStages = maxOptimizationStages;
+		this.maxSimulationTransitions = maxSimulationTransitions;
 	}
 
-	// -------------------- SETTERS AND GETTERS --------------------
+	// ==================== POGRAM CONTROL PARAMETERS ====================
+
+	public static final int DEFAULT_WARMUPITERATIONS = 1;
+
+	private int warmupIterations = DEFAULT_WARMUPITERATIONS;
+
+	public void setWarmupIterations(final int warmupIterations) {
+		this.warmupIterations = warmupIterations;
+	}
+
+	// ------------------------------------------------------------
+
+	public static final boolean DEFAULT_USEALLWARMUPITERATIONS = false;
+
+	private boolean useAllWarmupIterations = DEFAULT_USEALLWARMUPITERATIONS;
+
+	public void setUseAllWarmupIterations(final boolean useAllWarmupIterations) {
+		this.useAllWarmupIterations = useAllWarmupIterations;
+	}
+
+	// ------------------------------------------------------------
+
+	public static final int DEFAULT_MAXMEMORYPERTRAJECTORY = Integer.MAX_VALUE;
+
+	private int maxMemoryPerTrajectory = DEFAULT_MAXMEMORYPERTRAJECTORY;
+
+	public void setMaxMemoryPerTrajectory(final int maxMemoryPerTrajectory) {
+		this.maxMemoryPerTrajectory = maxMemoryPerTrajectory;
+	}
+
+	// ------------------------------------------------------------
+
+	public static final int DEFAULT_MAXTOTALMEMORY = Integer.MAX_VALUE;
+
+	private int maxTotalMemory = DEFAULT_MAXTOTALMEMORY;
+
+	public void setMaxTotalMemory(final int maxTotalMemory) {
+		this.maxTotalMemory = maxTotalMemory;
+	}
+
+	// ------------------------------------------------------------
+
+	private boolean maintainAllTrajectories = true;
+		
+	public void setMaintainAllTrajectories(final boolean maintainAllTrajectories) {
+		this.maintainAllTrajectories = maintainAllTrajectories;
+	}
+
+	// ------------------------------------------------------------
+
+	private String logFileName = null;
 
 	/**
 	 * Set opdyts log file name. Default is "null".
@@ -141,6 +163,10 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.logFileName = logFileName;
 	}
 
+	// ------------------------------------------------------------
+
+	private String convergenceTrackingFileName = null;
+
 	/**
 	 * Set opdyts convergence tracking file name. Default is "null".
 	 */
@@ -148,12 +174,18 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.convergenceTrackingFileName = convergenceTrackingFileName;
 	}
 
+	// ------------------------------------------------------------
+
+	private String outerIterationLogFileName = null;
+
 	/**
 	 * Set opdyts outer iteration log file name. Default is "null".
 	 */
 	public void setOuterIterationLogFileName(final String outerIterationLogFileName) {
 		this.outerIterationLogFileName = outerIterationLogFileName;
 	}
+
+	// -------------------- SETTERS AND GETTERS --------------------
 
 	/**
 	 * Essentially, switch on opdyts logging.
@@ -165,49 +197,23 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.setOuterIterationLogFileName(Paths.get(path, "opdyts.sum").toString());
 	}
 
-	public void setMaxTotalMemory(final int maxTotalMemory) {
-		this.maxTotalMemory = maxTotalMemory;
-	}
+	// public void setInitialEquilibriumGapWeight(final double
+	// initialEquilibriumGapWeight) {
+	// this.initialEquilibriumGapWeight = initialEquilibriumGapWeight;
+	// }
+	//
+	// public void setInitialUniformityGapWeight(final double
+	// initialUniformityGapWeight) {
+	// this.initialUniformityGapWeight = initialUniformityGapWeight;
+	// }
 
-	public void setMaxMemoryPerTrajectory(final int maxMemoryPerTrajectory) {
-		this.maxMemoryPerTrajectory = maxMemoryPerTrajectory;
-	}
+	// public void setSelfTuner(final SelfTuner selfTuner) {
+	// this.selfTuner = selfTuner;
+	// }
 
-	public void setMaintainAllTrajectories(final boolean maintainAllTrajectories) {
-		this.maintainAllTrajectories = maintainAllTrajectories;
-	}
-
-	public void setInitialEquilibriumGapWeight(final double initialEquilibriumGapWeight) {
-		this.initialEquilibriumGapWeight = initialEquilibriumGapWeight;
-	}
-
-	public void setInitialUniformityGapWeight(final double initialUniformityGapWeight) {
-		this.initialUniformityGapWeight = initialUniformityGapWeight;
-	}
-
-	public void setSelfTuner(final SelfTuner selfTuner) {
-		this.selfTuner = selfTuner;
-	}
-
-	public void setWarmupIterations(final int warmupIterations) {
-		this.warmupIterations = warmupIterations;
-	}
-
-	public void setUseAllWarmupIterations(final boolean useAllWarmupIterations) {
-		this.useAllWarmupIterations = useAllWarmupIterations;
-	}
-
-	public void setIncludeCurrentBest(final boolean includeCurrentBest) {
-		this.includeCurrentBest = includeCurrentBest;
-	}
-
-	public void setInterpolate(final boolean interpolate) {
-		this.interpolate = interpolate;
-	}
-
-	public void setRandom(final Random rnd) {
-		this.rnd = rnd;
-	}
+	// public void setIncludeCurrentBest(final boolean includeCurrentBest) {
+	// this.includeCurrentBest = includeCurrentBest;
+	// }
 
 	// -------------------- IMPLEMENTATION --------------------
 
@@ -233,8 +239,11 @@ public class RandomSearch<U extends DecisionVariable> {
 	// SelfTuner weightOptimizer) {
 	public void run() {
 
-		double equilibriumGapWeight = this.initialEquilibriumGapWeight;
-		double uniformityGapWeight = this.initialUniformityGapWeight;
+		// TODO NEW 2018-09-25
+		double equilibriumGapWeight = this.selfTuner.getEquilibriumGapWeight();
+		double uniformityGapWeight = this.selfTuner.getUniformityGapWeight();
+		// double equilibriumGapWeight = this.initialEquilibriumGapWeight;
+		// double uniformityGapWeight = this.initialUniformityGapWeight;
 
 		int totalTransitionCnt = 0;
 
@@ -254,21 +263,26 @@ public class RandomSearch<U extends DecisionVariable> {
 		U bestDecisionVariable = this.initialDecisionVariable;
 		Double bestObjectiveFunctionValue = null;
 		SimulatorState bestInitialState = null;
-		
+
 		SimulatorState newInitialState = null;
 
-		for (int it = 0; it < this.maxIterations && totalTransitionCnt < this.maxTransitions; it++) {
+		for (int it = 0; it < this.maxOptimizationStages && totalTransitionCnt < this.maxSimulationTransitions; it++) {
 
-			Logger.getLogger(this.getClass().getName()).info("Iteration " + (it + 1) + " of " + this.maxIterations
-					+ ", transitions " + totalTransitionCnt + " of " + this.maxTransitions + " ====================");
+			Logger.getLogger(this.getClass().getName())
+					.info("Iteration " + (it + 1) + " of " + this.maxOptimizationStages + ", transitions "
+							+ totalTransitionCnt + " of " + this.maxSimulationTransitions + " ====================");
 
 			final Set<U> candidates = new LinkedHashSet<U>();
-			if (this.includeCurrentBest) {
-				candidates.add(bestDecisionVariable);
-			}
-			while (candidates.size() < this.populationSize) {
-				candidates.addAll(this.randomizer.newRandomVariations(bestDecisionVariable));
-			}
+
+			// TODO NEW 2018-09-25
+			// if (this.includeCurrentBest) {
+			// candidates.add(bestDecisionVariable);
+			// }
+
+			// TODO NEW 2018-09-25
+			// while (candidates.size() < this.populationSize) {
+			candidates.addAll(this.decisionVariableRandomizer.newRandomVariations(bestDecisionVariable));
+			// }
 
 			int transitionsPerIteration = 0;
 			U newBestDecisionVariable;
@@ -276,7 +290,7 @@ public class RandomSearch<U extends DecisionVariable> {
 
 			final OuterIterationStatistics outerIterationStats;
 
-			if (this.interpolate) {
+			if (true) {
 
 				/*
 				 * >>>>>>>>>>>>>>>>>>>> PARALLEL SAMPLING >>>>>>>>>>>>>>>>>>>>
@@ -364,11 +378,10 @@ public class RandomSearch<U extends DecisionVariable> {
 						for (int i = 0; i < transitions.size(); i++) {
 							final ConvergenceCriterionResult convRes = this.convergenceCriterion.evaluate(
 									transitions.subList(0, i + 1), sampler.additionCnt(newBestDecisionVariable));
-							writer.write(
-									transitions.get(i).getToStateObjectiveFunctionValue() + "\t"
-											+ (convRes.finalObjectiveFunctionValue != null
-													? convRes.finalObjectiveFunctionValue : "")
-											+ "\t" + convRes.converged);
+							writer.write(transitions.get(i).getToStateObjectiveFunctionValue() + "\t"
+									+ (convRes.finalObjectiveFunctionValue != null ? convRes.finalObjectiveFunctionValue
+											: "")
+									+ "\t" + convRes.converged);
 							writer.newLine();
 						}
 						writer.flush();
@@ -378,10 +391,9 @@ public class RandomSearch<U extends DecisionVariable> {
 					}
 				}
 
-				if (selfTuner != null) {
-					selfTuner.update(sampler.getSamplingStages(),
-							sampler.getDecisionVariable2convergenceResultView()
-									.get(newBestDecisionVariable).finalObjectiveFunctionValue);
+				if (selfTuner != null) { // TODO is never null, remove local weight variables
+					selfTuner.update(sampler.getSamplingStages(), sampler.getDecisionVariable2convergenceResultView()
+							.get(newBestDecisionVariable).finalObjectiveFunctionValue);
 					equilibriumGapWeight = selfTuner.getEquilibriumGapWeight();
 					uniformityGapWeight = selfTuner.getUniformityGapWeight();
 				}
@@ -391,7 +403,7 @@ public class RandomSearch<U extends DecisionVariable> {
 				 */
 
 			} else {
-				
+
 				/*
 				 * >>>>>>>>>>>>>>>>>>>> SEQUENTIAL SAMPLING >>>>>>>>>>>>>>>>>>>>
 				 */
