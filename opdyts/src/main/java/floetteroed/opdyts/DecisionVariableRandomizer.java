@@ -39,20 +39,19 @@ import java.util.Collection;
 public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 
 	/**
-	 * The result should contain at least one random variation of
-	 * decisionVariable.
+	 * The result should contain at least one random variation of decisionVariable.
 	 * <p>
 	 * It is, however, recommended to implement one of the following sampling
 	 * strategies:
 	 * <ul>
 	 * <li>Return two random variations of decisionVariable that are symmetric (
 	 * "positive and negative") to the extent possible.
-	 * <li>Return an even larger number of decision variable variations (up to
-	 * the total number of candidate decision variables specified in
-	 * RandomSearch) by some experimental plan.
+	 * <li>Return an even larger number of decision variable variations (up to the
+	 * total number of candidate decision variables specified in RandomSearch) by
+	 * some experimental plan.
 	 * </ul>
 	 * <p>
 	 */
-	public Collection<U> newRandomVariations(final U decisionVariable);
+	public Collection<U> newRandomVariations(U decisionVariable, int searchIteration);
 
 }

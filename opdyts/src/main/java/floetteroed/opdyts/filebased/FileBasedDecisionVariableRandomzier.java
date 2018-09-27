@@ -65,7 +65,7 @@ public class FileBasedDecisionVariableRandomzier implements DecisionVariableRand
 
 	@Override
 	public Collection<FileBasedDecisionVariable> newRandomVariations(
-			FileBasedDecisionVariable originalDecisionVariable) {
+			FileBasedDecisionVariable originalDecisionVariable, int searchIteration) {
 
 		if (originalDecisionVariable != null) {
 			originalDecisionVariable.writeToNewDecisionVariableFile(this.executionFolder,

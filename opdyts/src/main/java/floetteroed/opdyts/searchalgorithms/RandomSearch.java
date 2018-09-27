@@ -278,7 +278,7 @@ public class RandomSearch<U extends DecisionVariable> {
 
 			// TODO NEW 2018-09-25
 			// while (candidates.size() < this.populationSize) {
-			candidates.addAll(this.decisionVariableRandomizer.newRandomVariations(bestDecisionVariable));
+			candidates.addAll(this.decisionVariableRandomizer.newRandomVariations(bestDecisionVariable, it));
 			// }
 
 			int transitionsPerIteration = 0;
