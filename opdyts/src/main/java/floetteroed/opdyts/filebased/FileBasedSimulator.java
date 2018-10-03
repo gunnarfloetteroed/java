@@ -40,7 +40,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> {
+public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable, SimulatorState> {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -95,12 +95,12 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 	// -------------------- IMPLEMENTATION OF Simulator --------------------
 
 	@Override
-	public SimulatorState run(final TrajectorySampler<FileBasedDecisionVariable> evaluator) {
+	public SimulatorState run(final TrajectorySampler<FileBasedDecisionVariable, SimulatorState> evaluator) {
 		return this.run(evaluator, null);
 	}
 
 	@Override
-	public SimulatorState run(final TrajectorySampler<FileBasedDecisionVariable> evaluator,
+	public SimulatorState run(final TrajectorySampler<FileBasedDecisionVariable, SimulatorState> evaluator,
 			final SimulatorState initialState) {
 		// evaluator.initialize();
 		FileBasedSimulatorState newState = null;

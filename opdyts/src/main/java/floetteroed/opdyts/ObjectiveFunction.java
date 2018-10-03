@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts;
 
 /**
@@ -30,10 +30,13 @@ package floetteroed.opdyts;
  * objective function value, the better the state.
  * 
  * @author Gunnar Flötteröd
+ * 
+ * @param X
+ *            the simulator state type
  *
  */
-public interface ObjectiveFunction {
+public interface ObjectiveFunction<X extends SimulatorState> {
 
-	public double value(final SimulatorState state);
+	public double value(final X state);
 
 }

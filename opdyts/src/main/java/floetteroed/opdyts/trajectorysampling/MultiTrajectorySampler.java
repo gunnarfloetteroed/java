@@ -59,13 +59,13 @@ import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
  * @author Gunnar Flötteröd
  *
  */
-public class MultiTrajectorySampler<U extends DecisionVariable> implements TrajectorySampler<U> {
+public class MultiTrajectorySampler<U extends DecisionVariable, X extends SimulatorState> implements TrajectorySampler<U, X> {
 
 	// -------------------- MEMBERS --------------------
 
 	// set during construction
 
-	private final ObjectiveFunction objectiveFunction;
+	private final ObjectiveFunction<X> objectiveFunction;
 
 	private final ConvergenceCriterion convergenceCriterion;
 
@@ -105,7 +105,7 @@ public class MultiTrajectorySampler<U extends DecisionVariable> implements Traje
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public MultiTrajectorySampler(final Set<? extends U> decisionVariables, final ObjectiveFunction objectiveFunction,
+	public MultiTrajectorySampler(final Set<? extends U> decisionVariables, final ObjectiveFunction<X> objectiveFunction,
 			final ConvergenceCriterion convergenceCriterion, final Random rnd, final double equilibriumWeight,
 			final double uniformityWeight, final boolean appendToLogFile, final int maxTotalMemory,
 			final int maxMemoryPerTrajectory, final boolean maintainAllTrajectories, final int warmupIterations,
@@ -175,7 +175,7 @@ public class MultiTrajectorySampler<U extends DecisionVariable> implements Traje
 	}
 
 	@Override
-	public ObjectiveFunction getObjectiveFunction() {
+	public ObjectiveFunction<X> getObjectiveFunction() {
 		return this.objectiveFunction;
 	}
 
@@ -189,7 +189,7 @@ public class MultiTrajectorySampler<U extends DecisionVariable> implements Traje
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	public void afterIteration(final SimulatorState newState) {
+	public void afterIteration(final X newState) {
 
 		/*
 		 * When this function is called for the first time, all of the following

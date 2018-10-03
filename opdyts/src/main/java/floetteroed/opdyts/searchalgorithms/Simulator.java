@@ -33,14 +33,14 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
  * @author Gunnar Flötteröd
  *
  */
-public interface Simulator<U extends DecisionVariable> {
+public interface Simulator<U extends DecisionVariable, X extends SimulatorState> {
 
 	/**
 	 * Implements the same functionality as run(TrajectorySampler, null).
 	 */
-	public SimulatorState run(TrajectorySampler<U> evaluator);
+	public SimulatorState run(TrajectorySampler<U, X> evaluator);
 
-	public SimulatorState run(TrajectorySampler<U> evaluator,
+	public SimulatorState run(TrajectorySampler<U, X> evaluator,
 			SimulatorState initialState);
 
 }

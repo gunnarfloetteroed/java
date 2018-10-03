@@ -37,7 +37,7 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public interface TrajectorySampler<U extends DecisionVariable> {
+public interface TrajectorySampler<U extends DecisionVariable, X extends SimulatorState> {
 
 	/**
 	 * Indicates if there is (no) need to further continue the iterations.
@@ -65,9 +65,9 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	 * @param newState
 	 *            the newly reached simulator state
 	 */
-	public void afterIteration(SimulatorState newState);
+	public void afterIteration(X newState);
 
 	// TODO NEW
-	public ObjectiveFunction getObjectiveFunction();
+	public ObjectiveFunction<X> getObjectiveFunction();
 
 }

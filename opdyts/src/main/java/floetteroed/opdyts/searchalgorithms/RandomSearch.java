@@ -54,7 +54,7 @@ import floetteroed.utilities.statisticslogging.TimeStampStatistic;
  * @author Gunnar Flötteröd
  *
  */
-public class RandomSearch<U extends DecisionVariable> {
+public class RandomSearch<U extends DecisionVariable, X extends SimulatorState> {
 
 	// -------------------- LABELS FOR LOGGING --------------------
 
@@ -66,11 +66,11 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	// --------------- MEMBERS WITHOUT SENSIBLE DEFAULT VALUES ---------------
 
-	private final Simulator<U> simulator;
+	private final Simulator<U, X> simulator;
 
 	private final ConvergenceCriterion convergenceCriterion;
 
-	private final ObjectiveFunction objectiveFunction;
+	private final ObjectiveFunction<X> objectiveFunction;
 
 	private final SelfTuner selfTuner;
 
@@ -86,8 +86,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RandomSearch(final Simulator<U> simulator, final ConvergenceCriterion convergenceCriterion,
-			final ObjectiveFunction objectiveFunction, final SelfTuner selfTuner, final Random rnd,
+	public RandomSearch(final Simulator<U, X> simulator, final ConvergenceCriterion convergenceCriterion,
+			final ObjectiveFunction<X> objectiveFunction, final SelfTuner selfTuner, final Random rnd,
 			final DecisionVariableRandomizer<U> decisionVariableRandomizer, final U initialDecisionVariable,
 			final int maxOptimizationStages, final int maxSimulationTransitions) {
 		this.simulator = simulator;
@@ -296,7 +296,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			outerIterationStats = new OuterIterationStatistics(System.currentTimeMillis(), it + 1, totalTransitionCnt,
 					equilibriumGapWeight, uniformityGapWeight);
 
-			final MultiTrajectorySampler<U> sampler;
+			final MultiTrajectorySampler<U, X> sampler;
 			sampler = new MultiTrajectorySampler<>(candidates, this.objectiveFunction, this.convergenceCriterion,
 					this.rnd, equilibriumGapWeight, uniformityGapWeight, (it > 0), this.maxTotalMemory,
 					this.maxMemoryPerTrajectory, this.maintainAllTrajectories, this.warmupIterations,

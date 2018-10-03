@@ -40,7 +40,7 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public class SingleTrajectorySampler<U extends DecisionVariable> implements TrajectorySampler<U> {
+public class SingleTrajectorySampler<U extends DecisionVariable> implements TrajectorySampler<U, SimulatorState> {
 
 	// -------------------- MEMBERS --------------------
 

@@ -5,6 +5,7 @@ import java.util.Random;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 
 /**
@@ -15,7 +16,7 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
  * @param <U>
  *            the decision variable type
  */
-public class RandomSearchBuilder<U extends DecisionVariable> {
+public class RandomSearchBuilder<U extends DecisionVariable, X extends SimulatorState> {
 
 	// -------------------- HELPERS --------------------
 
@@ -35,14 +36,14 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 
 	// ==================== PARAMETER DEFINITIONS ====================
 
-	private Simulator<U> simulator = null;
+	private Simulator<U, X> simulator = null;
 
 	/**
 	 * See {@link Simulator}.
 	 * 
 	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setSimulator(final Simulator<U> simulator) {
+	public final RandomSearchBuilder<U, X> setSimulator(final Simulator<U, X> simulator) {
 		this.simulator = simulator;
 		return this;
 	}
@@ -56,14 +57,14 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	 *
 	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setConvergenceCriterion(final ConvergenceCriterion convergenceCriterion) {
+	public final RandomSearchBuilder<U, X> setConvergenceCriterion(final ConvergenceCriterion convergenceCriterion) {
 		this.convergenceCriterion = convergenceCriterion;
 		return this;
 	}
 
 	// ------------------------------------------------------------
 
-	private ObjectiveFunction objectiveFunction = null;
+	private ObjectiveFunction<X> objectiveFunction = null;
 
 	/**
 	 * The objective function: a quantitative measure of what one wants to achieve.
@@ -71,7 +72,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	 * 
 	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setObjectiveFunction(final ObjectiveFunction objectiveFunction) {
+	public final RandomSearchBuilder<U, X> setObjectiveFunction(final ObjectiveFunction<X> objectiveFunction) {
 		this.objectiveFunction = objectiveFunction;
 		return this;
 	}
@@ -80,7 +81,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 
 	private SelfTuner selfTuner = null;
 
-	public final RandomSearchBuilder<U> setSelfTuner(final SelfTuner selfTuner) {
+	public final RandomSearchBuilder<U, X> setSelfTuner(final SelfTuner selfTuner) {
 		this.selfTuner = selfTuner;
 		return this;
 	}
@@ -89,7 +90,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 
 	private Random random = null;
 
-	public final RandomSearchBuilder<U> setRandom(final Random rnd) {
+	public final RandomSearchBuilder<U, X> setRandom(final Random rnd) {
 		this.random = rnd;
 		return this;
 	}
@@ -109,7 +110,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	 *
 	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setDecisionVariableRandomizer(
+	public final RandomSearchBuilder<U, X> setDecisionVariableRandomizer(
 			final DecisionVariableRandomizer<U> decisionVariableRandomizer) {
 		this.decisionVariableRandomizer = decisionVariableRandomizer;
 		return this;
@@ -125,7 +126,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	 * 
 	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setInitialDecisionVariable(final U initialDecisionVariable) {
+	public final RandomSearchBuilder<U, X> setInitialDecisionVariable(final U initialDecisionVariable) {
 		this.initialDecisionVariable = initialDecisionVariable;
 		return this;
 	}
@@ -139,7 +140,7 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	 * 
 	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setMaxOptimizationStages(int maxOptimizationStages) {
+	public final RandomSearchBuilder<U, X> setMaxOptimizationStages(int maxOptimizationStages) {
 		this.maxOptimizationStages = maxOptimizationStages;
 		return this;
 	}
@@ -153,14 +154,14 @@ public class RandomSearchBuilder<U extends DecisionVariable> {
 	 * 
 	 * For default value see code of {@link RandomSearchBuilder}.
 	 */
-	public final RandomSearchBuilder<U> setMaxSimulationTransitions(int maxSimulationTransitions) {
+	public final RandomSearchBuilder<U, X> setMaxSimulationTransitions(int maxSimulationTransitions) {
 		this.maxSimulationTransitions = maxSimulationTransitions;
 		return this;
 	}
 
 	// ============================================================
 
-	public final RandomSearch<U> build() {
+	public final RandomSearch<U, X> build() {
 
 		assertImplemented(this.simulator, Simulator.class);
 		assertImplemented(this.convergenceCriterion, ConvergenceCriterion.class);
