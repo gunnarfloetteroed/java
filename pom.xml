@@ -18,6 +18,7 @@
         <module>opdyts</module>
         <module>bioroute</module>
         <module>utilities</module>
+        <module>misc</module>
     </modules>
 
 </project>
