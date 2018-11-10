@@ -43,15 +43,13 @@ public class DownstreamJobArrivalHandler extends AbstractEventHandler<KWMQueuein
 
 		link.addJobToDQ(job);
 		if (link.getDQJobCnt() == 1) {
+			final KWMQueueingSimLink nextLink = job.getNextLink();
 			newEvents = new LinkedList<KWMQueueingSimEvent>();
-			// TODO NEW
-			newEvents.add(
-					new KWMQueueingSimEvent(event.getTime_s() + link.getServiceDistribution(job.getNextLink()).next(),
-							KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
-			// TODO ORIGINAL
-			// newEvents.add(new KWMQueueingSimEvent(event.getTime_s()
-			// + link.getServiceDistribution().next(),
-			// KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
+			newEvents.add(new KWMQueueingSimEvent(event.getTime_s() + link.getServiceDistribution(nextLink).next(),
+					KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
+			if (nextLink != null) {
+				nextLink.addPriorityOfApproachingVehicle(link.getPriority());
+			}
 		}
 
 		return newEvents;

@@ -28,6 +28,8 @@ public class LinkStateHandler extends AbstractEventHandler<KWMQueueingSimEvent> 
 
 	private final Map<KWMQueueingSimLink, List<Double>> link2runningQueue = new LinkedHashMap<KWMQueueingSimLink, List<Double>>();
 
+	private final Map<KWMQueueingSimLink, List<List<Integer>>> link2approachPrios = new LinkedHashMap<>();
+	
 	// -------------------- CONSTRUCTION --------------------
 
 	public LinkStateHandler(final KWMQueueingSimNetwork net) {
@@ -35,6 +37,7 @@ public class LinkStateHandler extends AbstractEventHandler<KWMQueueingSimEvent> 
 			this.link2upstreamQueue.put(link, new ArrayList<Double>());
 			this.link2downstreamQueue.put(link, new ArrayList<Double>());
 			this.link2runningQueue.put(link, new ArrayList<Double>());
+			this.link2approachPrios.put(link, new ArrayList<List<Integer>>());
 		}
 	}
 
@@ -123,6 +126,7 @@ public class LinkStateHandler extends AbstractEventHandler<KWMQueueingSimEvent> 
 						new Double(link.getDQJobCnt()));
 				this.link2runningQueue.get(link).set(lastIndex,
 						new Double(link.getRQJobCnt()));
+				this.link2approachPrios.get(link).set(lastIndex, link.getApproachingPrioritiesView());
 			}
 		} else if (event.getTime_s() > this.lastTime_s()) {
 			this.times_s.add(event.getTime());
@@ -133,6 +137,7 @@ public class LinkStateHandler extends AbstractEventHandler<KWMQueueingSimEvent> 
 						new Double(link.getDQJobCnt()));
 				this.link2runningQueue.get(link).add(
 						new Double(link.getRQJobCnt()));
+				this.link2approachPrios.get(link).add(link.getApproachingPrioritiesView());
 			}
 		} else {
 			throw new RuntimeException("current event time "
@@ -161,6 +166,7 @@ public class LinkStateHandler extends AbstractEventHandler<KWMQueueingSimEvent> 
 			for (KWMQueueingSimLink link : this.link2upstreamQueue.keySet()) {
 				result.append((int) (this.getRunningQueueStates(link).get(i) + this
 						.getDownstreamQueueStates(link).get(i)));
+				// result.append(";" + this.link2approachPrios.get(link).get(i));
 				result.append("\t");
 			}
 			result.append("\n");

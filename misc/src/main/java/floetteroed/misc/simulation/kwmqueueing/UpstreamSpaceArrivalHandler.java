@@ -10,8 +10,7 @@ import floetteroed.misc.simulation.eventbased.AbstractEventHandler;
  * @author Gunnar Flötteröd
  * 
  */
-public class UpstreamSpaceArrivalHandler extends
-		AbstractEventHandler<KWMQueueingSimEvent> {
+public class UpstreamSpaceArrivalHandler extends AbstractEventHandler<KWMQueueingSimEvent> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -19,8 +18,7 @@ public class UpstreamSpaceArrivalHandler extends
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public UpstreamSpaceArrivalHandler(
-			final KWMQueueingSimulation queueingSimulation) {
+	public UpstreamSpaceArrivalHandler(final KWMQueueingSimulation queueingSimulation) {
 		super();
 		this.queueingSimulation = queueingSimulation;
 	}
@@ -42,19 +40,18 @@ public class UpstreamSpaceArrivalHandler extends
 		if (this.queueingSimulation.getInstantaneousUnblocking()) {
 			KWMQueueingSimLink unblockedLink = null;
 			for (KWMQueueingSimLink cand : link.getInLinks()) {
-				if (link.equals(cand.getBlockingLink())
-						&& ((unblockedLink == null) || (cand
-								.getBlockingTime_s() < unblockedLink
-								.getBlockingTime_s()))) {
+				if (link.equals(cand.getBlockingLink()) && ((unblockedLink == null)
+						|| (cand.getBlockingTime_s() < unblockedLink.getBlockingTime_s()))) {
 					unblockedLink = cand;
 				}
 			}
 			if (unblockedLink != null) {
 				newEvents = new LinkedList<KWMQueueingSimEvent>();
-				final KWMQueueingSimJob unblockedJob = unblockedLink
-						.removeFirstJobFromLink(event.getTime_s(), newEvents);
-				newEvents.add(new KWMQueueingSimEvent(event.getTime_s(),
-						KWMQueueingSimEvent.TYPE.UQ_JOB_ARR, link, unblockedJob));
+				final KWMQueueingSimJob unblockedJob = unblockedLink.removeFirstJobFromLink(event.getTime_s(),
+						newEvents);
+				link.removePriorityOfApproachingVehicle(unblockedLink.getPriority());
+				newEvents.add(new KWMQueueingSimEvent(event.getTime_s(), KWMQueueingSimEvent.TYPE.UQ_JOB_ARR, link,
+						unblockedJob));
 			}
 		}
 

@@ -1,5 +1,6 @@
 package floetteroed.misc.simulation.kwmqueueing;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,8 @@ public class KWMQueueingSimLink extends AbstractLink<KWMQueueingSimNode, KWMQueu
 
 	private double bwdLag_s;
 
+	private Integer priority = 0; // default value
+
 	// -------------------- STATE VARIABLES --------------------
 
 	private int uqJobCnt;
@@ -42,6 +45,9 @@ public class KWMQueueingSimLink extends AbstractLink<KWMQueueingSimNode, KWMQueu
 	private KWMQueueingSimLink blockingLink;
 
 	private double blockingTime_s; // relevant only if blockingLink != null
+
+	// priorities of all vehicles about to enter this link
+	private final List<Integer> approachingPriorities = new LinkedList<>();
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -122,6 +128,18 @@ public class KWMQueueingSimLink extends AbstractLink<KWMQueueingSimNode, KWMQueu
 		this.uqJobCnt = uqJobCnt;
 	}
 
+	public void setPriority(final int priority) {
+		this.priority = priority;
+	}
+
+	public int getPriority() {
+		return this.priority;
+	}
+	
+	public List<Integer> getApproachingPrioritiesView() {
+		return Collections.unmodifiableList(this.approachingPriorities);
+	}
+
 	// -------------------- SIMULATION --------------------
 
 	// UPSTREAM QUEUE
@@ -174,15 +192,13 @@ public class KWMQueueingSimLink extends AbstractLink<KWMQueueingSimNode, KWMQueu
 		newEvents.add(new KWMQueueingSimEvent(time_s + this.getBwdLag_s(), KWMQueueingSimEvent.TYPE.UQ_SPACE_ARR, this,
 				null));
 		if (this.getDQJobCnt() > 0) {
-			// TODO NEW
 			final KWMQueueingSimJob nextJob = this.queueingJobs.getFirst();
-			newEvents.add(new KWMQueueingSimEvent(time_s + this.getServiceDistribution(nextJob.getNextLink()).next(),
+			final KWMQueueingSimLink nextLink = nextJob.getNextLink();
+			newEvents.add(new KWMQueueingSimEvent(time_s + this.getServiceDistribution(nextLink).next(),
 					KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, this, nextJob));
-			// TODO ORIGINAL
-			// newEvents.add(new KWMQueueingSimEvent(time_s +
-			// this.getServiceDistribution().next(),
-			// KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, this,
-			// this.queueingJobs.getFirst()));
+			if (nextLink != null) {
+				nextLink.addPriorityOfApproachingVehicle(this.getPriority());
+			}
 		}
 		return result;
 	}
@@ -206,5 +222,22 @@ public class KWMQueueingSimLink extends AbstractLink<KWMQueueingSimNode, KWMQueu
 
 	public boolean spillsBack() {
 		return (this.uqJobCnt >= this.spaceCapacity_jobs);
+	}
+
+	public void addPriorityOfApproachingVehicle(final Integer priority) {
+		this.approachingPriorities.add(priority);
+	}
+
+	public void removePriorityOfApproachingVehicle(final Integer priority) {
+		this.approachingPriorities.remove(this.approachingPriorities.indexOf(priority));
+	}
+	
+	public boolean isHighestApproachingPriority(final Integer testPriority) {
+		for (Integer approachingPriority : this.approachingPriorities) {
+			if (approachingPriority > testPriority) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

@@ -46,18 +46,20 @@ public class DownstreamJobServiceHandler extends AbstractEventHandler<KWMQueuein
 				if (this.queueingSimulation.getInstantaneousUnblocking()) {
 					link.setBlockingLinkAndTime_s(nextLink, time_s);
 				} else {
-					// TODO NEW
 					newEvents
 							.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution(job.getNextLink()).next(),
 									KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
-					// TODO ORIGINAL
-					// newEvents.add(new KWMQueueingSimEvent(time_s
-					// + link.getServiceDistribution().next(),
-					// KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
 				}
 			} else {
-				link.removeFirstJobFromLink(time_s, newEvents);
-				newEvents.add(new KWMQueueingSimEvent(time_s, KWMQueueingSimEvent.TYPE.UQ_JOB_ARR, nextLink, job));
+				if (nextLink.isHighestApproachingPriority(link.getPriority())) {
+					link.removeFirstJobFromLink(time_s, newEvents);
+					nextLink.removePriorityOfApproachingVehicle(link.getPriority());
+					newEvents.add(new KWMQueueingSimEvent(time_s, KWMQueueingSimEvent.TYPE.UQ_JOB_ARR, nextLink, job));					
+				} else {
+					newEvents
+					.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution(job.getNextLink()).next(),
+							KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));					
+				}
 			}
 		}
 
