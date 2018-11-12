@@ -16,7 +16,7 @@ public class TandemLink {
 	
 	// SCENARIO-SPECIFIC PARAMETERS
 
-		static final long replications = 1000 * 1000;
+		static final long replications = 10 * 10;
 		static final double straightTurningProba = 1.0;
 		static final double tMax = 600.0; // simulation duration
 
@@ -61,8 +61,8 @@ public class TandemLink {
 						spaceCap_veh, binSize_s, binCnt);
 				//final NodeStatisticSummarizer nodestats = new NodeStatisticSummarizer(
 						//spaceCap_veh, spaceCap_veh, binSize_s, binCnt);
-				//final OutflowSummarizer out12stats = new OutflowSummarizer(
-						//spaceCap_veh, binSize_s, binCnt);
+				final TurnCountSummarizer out12stats = new TurnCountSummarizer(
+						spaceCap_veh, binSize_s, binCnt);
 				
 				// RUN REPLICATIONS
 
@@ -111,8 +111,8 @@ public class TandemLink {
 					sim.setInstantaneousUnblocking(false); //change it to true for comparison
 					final LinkStateHandler linkStateHandler = new LinkStateHandler(net);
 					sim.addHandler(linkStateHandler);
-					//final OutflowCounter outflowCounter = new OutflowCounter();
-					//sim.addHandler(outflowCounter);
+					final TurnCounter outflowCounter = new TurnCounter();
+					sim.addHandler(outflowCounter);
 					// sim.addHandler(new PrintEventHandler<KWMQueueingEvent>());
 
 					// ADD THE DEMAND
@@ -129,8 +129,9 @@ public class TandemLink {
 					l1stats.addHandlerContent(linkStateHandler, l1);
 					l2stats.addHandlerContent(linkStateHandler, l2);
 					//nodestats.addHandlerContent(linkStateHandler,l1,linkStateHandler,l6);
-					//out12stats.addHandlerContent(outflowCounter, l1, l6);
-					//outflowCounter.printFlowCounter();
+					out12stats.addHandlerContent(outflowCounter, l1, l2);
+					System.out.println(outflowCounter.toString());
+					
 				}
 
 				// WRITE RESULTS TO FILE
@@ -138,7 +139,7 @@ public class TandemLink {
 				l1stats.toFile(filePrefix + "_1.data");
 				l2stats.toFile(filePrefix + "_2.data");
 				//nodestats.toFile(filePrefix + "_node.data");
-				//out12stats.toFile(filePrefix + "_outflow12.data");
+				out12stats.toFile(filePrefix + "_outflow12.data");
 				
 
 				// WRITE OUT SOME TEST DATA
