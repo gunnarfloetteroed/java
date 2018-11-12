@@ -12,7 +12,7 @@ public class KWMQueueingSimEvent extends AbstractEvent<KWMQueueingSimEvent> {
 	// -------------------- TYPES --------------------
 
 	public static enum TYPE {
-		UQ_JOB_ARR, UQ_SPACE_ARR, DQ_JOB_ARR, DQ_JOB_SERVICE, NULL;
+		UQ_JOB_ARR, UQ_SPACE_ARR, DQ_JOB_ARR, DQ_JOB_SERVICE, DQ_JOB_FLOW, NULL;
 	};
 
 	// -------------------- CONSTANTS --------------------

@@ -16,7 +16,7 @@ public class TandemLink {
 	
 	// SCENARIO-SPECIFIC PARAMETERS
 
-		static final long replications = 10 * 10;
+		static final long replications = 1000 * 1000;
 		static final double straightTurningProba = 1.0;
 		static final double tMax = 600.0; // simulation duration
 
@@ -24,11 +24,11 @@ public class TandemLink {
 		static final int bwdLag_s = 10;
 		static final int spaceCap_veh = 10;
 
-		static final double gamma_veh_s = 0.1;
-		static final double gammaB_veh_s = 0.6;
-		static final double gammaC_veh_s = 0.01;
+		static final double gamma_veh_s = 0.6;
+		static final double gammaB_veh_s = 0.01;
+		static final double gammaC_veh_s = 0.1;
 		static final double innerFlowCap_veh_s = 0.4;
-		static final double exitFlowCap_veh_s = 0.01;
+		static final double exitFlowCap_veh_s = 0.2;
 		
 		public static void main(String[] args) throws FileNotFoundException {
 			
@@ -130,7 +130,7 @@ public class TandemLink {
 					l2stats.addHandlerContent(linkStateHandler, l2);
 					//nodestats.addHandlerContent(linkStateHandler,l1,linkStateHandler,l6);
 					out12stats.addHandlerContent(outflowCounter, l1, l2);
-					System.out.println(outflowCounter.toString());
+					//System.out.println(outflowCounter.toString());
 					
 				}
 

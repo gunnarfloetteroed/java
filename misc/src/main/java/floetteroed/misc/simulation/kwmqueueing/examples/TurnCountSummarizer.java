@@ -33,8 +33,7 @@ public class TurnCountSummarizer {
 			void addHandlerContent(final TurnCounter handler,
 					final KWMQueueingSimLink link1, final KWMQueueingSimLink link2) {
 				for (int k = 0; k < this.binCnt; k++) { 
-					final long result = handler.getCount(link1.getId(),link2.getId(),k);
-					int outflow = (int) result;
+					final int outflow = handler.getCount(link1.getId(),link2.getId(),k);
 					this.data[k][outflow]++;
 				}
 				this.samples++;
