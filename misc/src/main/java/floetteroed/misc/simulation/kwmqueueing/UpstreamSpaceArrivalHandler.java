@@ -40,8 +40,11 @@ public class UpstreamSpaceArrivalHandler extends AbstractEventHandler<KWMQueuein
 		if (this.queueingSimulation.getInstantaneousUnblocking()) {
 			KWMQueueingSimLink unblockedLink = null;
 			for (KWMQueueingSimLink cand : link.getInLinks()) {
-				if (link.equals(cand.getBlockingLink()) && ((unblockedLink == null)
-						|| (cand.getBlockingTime_s() < unblockedLink.getBlockingTime_s()))) {
+				// in order to account for priority in instantaneous unblocking, we should change the unblocking link logic below
+				if (link.equals(cand.getBlockingLink()) && link.isHighestApproachingPriority(cand.getPriority())
+						&& ((unblockedLink == null))||(cand.getBlockingTime_s() < unblockedLink.getBlockingTime_s())){        
+				//if (link.equals(cand.getBlockingLink()) && ((unblockedLink == null)
+						//|| (cand.getBlockingTime_s() < unblockedLink.getBlockingTime_s()))) {
 					unblockedLink = cand;
 				}
 			}
