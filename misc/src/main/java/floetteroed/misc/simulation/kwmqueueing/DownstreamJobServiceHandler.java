@@ -45,10 +45,11 @@ public class DownstreamJobServiceHandler extends AbstractEventHandler<KWMQueuein
 			if (nextLink.spillsBack()) {
 				if (this.queueingSimulation.getInstantaneousUnblocking()) {
 					link.setBlockingLinkAndTime_s(nextLink, time_s);
-				} else {
-					newEvents
-							.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution(job.getNextLink()).next(),
-									KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
+				} else {// let's change job.getNextLink() to Null to get the original version
+					//newEvents.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution(job.getNextLink()).next(),
+								//	KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
+					newEvents.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution().next(),
+							KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
 				}
 			} else {
 				if (nextLink.isHighestApproachingPriority(link.getPriority())) {
@@ -56,10 +57,11 @@ public class DownstreamJobServiceHandler extends AbstractEventHandler<KWMQueuein
 					nextLink.removePriorityOfApproachingVehicle(link.getPriority());
 					//newEvents.add(new KWMQueueingSimEvent(time_s, KWMQueueingSimEvent.TYPE.UQ_JOB_ARR, nextLink, job));	
 					newEvents.add(new KWMQueueingSimEvent(time_s, KWMQueueingSimEvent.TYPE.DQ_JOB_FLOW, link, job));
-				} else {
-					newEvents
-					.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution(job.getNextLink()).next(),
-							KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));					
+				} else {// if not highest priority, for instantaneous unblocking we should hold this job i.e., not creating newEvent
+					//newEvents.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution(job.getNextLink()).next(),
+							//KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
+					newEvents.add(new KWMQueueingSimEvent(time_s + link.getServiceDistribution().next(),
+							KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, link, job));
 				}
 			}
 		}

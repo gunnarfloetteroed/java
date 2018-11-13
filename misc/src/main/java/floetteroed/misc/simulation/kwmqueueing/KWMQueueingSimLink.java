@@ -194,7 +194,9 @@ public class KWMQueueingSimLink extends AbstractLink<KWMQueueingSimNode, KWMQueu
 		if (this.getDQJobCnt() > 0) {
 			final KWMQueueingSimJob nextJob = this.queueingJobs.getFirst();
 			final KWMQueueingSimLink nextLink = nextJob.getNextLink();
-			newEvents.add(new KWMQueueingSimEvent(time_s + this.getServiceDistribution(nextLink).next(),
+			//newEvents.add(new KWMQueueingSimEvent(time_s + this.getServiceDistribution(nextLink).next(),
+					//KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, this, nextJob));
+			newEvents.add(new KWMQueueingSimEvent(time_s + this.getServiceDistribution().next(),
 					KWMQueueingSimEvent.TYPE.DQ_JOB_SERVICE, this, nextJob));
 			if (nextLink != null) {
 				nextLink.addPriorityOfApproachingVehicle(this.getPriority());
