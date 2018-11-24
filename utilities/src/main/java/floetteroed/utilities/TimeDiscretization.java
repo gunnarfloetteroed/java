@@ -37,13 +37,13 @@ public class TimeDiscretization {
 	}
 
 	// TODO NEW
-	public int getBinCenterTime_s(final int bin) {
-		return bin * this.binSize_s + this.binSize_s / 2;
+	public int getBinStartTime_s(final int bin) {
+		return this.startTime_s + bin * this.binSize_s;
 	}
 
 	// TODO NEW
-	public int getBinStartTime_s(final int bin) {
-		return this.startTime_s + bin * this.binSize_s;
+	public int getBinCenterTime_s(final int bin) {
+		return this.getBinStartTime_s(bin) + this.binSize_s / 2;
 	}
 
 	// TODO NEW
