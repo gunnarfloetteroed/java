@@ -36,9 +36,11 @@ import floetteroed.utilities.statisticslogging.Statistic;
 public class LastObjectiveFunctionValue<U extends DecisionVariable> implements
 		Statistic<SamplingStage<U>> {
 
+	public static final String LABEL = "Last Objective Function Value";
+	
 	@Override
 	public String label() {
-		return "Last Objective Function Value";
+		return LABEL;
 	}
 
 	@Override

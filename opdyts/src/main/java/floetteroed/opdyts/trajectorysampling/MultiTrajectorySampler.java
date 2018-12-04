@@ -59,7 +59,8 @@ import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
  * @author Gunnar Flötteröd
  *
  */
-public class MultiTrajectorySampler<U extends DecisionVariable, X extends SimulatorState> implements TrajectorySampler<U, X> {
+public class MultiTrajectorySampler<U extends DecisionVariable, X extends SimulatorState>
+		implements TrajectorySampler<U, X> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -105,11 +106,11 @@ public class MultiTrajectorySampler<U extends DecisionVariable, X extends Simula
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public MultiTrajectorySampler(final Set<? extends U> decisionVariables, final ObjectiveFunction<X> objectiveFunction,
-			final ConvergenceCriterion convergenceCriterion, final Random rnd, final double equilibriumWeight,
-			final double uniformityWeight, final boolean appendToLogFile, final int maxTotalMemory,
-			final int maxMemoryPerTrajectory, final boolean maintainAllTrajectories, final int warmupIterations,
-			final boolean useAllWarmupIterations) {
+	public MultiTrajectorySampler(final Set<? extends U> decisionVariables,
+			final ObjectiveFunction<X> objectiveFunction, final ConvergenceCriterion convergenceCriterion,
+			final Random rnd, final double equilibriumWeight, final double uniformityWeight,
+			final boolean appendToLogFile, final int maxTotalMemory, final int maxMemoryPerTrajectory,
+			final boolean maintainAllTrajectories, final int warmupIterations, final boolean useAllWarmupIterations) {
 		this.useAllWarmupIterations = useAllWarmupIterations;
 		for (U decisionVariable : decisionVariables) {
 			this.decisionVariable2remainingWarmupIterations.put(decisionVariable, warmupIterations);
@@ -197,36 +198,39 @@ public class MultiTrajectorySampler<U extends DecisionVariable, X extends Simula
 		 * 
 		 * Implications:
 		 * 
-		 * The simulation needs to ensure that a sensible initial decision
-		 * variable is used. This should be the decision variable of which
-		 * variations are to be tried out (i.e. the "mean" decision variable).
+		 * The simulation needs to ensure that a sensible initial decision variable is
+		 * used. This should be the decision variable of which variations are to be
+		 * tried out (i.e. the "mean" decision variable).
 		 * 
-		 * Since currentDecisionVariable, initialState, fromState are
-		 * initialized with null values only at construction time, instances of
-		 * this class cannot be recycled.
+		 * Since currentDecisionVariable, initialState, fromState are initialized with
+		 * null values only at construction time, instances of this class cannot be
+		 * recycled.
 		 */
 
 		this.totalTransitionCnt++;
 		Logger.getLogger(this.getClass().getName()).info("Trajectory sampling iteration " + this.totalTransitionCnt);
 
 		/*
-		 * If the currentDecisionVariable is null then one has just observed the
-		 * first simulator transition after initialization; not much can be
-		 * learned from that. (The currentDecisionVariable being null implies
-		 * both the fromState and the initialState being null.)
+		 * If the currentDecisionVariable is null then one has just observed the first
+		 * simulator transition after initialization; not much can be learned from that.
+		 * (The currentDecisionVariable being null implies both the fromState and the
+		 * initialState being null.)
 		 * 
-		 * If the currentDecisionVariable is not null, a full transition has
-		 * been observed that can now be memorized for (later) processing. If
-		 * this is done depends on if it is a warm-up iteration and what the
-		 * configuration for using such iterations is.
+		 * If the currentDecisionVariable is not null, a full transition has been
+		 * observed that can now be memorized for (later) processing. If this is done
+		 * depends on if it is a warm-up iteration and what the configuration for using
+		 * such iterations is.
 		 */
+
+		Double justObservedObjectiveFunctionValue = null; // only for logging
 
 		if ((this.currentDecisionVariable != null) && (this.useAllWarmupIterations
 				|| (this.decisionVariable2remainingWarmupIterations.get(this.currentDecisionVariable) == null))) {
 
+			justObservedObjectiveFunctionValue = this.objectiveFunction.value(newState);
 			this.allTransitionSequences.addTransition(this.fromState, this.currentDecisionVariable, newState,
-					this.objectiveFunction.value(newState));
-
+					// this.objectiveFunction.value(newState)
+					justObservedObjectiveFunctionValue);
 		}
 
 		/*
@@ -250,6 +254,12 @@ public class MultiTrajectorySampler<U extends DecisionVariable, X extends Simula
 				this.fromState = newState;
 			}
 
+			this.statisticsWriter.writeToFile(null, LastObjectiveFunctionValue.LABEL,
+					Statistic.toString(justObservedObjectiveFunctionValue), EquilibriumGapWeight.LABEL,
+					Double.toString(this.equilibriumWeight), UniformityGapWeight.LABEL,
+					Double.toString(this.uniformityWeight), LastDecisionVariable.LABEL,
+					this.currentDecisionVariable.toString());
+
 			this.currentDecisionVariable = this.decisionVariable2remainingWarmupIterations.keySet().iterator().next(); // relies
 			this.currentDecisionVariable.implementInSimulation();
 
@@ -264,8 +274,9 @@ public class MultiTrajectorySampler<U extends DecisionVariable, X extends Simula
 				}
 			}
 
-			this.statisticsWriter.writeToFile(null, EquilibriumGapWeight.LABEL, Double.toString(this.equilibriumWeight),
-					UniformityGapWeight.LABEL, Double.toString(this.uniformityWeight));
+			// this.statisticsWriter.writeToFile(null, EquilibriumGapWeight.LABEL,
+			// Double.toString(this.equilibriumWeight),
+			// UniformityGapWeight.LABEL, Double.toString(this.uniformityWeight));
 
 		} else {
 

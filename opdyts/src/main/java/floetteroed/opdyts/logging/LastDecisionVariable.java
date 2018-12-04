@@ -36,9 +36,11 @@ import floetteroed.utilities.statisticslogging.Statistic;
 public class LastDecisionVariable<U extends DecisionVariable> implements
 		Statistic<SamplingStage<U>> {
 
+	public static final String LABEL = "Last Decision Variable";
+	
 	@Override
 	public String label() {
-		return "Last Decision Variable";
+		return LABEL;
 	}
 
 	@Override
