@@ -258,7 +258,7 @@ public class MultiTrajectorySampler<U extends DecisionVariable, X extends Simula
 					Statistic.toString(justObservedObjectiveFunctionValue), EquilibriumGapWeight.LABEL,
 					Double.toString(this.equilibriumWeight), UniformityGapWeight.LABEL,
 					Double.toString(this.uniformityWeight), LastDecisionVariable.LABEL,
-					this.currentDecisionVariable.toString());
+					Statistic.toString(this.currentDecisionVariable));
 
 			this.currentDecisionVariable = this.decisionVariable2remainingWarmupIterations.keySet().iterator().next(); // relies
 			this.currentDecisionVariable.implementInSimulation();
