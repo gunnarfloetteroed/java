@@ -103,6 +103,16 @@ public class RandomSearch<U extends DecisionVariable, X extends SimulatorState> 
 
 	// ==================== POGRAM CONTROL PARAMETERS ====================
 
+	public static final double DEFAULT_SMALLESTACCEPTEDIMPROVEMENT = 0.0;
+
+	private double smallestAcceptedImprovement = DEFAULT_SMALLESTACCEPTEDIMPROVEMENT;
+
+	public void setSmallestAcceptedImprovement(final double smallestAcceptedImprovement) {
+		this.smallestAcceptedImprovement = smallestAcceptedImprovement;
+	}
+
+	// ------------------------------------------------------------
+
 	public static final int DEFAULT_WARMUPITERATIONS = 1;
 
 	private int warmupIterations = DEFAULT_WARMUPITERATIONS;
@@ -458,7 +468,8 @@ public class RandomSearch<U extends DecisionVariable, X extends SimulatorState> 
 			// */
 			// }
 
-			if (bestObjectiveFunctionValue == null || newBestObjectiveFunctionValue < bestObjectiveFunctionValue) {
+			if ((bestObjectiveFunctionValue == null) || (newBestObjectiveFunctionValue < bestObjectiveFunctionValue
+					- this.smallestAcceptedImprovement)) {
 				bestDecisionVariable = newBestDecisionVariable;
 				bestObjectiveFunctionValue = newBestObjectiveFunctionValue;
 				bestInitialState = newInitialState;
