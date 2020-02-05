@@ -19,6 +19,7 @@
         <module>bioroute</module>
         <module>utilities</module>
         <module>misc</module>
+        <module>experimental</module>
     </modules>
 
 </project>
