@@ -9,12 +9,11 @@
   <name>java</name>
   
   <modules>
+    <module>utilities</module>
   	<module>bioroute</module>
   	<module>cadyts</module>
-    <module>experimental</module>    
-    
     <module>opdyts</module>
-    <module>utilities</module>
+    <module>experimental</module>    
     <module>misc</module>
   </modules>
   
