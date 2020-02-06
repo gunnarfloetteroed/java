@@ -7,11 +7,13 @@
     <groupId>gunnarfloetteroed</groupId>
     <artifactId>gunnarfloetteroed-root</artifactId>
     <version>master-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>pom</packaging> 
 
+	<!--
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
+	-->
 
     <modules>
 		<!-- testing ... 

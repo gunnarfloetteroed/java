@@ -9,13 +9,13 @@
 		<artifactId>gunnarfloetteroed-root</artifactId>
 	    <version>master-SNAPSHOT</version>
 	</parent>
-    <groupId>gunnarfloetteroed</groupId>
     
     <artifactId>experimental</artifactId>
-    <version>master-SNAPSHOT</version>
 
     <properties>
+        <!-- 
         <maven.deploy.skip>true</maven.deploy.skip>
+        -->
         <matsim.version>11.0</matsim.version>
         <geotools.version>14.0</geotools.version>
     </properties>
