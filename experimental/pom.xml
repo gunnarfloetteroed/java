@@ -16,7 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<!-- >>> OWN >>> -->
     <matsim.version>11.0</matsim.version>
-    <geotools.version>14.0</geotools.version>
+    <geotools.version>20.5</geotools.version>
 	<!-- <<< OWN <<< -->
   </properties>
   
@@ -53,7 +53,7 @@
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
-				
+		
 	</repositories>
   <!-- <<< OWN <<< -->
   
@@ -78,7 +78,7 @@
 
     	<dependency>
 			<groupId>gunnarfloetteroed</groupId>
-			<artifactId>floetteroed-utilities</artifactId>
+			<artifactId>utilities</artifactId>
 			<version>master-SNAPSHOT</version>
 		</dependency>
 
@@ -112,12 +112,44 @@
 			<version>3.3.0</version>
 		</dependency>	
 		
+		
+		
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-referencing</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+
+		<!-- 
+
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-main</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+				
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-shapefile</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-hsql</artifactId>
+			<version>${geotools.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+		 -->
+		
 		<dependency>
   		<!-- Dependency for database connections -->
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
+		
  		<dependency>
  		<!-- Dependency for CQL filtering -->
  			<groupId>org.geotools</groupId>
@@ -130,7 +162,6 @@
 			<artifactId>jts-core</artifactId>
 			<version>1.16.1</version>
 		</dependency>
-		
 		
 		<!-- MATSIM INFRASTRUCTURE -->
     
