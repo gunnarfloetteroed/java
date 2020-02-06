@@ -9,8 +9,8 @@
     <version>MASTER-SNAPSHOT</version>
   </parent>
 
-  <artifactId>floetteroed-utilities</artifactId>
-  <name>floetteroed-utilities</name>
+  <artifactId>cadyts</artifactId>
+  <name>cadyts</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,10 +23,24 @@
   <dependencies>
   
         <dependency>
+            <groupId>gunnarfloetteroed</groupId>
+            <artifactId>floetteroed-utilities</artifactId>
+        	<version>master-SNAPSHOT</version>
+        </dependency>
+
+		<!--  ORIGINAL        
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+        -->
+        <dependency>
     		<groupId>org.apache.commons</groupId>
     		<artifactId>commons-math3</artifactId>
     		<version>3.6.1</version>
-		</dependency>        
+		</dependency>
+        
     
   </dependencies>
   

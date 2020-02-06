@@ -9,8 +9,8 @@
     <version>MASTER-SNAPSHOT</version>
   </parent>
 
-  <artifactId>floetteroed-utilities</artifactId>
-  <name>floetteroed-utilities</name>
+  <artifactId>bioroute</artifactId>
+  <name>bioroute</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,11 +22,17 @@
   
   <dependencies>
   
-        <dependency>
-    		<groupId>org.apache.commons</groupId>
-    		<artifactId>commons-math3</artifactId>
-    		<version>3.6.1</version>
-		</dependency>        
+  	<dependency>
+    	<groupId>gunnarfloetteroed</groupId>
+        <artifactId>floetteroed-utilities</artifactId>
+        <version>master-SNAPSHOT</version>
+    </dependency>
+  
+    <dependency>
+    	<groupId>org.apache.commons</groupId>
+    	<artifactId>commons-math3</artifactId>
+    	<version>3.6.1</version>
+	</dependency>        
     
   </dependencies>
   
