@@ -4,8 +4,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>gunnarfloetteroed</groupId>
-    <artifactId>java</artifactId>
+    <groupId>gunnarfloetteroed.java</groupId>
+    <artifactId>java-root</artifactId>
     <version>MASTER-SNAPSHOT</version>
   </parent>
 
@@ -26,7 +26,7 @@
   <dependencies>
  
         <dependency>
-    	<groupId>com.github.gunnarfloetteroed.java</groupId>
+    		<groupId>gunnarfloetteroed.java</groupId>
             <artifactId>utilities</artifactId>
         	<version>master-SNAPSHOT</version>
         </dependency>
