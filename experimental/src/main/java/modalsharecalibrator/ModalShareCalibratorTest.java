@@ -23,9 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.Tuple;
 
 import modalsharecalibrator.ModalShareCalibrator.Mode;
 
@@ -53,7 +51,6 @@ public class ModalShareCalibratorTest {
 		return result;
 	}
 
-	@Test
 	public void test() {
 
 		System.out.println("STARTED ...");
