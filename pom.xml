@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>floetteroed</groupId>
-    <artifactId>floetteroed</artifactId>
+    <artifactId>floetteroed-root</artifactId>
     <version>master-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -14,11 +14,13 @@
     </properties>
 
     <modules>
+		<!-- testing ... 
         <module>cadyts</module>
         <module>opdyts</module>
         <module>bioroute</module>
         <module>utilities</module>
         <module>misc</module>
+        -->
         <module>experimental</module>
     </modules>
 
