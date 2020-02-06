@@ -14,10 +14,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<!-- >>> OWN >>> -->
-    <matsim.version>11.0</matsim.version>
-    <geotools.version>14.0</geotools.version>
-	<!-- <<< OWN <<< -->
   </properties>
   
   <dependencies>

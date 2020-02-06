@@ -12,9 +12,10 @@
   	<module>bioroute</module>
   	<module>cadyts</module>
     <module>experimental</module>    
-    <module>misc</module>
+    
     <module>opdyts</module>
     <module>utilities</module>
+    <module>misc</module>
   </modules>
   
   <build>

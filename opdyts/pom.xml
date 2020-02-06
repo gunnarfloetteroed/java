@@ -14,10 +14,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<!-- >>> OWN >>> -->
-    <matsim.version>11.0</matsim.version>
-    <geotools.version>14.0</geotools.version>
-	<!-- <<< OWN <<< -->
   </properties>
   
   <dependencies>
@@ -28,13 +24,6 @@
         	<version>master-SNAPSHOT</version>
         </dependency>
 
-		<!--  ORIGINAL        
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.4.1</version>
-        </dependency>
-        -->
         <dependency>
     		<groupId>org.apache.commons</groupId>
     		<artifactId>commons-math3</artifactId>
