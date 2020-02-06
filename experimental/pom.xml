@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>floetteroed</groupId>
-		<artifactId>floetteroed-root</artifactId>
+		<groupId>gunnarfloetteroed</groupId>
+		<artifactId>gunnarfloetteroed-root</artifactId>
 	    <version>master-SNAPSHOT</version>
 	</parent>
-
-    <groupId>floetteroed</groupId>
+    <groupId>gunnarfloetteroed</groupId>
+    
     <artifactId>experimental</artifactId>
     <version>master-SNAPSHOT</version>
 
