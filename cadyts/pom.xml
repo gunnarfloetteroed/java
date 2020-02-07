@@ -1,43 +1,25 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>gunnarfloetteroed.java</groupId>
-    <artifactId>java-root</artifactId>
-    <version>MASTER-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<groupId>gunnarfloetteroed</groupId>
+		<artifactId>java</artifactId>
+		<version>MASTER-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>cadyts</artifactId>
-  <name>cadyts</name>
+	<artifactId>cadyts</artifactId>
+	<name>cadyts</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  
-    <repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-  
-  <dependencies>
-  
-        <dependency>
-    		<groupId>gunnarfloetteroed.java</groupId>
-            <artifactId>utilities</artifactId>
-        	<version>master-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-    		<groupId>org.apache.commons</groupId>
-    		<artifactId>commons-math3</artifactId>
-    		<version>3.6.1</version>
+	<dependencies>
+		<dependency>
+			<groupId>gunnarfloetteroed</groupId>
+			<artifactId>utilities</artifactId>
+			<version>master-SNAPSHOT</version>
 		</dependency>
-        
-    
-  </dependencies>
-  
+	</dependencies>
+
 </project>

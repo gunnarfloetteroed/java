@@ -1,48 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <groupId>jitpack.io</groupId>
-  <artifactId>java-root</artifactId>
-  <version>MASTER-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>java-root</name>
-  
-  <modules>
-  	<module>bioroute</module>
-  	<module>cadyts</module>
-    <module>opdyts</module>
-    <module>experimental</module>    
-    <module>misc</module>
-    <module>utilities</module>
-  </modules>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.2</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-      
-      <!-- >>> OWN >>> -->
-      
-      <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-eclipse-plugin</artifactId>
-		<configuration>
-			<downloadSources>true</downloadSources>
-			<downloadJavadocs>true</downloadJavadocs>
-		</configuration>
-	  </plugin>
-      
-      <!-- <<< OWN <<< -->
-      
-    </plugins>
-  </build>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>gunnarfloetteroed</groupId>
+	<artifactId>java</artifactId>
+	<version>MASTER-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>java</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<modules>
+		<module>bioroute</module>
+		<module>cadyts</module>
+		<module>opdyts</module>
+		<module>experimental</module>
+		<module>misc</module>
+		<module>utilities</module>
+	</modules>
+
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.6.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ca.umontreal.iro.simul</groupId>
+			<artifactId>ssj</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

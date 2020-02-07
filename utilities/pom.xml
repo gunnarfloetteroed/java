@@ -1,29 +1,17 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>jitpack.io</groupId>
-    <artifactId>java-root</artifactId>
-    <version>MASTER-SNAPSHOT</version>
-  </parent>
+	<parent>
+		<groupId>gunnarfloetteroed</groupId>
+		<artifactId>java</artifactId>
+		<version>MASTER-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>utilities</artifactId>
-  <name>utilities</name>
+	<artifactId>utilities</artifactId>
+	<name>utilities</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  
-  <dependencies>
-  
-        <dependency>
-    		<groupId>org.apache.commons</groupId>
-    		<artifactId>commons-math3</artifactId>
-    		<version>3.6.1</version>
-		</dependency>        
-    
-  </dependencies>
-  
 </project>
