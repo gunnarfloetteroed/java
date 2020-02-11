@@ -135,8 +135,9 @@
 			<scope>test</scope>
 		</dependency>
 
+
+		<!--MATSim test infrastructure. -->
 		<dependency>
-			<!--MATSim test infrastructure. -->
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<type>test-jar</type>

@@ -40,7 +40,7 @@ package stockholm.wum.creation;
 // * @author Gunnar Flötteröd
 // *
 // */
-//public class CreateFullTransitSystem {
+public class CreateFullTransitSystem {
 //
 //	public static void main(String[] args) {
 //
@@ -92,4 +92,4 @@ package stockholm.wum.creation;
 //		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(transitVehiclesFile);
 //
 //	}
-//}
+}
