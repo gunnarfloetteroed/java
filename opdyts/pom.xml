@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>gunnarfloetteroed</groupId>
 			<artifactId>utilities</artifactId>
-			<version>master-SNAPSHOT</version>
+			<version>MASTER-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
