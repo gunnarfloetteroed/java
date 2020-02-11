@@ -147,6 +147,13 @@
 			<artifactId>matsim-sbb-extensions</artifactId>
 			<version>0.11.0-2018w44</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/colt/colt -->
+		<dependency>
+			<groupId>colt</groupId>
+			<artifactId>colt</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+
 
 	</dependencies>
 
