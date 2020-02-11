@@ -51,6 +51,13 @@
 			<url>https://jitpack.io</url>
 		</repository>
 
+		<!--  				
+  		<repository>
+  	    	<id>SBB</id>
+  	    	<url>https://bintray.com/schweizerischebundesbahnen/simba.mvn/matsim-sbb-extensions</url>
+  		</repository>
+		-->
+
 	</repositories>
 
 	<dependencies>
@@ -73,37 +80,45 @@
 			<version>MASTER-SNAPSHOT</version>
 		</dependency>
 
+		<!-- 
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
+ 		-->
 
+		<!-- 
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-referencing</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
-
+		-->
+	
+		<!-- Dependency for database connections -->	
+		<!--  
 		<dependency>
-			<!-- Dependency for database connections -->
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
+		-->
 
+		<!-- Dependency for CQL filtering -->
 		<dependency>
-			<!-- Dependency for CQL filtering -->
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-cql</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
 
+		<!-- 
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
 			<artifactId>jts-core</artifactId>
 			<version>1.16.1</version>
 		</dependency>
+		-->
 
 		<dependency>
 			<!-- This is the matsim "core": -->
@@ -142,11 +157,20 @@
 			<version>${matsim.version}</version>
 		</dependency>
 
+		<!--  
 		<dependency>
 			<groupId>com.github.simunto</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
 			<version>0.11.0-2018w44</version>
 		</dependency>
+		-->
+		
+		<dependency>
+  			<groupId>com.github.schweizerischebundesbahnen</groupId>
+  			<artifactId>matsim-sbb-extensions</artifactId>
+  			<version>11.0</version>
+		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/colt/colt -->
 		<dependency>
 			<groupId>colt</groupId>
