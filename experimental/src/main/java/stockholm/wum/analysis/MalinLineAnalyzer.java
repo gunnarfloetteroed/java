@@ -19,6 +19,8 @@
  */
 package stockholm.wum.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ import stockholm.wum.malin.VehiclesPerLineIdentifier;
  */
 public class MalinLineAnalyzer {
 
-	static void savePopulationSubset(final String fromFile, final String toFile, final Set<Id<Person>> keepPersons) {
+	static void savePopulationSubset(final String fromFile, final String toFile, final String onlyIdsFile, final Set<Id<Person>> keepPersons) {
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(fromFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -55,17 +57,28 @@ public class MalinLineAnalyzer {
 		}
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
 		writer.write(toFile);
+		
+		try {
+			final PrintWriter idWriter = new PrintWriter(onlyIdsFile);
+			for (Id<Person> id : scenario.getPopulation().getPersons().keySet()) {
+				idWriter.println(id.toString());
+			}
+			idWriter.flush();
+			idWriter.close();
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	public static void main(String[] args) {
 		System.out.println("STARTED ...");
 
-		final String baseCasePath = "C:\\Users\\GunnarF\\NoBackup\\data-workspace\\wum\\2019-11-16_base-case\\";
-		final String malinPath = "C:\\Users\\GunnarF\\NoBackup\\data-workspace\\wum\\2019-11-16_malin-scenario\\";
-
+		final String path = "/Users/GunnarF/OneDrive - VTI/My Data/wum/WUM-FINAL/";
+		
 		final Config config = ConfigUtils.createConfig();
-		config.transit().setTransitScheduleFile(malinPath + "output_transitSchedule.xml.gz");
-		config.transit().setVehiclesFile(malinPath + "output_transitVehicles.xml"); // replaced PC equiv. NaN by 1.0
+		config.transit().setTransitScheduleFile(path + "2019-11-07_policycase/output/output_transitSchedule.xml.gz");
+		config.transit().setVehiclesFile(path + "2019-11-07_policycase/output/output_transitVehicles.xml"); // replaced PC equiv. NaN by 1.0
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -79,7 +92,7 @@ public class MalinLineAnalyzer {
 
 		final EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(lineUsageStats);
-		EventsUtils.readEvents(manager, malinPath + "output_events.xml.gz");
+		EventsUtils.readEvents(manager, path + "2019-11-07_policycase/output/output_events.xml.gz");
 		System.out.println(lineUsageStats.getTravelers().size() + " travelers:");
 		for (Id<Person> lineUserId : lineUsageStats.getTravelers()) {
 			System.out.println(lineUserId);
@@ -99,10 +112,21 @@ public class MalinLineAnalyzer {
 		System.out.println();
 		System.out.println(lineUsageStats.getEntryExitLog());
 
-		savePopulationSubset(baseCasePath + "output_plans.xml.gz", baseCasePath + "malin_plans.xml.gz",
-				lineUsageStats.getTravelers());
-		savePopulationSubset(malinPath + "output_plans.xml.gz", malinPath + "malin_plans.xml.gz",
-				lineUsageStats.getTravelers());
+		try {
+			final PrintWriter idWriter = new PrintWriter(path + "malin-boat-users.ids.txt");
+			for (Id<Person> id : lineUsageStats.getTravelers()) {
+				idWriter.println(id.toString());
+			}
+			idWriter.flush();
+			idWriter.close();
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		
+//		savePopulationSubset(baseCasePath + "output_plans.xml.gz", baseCasePath + "malin_plans.xml.gz",
+//				lineUsageStats.getTravelers());
+//		savePopulationSubset(malinPath + "output_plans.xml.gz", malinPath + "malin_plans.xml.gz",
+//				lineUsageStats.getTravelers());
 
 		System.out.println("... DONE");
 	}

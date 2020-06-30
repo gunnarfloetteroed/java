@@ -19,6 +19,8 @@
  */
 package stockholm.wum.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -41,12 +43,14 @@ public class ExtractFerryUsers {
 
 	public static void main(String[] args) {
 
-		final String path = "/Users/GunnarF/NoBackup/data-workspace/wum/runs/2018-01-06b/";
-		final String fromFile = "output/ITERS/it.300/300.plans.xml.gz";
-		final String toFile = "300.plans.ferry-users.xml.gz";
+		final String fromFile = "/Users/GunnarF/OneDrive - VTI/My Data/wum/WUM-FINAL/2019-11-06_basecase/output/output_plans.xml.gz";
+		final String toFile = "/Users/GunnarF/OneDrive - VTI/My Data/wum/WUM-FINAL/basecase_ferry-users.xml.gz";
+		final String onlyIdsFile = "/Users/GunnarF/OneDrive - VTI/My Data/wum/WUM-FINAL/basecase_ferry-users.ids.txt";
 
+		
+		
 		final Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(path + fromFile);
+		config.plans().setInputFile(fromFile);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final Set<Id<Person>> noFerryUsers = new LinkedHashSet<>(scenario.getPopulation().getPersons().keySet());
@@ -60,14 +64,24 @@ public class ExtractFerryUsers {
 				}
 			}
 		}
-		
+
 		for (Id<Person> noFerryUser : noFerryUsers) {
 			scenario.getPopulation().getPersons().remove(noFerryUser);
 		}
+	
 		final PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
-		writer.write(path + toFile);
+		writer.write(toFile);
 		
-		
+		try {
+			final PrintWriter idWriter = new PrintWriter(onlyIdsFile);
+			for (Id<Person> id : scenario.getPopulation().getPersons().keySet()) {
+				idWriter.println(id.toString());
+			}
+			idWriter.flush();
+			idWriter.close();
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 		
 	}
 

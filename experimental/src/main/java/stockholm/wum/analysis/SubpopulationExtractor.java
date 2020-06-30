@@ -19,20 +19,20 @@
  */
 package stockholm.wum.analysis;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.StringUtils;
 
 /**
  *
@@ -41,47 +41,54 @@ import org.matsim.core.utils.misc.StringUtils;
  */
 public class SubpopulationExtractor {
 
-	public static void main(String[] args) {
+	public SubpopulationExtractor() {
+	}
 
-		String from = null;
-		String to = null;
-		String idList = null;
-		try {
-			from = args[0];
-			to = args[1];
-			idList = args[2];
-		} catch (Exception e) {
-			System.out.println("parameters: fromFile toFile commaSeparatedListOfPersonIds");
-			System.exit(0);
-		}
-
-		final Set<Id<Person>> allRelevantPersonIds = new LinkedHashSet<>();
-		for (String part : StringUtils.explode(idList, ',')) {
-			allRelevantPersonIds.add(Id.createPersonId(part.trim().intern()));
-		}
-		System.out.println("Identified " + allRelevantPersonIds.size() + " person ids: " + allRelevantPersonIds);
-
-		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(from);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Set<Id<Person>> allToRemove = new LinkedHashSet<>();
-		for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
-			if (!allRelevantPersonIds.contains(personId)) {
-				allToRemove.add(personId);
+	private Set<Id<Person>> readIds(final String idFile) throws IOException {
+		final Set<Id<Person>> result = new LinkedHashSet<>();
+		final BufferedReader reader = new BufferedReader(new FileReader(idFile));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			line = line.trim();
+			if (line.length() > 0) {
+				result.add(Id.createPersonId(line));
 			}
 		}
+		reader.close();
+		return result;
+	}
 
-		for (Id<Person> removeId : allToRemove) {
-			scenario.getPopulation().getPersons().remove(removeId);
+	public void run(final String from, final String to, final String ids) {
+
+		final Set<Id<Person>> personIds;
+		try {
+			personIds = this.readIds(ids);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		System.out.println("Identified " + scenario.getPopulation().getPersons().keySet().size() + " persons: "
-				+ scenario.getPopulation().getPersons().keySet());
+
+		final Config config = ConfigUtils.createConfig();
+		config.plans().setInputFile(from);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		scenario.getPopulation().getPersons().keySet().retainAll(personIds);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			PersonUtils.removeUnselectedPlans(person);
 		}
-		
+
 		new PopulationWriter(scenario.getPopulation()).write(to);
 	}
+
+	public static void main(String[] args) {
+		final String path = "/Users/GunnarF/OneDrive - VTI/My Data/wum/WUM-FINAL/";
+		
+		System.out.println("STARTED ...");
+
+		// new SubpopulationExtractor().run(path + "2019-11-06_basecase/output/output_plans.xml.gz", path + "baseCase_malinBoatUsers.xml.gz", path + "malin-boat-users.ids.txt");
+		new SubpopulationExtractor().run(path + "2019-11-07_policycase/output/output_plans.xml.gz", path + "policyCase_malinBoatUsers.xml.gz", path + "malin-boat-users.ids.txt");
+		
+		System.out.println("... DONE");
+	}
+
 }

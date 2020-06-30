@@ -245,7 +245,7 @@ public class PropModelBuilder {
 			point[i] = 2.0 * (rnd.nextDouble() - 0.5);
 		}
 		
-		for (double regularizationWeight : new double[] { 1e-3 }) {
+		for (double regularizationWeight : new double[] { 1e-3, 1e-6, 1e-9, 1e-12 }) {
 			model = new PropModel(regularizationWeight, model);
 
 			final PropModelEstimator estimator = new PropModelEstimator(model, 1e-8, Integer.MAX_VALUE,
