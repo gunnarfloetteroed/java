@@ -31,8 +31,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleReaderV1;
 
 /**
  *
@@ -50,7 +50,10 @@ public class DifferentiatedPTModeReconstructor {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getTransitVehicles());
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getTransitVehicles());
+		MatsimVehicleReader vehicleReader = new MatsimVehicleReader(scenario.getTransitVehicles());
+
 		vehicleReader.readFile(path + "/vehicles.xml");
 		System.out.println("  loaded " + scenario.getTransitVehicles().getVehicles().size() + " transit vehicles");
 

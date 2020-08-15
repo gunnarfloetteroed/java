@@ -1,10 +1,10 @@
 package org.matsim.contrib.ier.emulator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -18,9 +18,6 @@ import org.matsim.core.scoring.PersonExperiencedActivity;
 import org.matsim.core.scoring.PersonExperiencedLeg;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.roadpricing.MyRoadPricingUtils;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingScheme;
 
 import com.google.inject.Inject;
 
@@ -61,14 +58,16 @@ public final class AgentEmulator {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(eventHandler);
 
-		if (this.scenario.getConfig().getModules().containsKey(RoadPricingConfigGroup.GROUP_NAME)) {
-			// RoadPricingTollCalculator ADDS ITSELF as a handler to the EventsManager.
-			// Creates then suitable PersonMoneyEvents and passes them to the manager.
-			RoadPricingScheme scheme = (RoadPricingScheme) this.scenario
-					.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-			Network network = this.scenario.getNetwork();
-			MyRoadPricingUtils.newInstance(network, scheme, eventsManager);
-		}
+		Logger.getLogger(this.getClass())
+				.warn("Removed road pricing related code. (2020-08-14: changed while moving to MATSim 12)");
+//		if (this.scenario.getConfig().getModules().containsKey(RoadPricingConfigGroup.GROUP_NAME)) {
+//			// RoadPricingTollCalculator ADDS ITSELF as a handler to the EventsManager.
+//			// Creates then suitable PersonMoneyEvents and passes them to the manager.
+//			RoadPricingScheme scheme = (RoadPricingScheme) this.scenario
+//					.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+//			Network network = this.scenario.getNetwork();
+//			MyRoadPricingUtils.newInstance(network, scheme, eventsManager);
+//		}
 
 		EventsToActivities eventsToActivities = new EventsToActivities();
 		EventsToLegs eventsToLegs = new EventsToLegs(this.scenario);

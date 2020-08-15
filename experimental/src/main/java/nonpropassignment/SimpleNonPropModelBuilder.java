@@ -96,12 +96,12 @@ public class SimpleNonPropModelBuilder {
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof Leg) {
 				final Leg leg = (Leg) pe;
-				if ((leg.getDepartureTime() >= this.analysisIntervalStart_s) && "car".equals(leg.getMode())) {
+				if ((leg.getDepartureTime().seconds() >= this.analysisIntervalStart_s) && "car".equals(leg.getMode())) {
 					final NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
 					int[] linkIndices = new int[1 + networkRoute.getLinkIds().size()];
 					int i = 0;
 					// first link
-					double time_s = leg.getDepartureTime();
+					double time_s = leg.getDepartureTime().seconds();
 					Link link = this.network.getLinks().get(networkRoute.getStartLinkId());
 					linkIndices[i++] = this.linkPairIndexer.getLinkIndex(link.getId());
 					time_s += travelTime.getLinkTravelTime(link, time_s, person, null);

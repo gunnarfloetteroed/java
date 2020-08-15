@@ -70,7 +70,7 @@ class PersonTravelStatistics implements ActivityHandler, LegHandler {
 		}
 
 		void update(final Leg leg) {
-			this.totalTravelTime_s += leg.getTravelTime();
+			this.totalTravelTime_s += leg.getTravelTime().seconds();
 			this.totalTravelDistance_m += leg.getRoute().getDistance();
 		}
 	}

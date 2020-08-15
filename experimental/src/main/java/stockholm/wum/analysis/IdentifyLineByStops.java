@@ -33,7 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.MatsimVehicleReader;
 
 /**
  *
@@ -73,7 +73,9 @@ public class IdentifyLineByStops {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readFile(reducedScheduleFile);
-		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(reducedTransitVehiclesFile);
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: new VehicleReaderV1(scenario.getTransitVehicles()).readFile(reducedTransitVehiclesFile);
+		new MatsimVehicleReader(scenario.getTransitVehicles()).readFile(reducedTransitVehiclesFile);
 
 		for (TransitLine line : scenario.getTransitSchedule().getTransitLines().values()) {
 

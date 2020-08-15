@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.MatsimVehicleReader;
 
 import stockholm.ihop2.regent.demandreading.ZonalSystem;
 import stockholm.saleem.StockholmTransformationFactory;
@@ -72,7 +72,10 @@ public class CropTransitSystem {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readFile(this.fullScheduleFile);
-		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.fullTransitVehiclesFile);
+				
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLDnew VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.fullTransitVehiclesFile);
+		new MatsimVehicleReader(scenario.getTransitVehicles()).readFile(this.fullTransitVehiclesFile);
 
 		System.out.print("Identifying contained stop facilities ... ");
 		final Set<Id<TransitStopFacility>> relevantStopFacilityIds = new LinkedHashSet<>();
@@ -189,7 +192,10 @@ public class CropTransitSystem {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readFile(fullScheduleFile);
-		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(fullTransitVehiclesFile);
+
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: new VehicleReaderV1(scenario.getTransitVehicles()).readFile(fullTransitVehiclesFile);
+		new MatsimVehicleReader(scenario.getTransitVehicles()).readFile(fullTransitVehiclesFile);
 
 		final CoordinateTransformation network2zonal = StockholmTransformationFactory.getCoordinateTransformation(
 				StockholmTransformationFactory.WGS84_SWEREF99, StockholmTransformationFactory.WGS84_EPSG3857);

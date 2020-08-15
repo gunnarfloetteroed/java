@@ -90,6 +90,9 @@ public class PopulationCreator {
 
 	private double populationSampleFactor = 1.0;
 
+	// 2020-08-14: changed while moving to MATSim 12
+	private final ObjectAttributes personAttributes = new ObjectAttributes();
+
 	// -------------------- CONSTRUCTION --------------------
 
 	/*
@@ -108,7 +111,11 @@ public class PopulationCreator {
 		this.zonalSystem.addNetwork(this.scenario.getNetwork(), StockholmTransformationFactory.WGS84_SWEREF99);
 		Logger.getLogger(this.getClass().getName())
 				.info("number of zones in zonal system is " + this.zonalSystem.getId2zoneView().size());
-		new ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes()).readFile(populationFileName);
+
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD new
+		// ObjectAttributesXmlReader(this.scenario.getPopulation().getPersonAttributes()).readFile(populationFileName);
+		new ObjectAttributesXmlReader(this.personAttributes).readFile(populationFileName);
 	}
 
 	public void setBuildingsFileName(final String buildingShapeFileName) {
@@ -164,7 +171,10 @@ public class PopulationCreator {
 	}
 
 	private Object attr(final String who, final String what) {
-		return this.scenario.getPopulation().getPersonAttributes().getAttribute(who, what);
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD return
+		// this.scenario.getPopulation().getPersonAttributes().getAttribute(who, what);
+		return this.personAttributes.getAttribute(who, what);
 	}
 
 	private Person newPerson(final String personId, final XY2Links xy2links,
@@ -322,7 +332,11 @@ public class PopulationCreator {
 		final CoordinateTransformation coordinateTransform = getCoordinateTransformation(WGS84_EPSG3857,
 				WGS84_SWEREF99);
 
-		final List<String> allPersonIds = allObjectKeys(this.scenario.getPopulation().getPersonAttributes());
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD final List<String> allPersonIds =
+		// allObjectKeys(this.scenario.getPopulation().getPersonAttributes());
+		final List<String> allPersonIds = allObjectKeys(this.personAttributes);
+
 		Collections.shuffle(allPersonIds);
 
 		for (String personId : new FractionalIterable<>(allPersonIds, this.populationSampleFactor)) {

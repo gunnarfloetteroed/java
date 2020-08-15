@@ -21,7 +21,7 @@ package org.matsim.contrib.greedo.analysis;
 
 import java.io.File;
 
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 
 /**
@@ -33,7 +33,7 @@ public class AccelerationAnalyzer {
 
 	static void save(final JFreeChart chart, final String fileName) {
 		try {
-			ChartUtilities.saveChartAsPNG(new File(fileName + ".png"), chart, 1000, 600);
+			ChartUtils.saveChartAsPNG(new File(fileName + ".png"), chart, 1000, 600);
 
 			// SVGGraphics2D g2 = new SVGGraphics2D(500, 300);
 			// Rectangle r = new Rectangle(0, 0, 500, 300);

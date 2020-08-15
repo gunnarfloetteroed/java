@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -92,7 +93,7 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 				if (TransportMode.transit_walk.equals(leg.getMode())) {
 
 					final double generalizedTravelTime_s = super.utlFct.getGeneralizedPTTravelTime_s(0.0, 0.0, 0.0,
-							leg.getTravelTime(), 0);
+							leg.getTravelTime().seconds(), 0);
 					final SampersPTSummaryLeg summaryLeg = new SampersPTSummaryLeg(generalizedTravelTime_s);
 					super.handleLeg(summaryLeg);
 
@@ -118,24 +119,24 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 					throw new RuntimeException("Expected " + TransportMode.egress_walk + " but received "
 							+ this.tmpLegs.getLast().getMode() + " in the last leg.");
 				}
-				final double accessEgressTime_s = this.tmpLegs.getFirst().getTravelTime()
-						+ this.tmpLegs.getLast().getTravelTime();
+				final double accessEgressTime_s = this.tmpLegs.getFirst().getTravelTime().seconds()
+						+ this.tmpLegs.getLast().getTravelTime().seconds();
 
 				// "första väntetid"
-				final double firstWaitingTime_s = this.tmpActs.getFirst().getEndTime()
-						- this.tmpActs.getFirst().getStartTime();
+				final double firstWaitingTime_s = this.tmpActs.getFirst().getEndTime().seconds()
+						- this.tmpActs.getFirst().getStartTime().seconds();
 
 				double transferTime_s = 0.0; // "bytestid"
 				double inVehicleTime_s = 0.0; // "restid i fordonet"
 				for (int i = 1; i < this.tmpLegs.size() - 1; i++) { // leave out access and egress
 					final Leg leg = this.tmpLegs.get(i);
 					if (TransportMode.transit_walk.equals(leg.getMode())) {
-						transferTime_s += leg.getTravelTime();
+						transferTime_s += leg.getTravelTime().seconds();
 					} else if (PT_SUBMODES.contains(leg.getMode())) {
 						if (this.sthlmConfig.isFerryPassengerMode(leg.getMode())) {
-							inVehicleTime_s += this.sthlmConfig.getBoatFactor() * leg.getTravelTime();
+							inVehicleTime_s += this.sthlmConfig.getBoatFactor() * leg.getTravelTime().seconds();
 						} else {						
-							inVehicleTime_s += leg.getTravelTime();
+							inVehicleTime_s += leg.getTravelTime().seconds();
 						}
 					} else {
 						throw new RuntimeException("Unknown PT trip-chain mode: " + leg.getMode());
@@ -144,7 +145,7 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 				int numberOfTransfers = 0; // "antal byten"
 				for (Activity transfer : this.tmpActs) {
 					numberOfTransfers++;
-					transferTime_s += transfer.getEndTime() - transfer.getStartTime();
+					transferTime_s += transfer.getEndTime().seconds() - transfer.getStartTime().seconds();
 				}
 
 				final double generalizedTravelTime_s = super.utlFct.getGeneralizedPTTravelTime_s(accessEgressTime_s,
@@ -176,12 +177,15 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 
 	// -------------------- INNER CLASS --------------------
 
+	// 2020-08-14: changed while moving to MATSim 12
 	class SampersPTSummaryLeg implements Leg {
 
-		private final double generalizedTravelTime_s;
+		// private final double generalizedTravelTime_s;
+		private final OptionalTime generalizedTravelTime_s;
 
 		private SampersPTSummaryLeg(final double generalizedTravelTime_s) {
-			this.generalizedTravelTime_s = generalizedTravelTime_s;
+			// this.generalizedTravelTime_s = generalizedTravelTime_s;
+			this.generalizedTravelTime_s = OptionalTime.defined(generalizedTravelTime_s);
 		}
 
 		@Override
@@ -199,11 +203,6 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 
 				@Override
 				public void setDistance(double distance) {
-					throw new UnsupportedOperationException();
-				}
-
-				@Override
-				public double getTravelTime() {
 					throw new UnsupportedOperationException();
 				}
 
@@ -251,12 +250,17 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 				public Route clone() {
 					throw new UnsupportedOperationException();
 				}
-			};
-		}
 
-		@Override
-		public double getTravelTime() {
-			return this.generalizedTravelTime_s;
+				@Override
+				public OptionalTime getTravelTime() {
+					return generalizedTravelTime_s;
+				}
+
+				@Override
+				public void setTravelTimeUndefined() {
+					throw new UnsupportedOperationException();
+				}
+			};
 		}
 
 		@Override
@@ -275,17 +279,32 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 		}
 
 		@Override
-		public double getDepartureTime() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public void setDepartureTime(double seconds) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public void setTravelTime(double seconds) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public OptionalTime getDepartureTime() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setDepartureTimeUndefined() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public OptionalTime getTravelTime() {
+			return this.generalizedTravelTime_s;
+		}
+
+		@Override
+		public void setTravelTimeUndefined() {
 			throw new UnsupportedOperationException();
 		}
 	}

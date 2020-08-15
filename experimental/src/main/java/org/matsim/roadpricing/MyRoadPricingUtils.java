@@ -19,18 +19,12 @@
  */
 package org.matsim.roadpricing;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.RoadPricingScheme;
-
 /**
  *
  * @author Gunnar Flötteröd
  *
  */
+@Deprecated
 public class MyRoadPricingUtils {
 
 	/*
@@ -39,13 +33,13 @@ public class MyRoadPricingUtils {
 	 * switch to a more recent version of the roadpricing contrib, hence living with
 	 * this hack for the time being.
 	 */
-	public static CalcPaidToll newInstance(final Network network, final RoadPricingScheme scheme,
-			EventsManager events) {
-		final Level level = Logger.getLogger("org.matsim").getLevel();
-		Logger.getLogger("org.matsim").setLevel(Level.OFF);
-		final CalcPaidToll result = new CalcPaidToll(network, scheme, events);
-		Logger.getLogger("org.matsim").setLevel(level);
-		return result;
-	}
+//	public static CalcPaidToll newInstance(final Network network, final RoadPricingScheme scheme,
+//			EventsManager events) {
+//		final Level level = Logger.getLogger("org.matsim").getLevel();
+//		Logger.getLogger("org.matsim").setLevel(Level.OFF);
+//		final CalcPaidToll result = new CalcPaidToll(network, scheme, events);
+//		Logger.getLogger("org.matsim").setLevel(level);
+//		return result;
+//	}
 
 }

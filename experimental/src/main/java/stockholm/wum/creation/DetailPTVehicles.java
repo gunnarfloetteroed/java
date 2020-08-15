@@ -27,8 +27,8 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -44,20 +44,21 @@ public class DetailPTVehicles {
 
 	private final String transitVehicleTypeDefinitionsFileName;
 	private final String scheduleFileName;
-	private final String oldTransitVehiclesFileName; 
-	
-	public DetailPTVehicles(final String transitVehicleTypeDefinitionsFileName,
-			final String scheduleFileName,
+	private final String oldTransitVehiclesFileName;
+
+	public DetailPTVehicles(final String transitVehicleTypeDefinitionsFileName, final String scheduleFileName,
 			final String vehiclesFileName) {
 		this.transitVehicleTypeDefinitionsFileName = transitVehicleTypeDefinitionsFileName;
 		this.scheduleFileName = scheduleFileName;
 		this.oldTransitVehiclesFileName = vehiclesFileName;
 	}
-	
+
 	public void run(final String newTransitVehiclesFileName) {
 		final Vehicles newVehicles = VehicleUtils.createVehiclesContainer();
 		{
-			final VehicleReaderV1 reader = new VehicleReaderV1(newVehicles);
+			// 2020-08-14: changed while moving to MATSim 12
+			// final VehicleReaderV1 reader = new VehicleReaderV1(newVehicles);
+			final MatsimVehicleReader reader = new MatsimVehicleReader(newVehicles);
 			reader.readFile(transitVehicleTypeDefinitionsFileName);
 		}
 
@@ -65,7 +66,10 @@ public class DetailPTVehicles {
 		{
 			final TransitScheduleReader scheduleReader = new TransitScheduleReader(scenario);
 			scheduleReader.readFile(scheduleFileName);
-			final VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getTransitVehicles());
+			// 2020-08-14: changed while moving to MATSim 12
+			// OLD: final VehicleReaderV1 vehicleReader = new
+			// VehicleReaderV1(scenario.getTransitVehicles());
+			final MatsimVehicleReader vehicleReader = new MatsimVehicleReader(scenario.getTransitVehicles());
 			vehicleReader.readFile(oldTransitVehiclesFileName);
 		}
 
@@ -88,7 +92,7 @@ public class DetailPTVehicles {
 		final VehicleWriterV1 vehicleWriter = new VehicleWriterV1(newVehicles);
 		vehicleWriter.writeFile(newTransitVehiclesFileName);
 	}
-	
+
 	public static void main(String[] args) {
 
 		System.out.println("STARTED ...");
@@ -100,7 +104,9 @@ public class DetailPTVehicles {
 
 		final Vehicles newVehicles = VehicleUtils.createVehiclesContainer();
 		{
-			final VehicleReaderV1 reader = new VehicleReaderV1(newVehicles);
+			// 2020-08-14: changed while moving to MATSim 12
+			// OLD: final VehicleReaderV1 reader = new VehicleReaderV1(newVehicles);
+			final MatsimVehicleReader reader = new MatsimVehicleReader(newVehicles);
 			reader.readFile(transitVehicleTypeDefinitionsFileName);
 		}
 
@@ -108,7 +114,10 @@ public class DetailPTVehicles {
 		{
 			final TransitScheduleReader scheduleReader = new TransitScheduleReader(scenario);
 			scheduleReader.readFile(scheduleFileName);
-			final VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getTransitVehicles());
+			// 2020-08-14: changed while moving to MATSim 12
+			// OLD: final VehicleReaderV1 vehicleReader = new
+			// VehicleReaderV1(scenario.getTransitVehicles());
+			final MatsimVehicleReader vehicleReader = new MatsimVehicleReader(scenario.getTransitVehicles());
 			vehicleReader.readFile(oldTransitVehiclesFileName);
 		}
 
@@ -130,7 +139,7 @@ public class DetailPTVehicles {
 
 		final VehicleWriterV1 vehicleWriter = new VehicleWriterV1(newVehicles);
 		vehicleWriter.writeFile(newTransitVehiclesFileName);
-		
+
 		// vehiclesFactory.createVehicle(id, type)
 
 		// final Set<Id<VehicleType>> oldVehTypeIds = new LinkedHashSet<>(

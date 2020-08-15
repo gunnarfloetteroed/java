@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.greedo.Greedo;
 import org.matsim.contrib.greedo.GreedoConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
 import org.matsim.core.config.Config;
@@ -40,8 +42,6 @@ import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 
@@ -143,7 +143,11 @@ public class WUMProductionRunner {
 		// }
 
 		final Controler controler = new Controler(scenario);
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		controler.addOverridingModule(new RoadPricingModule());
+		
 		controler.addOverridingModule(new SampersDifferentiatedPTScoringFunctionModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

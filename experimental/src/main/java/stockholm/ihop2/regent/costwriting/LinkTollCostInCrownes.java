@@ -16,14 +16,13 @@
  *
  * contact: gunnar.flotterod@gmail.com
  *
- */ 
+ */
 package stockholm.ihop2.regent.costwriting;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -38,19 +37,18 @@ public class LinkTollCostInCrownes implements TravelDisutility {
 	private final RoadPricingSchemeImpl roadPricingScheme;
 
 	public LinkTollCostInCrownes(final String tollFileName) {
-		this.roadPricingScheme = new RoadPricingSchemeImpl();
-		final RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(
-				this.roadPricingScheme);
-		reader.readFile(tollFileName);
+		// 2020-08-14: removed while moving to MATSim 12
+//		this.roadPricingScheme = new RoadPricingSchemeImpl();		
+//		final RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(
+//				this.roadPricingScheme);
+//		reader.readFile(tollFileName);
+		throw new RuntimeException("Need to update usage of Roadpricing config.");
 	}
 
 	@Override
-	public double getLinkTravelDisutility(Link link, double time,
-			Person person, Vehicle vehicle) {
-		final RoadPricingSchemeImpl.Cost cost = this.roadPricingScheme
-				.getLinkCostInfo(link.getId(), time,
-						(person != null) ? person.getId() : null,
-						(vehicle != null) ? vehicle.getId() : null);
+	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+		final RoadPricingSchemeImpl.Cost cost = this.roadPricingScheme.getLinkCostInfo(link.getId(), time,
+				(person != null) ? person.getId() : null, (vehicle != null) ? vehicle.getId() : null);
 		if (cost == null) {
 			return 0.0;
 		} else {

@@ -109,16 +109,16 @@ class SampersTour {
 	}
 
 	Double getRealizedStartTime_s() {
-		return this.activity.getStartTime();
+		return this.activity.getStartTime().seconds();
 	}
 
 	double getRealizedActivityDuration_s() {
-		return (this.activity.getEndTime() - this.activity.getStartTime());
+		return (this.activity.getEndTime().seconds() - this.activity.getStartTime().seconds());
 	}
 
 	double getRealizedTravelTime_min() {
 		// legs contain travel time in seconds
-		return (this.firstLeg.getTravelTime() + this.secondLeg.getTravelTime()) / 60.0;
+		return (this.firstLeg.getTravelTime().seconds() + this.secondLeg.getTravelTime().seconds()) / 60.0;
 	}
 
 	double getRealizedTravelDistance_km() {

@@ -24,7 +24,6 @@ import org.matsim.contrib.opdyts.buildingblocks.decisionvariables.composite.Comp
 import org.matsim.contrib.opdyts.buildingblocks.decisionvariables.scalar.ScalarRandomizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.utils.misc.Time;
 
 import floetteroed.utilities.Units;
 
@@ -40,25 +39,27 @@ public class ActivityTimesUtils {
 		final CompositeDecisionVariableBuilder builder = new CompositeDecisionVariableBuilder();
 		for (ActivityParams actParams : config.planCalcScore().getActivityParams()) {
 			if (!"dummy".equals(actParams.getActivityType())) { // magic act in PlanCalcScoreConfigGroup
-				if (!Time.isUndefinedTime(actParams.getOpeningTime())) {
+				// 2020-08-14: changed while moving to MATSim 12
+				if (actParams.getOpeningTime().isDefined()) {
 					final OpeningTime openingTime = new OpeningTime(config, actParams.getActivityType(),
-							actParams.getOpeningTime());
+							actParams.getOpeningTime().seconds());
 					openingTime.setMinValue_s(0);
 					openingTime.setMaxValue_s(Units.S_PER_D);
 					builder.add(openingTime,
 							new ScalarRandomizer<OpeningTime>(timeVariationStepSize_s, searchStageExponent));
 				}
-				if (!Time.isUndefinedTime(actParams.getClosingTime())) {
+				// 2020-08-14: changed while moving to MATSim 12
+				if (actParams.getClosingTime().isDefined()) {
 					final ClosingTime closingTime = new ClosingTime(config, actParams.getActivityType(),
-							actParams.getClosingTime());
+							actParams.getClosingTime().seconds());
 					closingTime.setMinValue_s(0);
 					closingTime.setMaxValue_s(Units.S_PER_D);
 					builder.add(closingTime,
 							new ScalarRandomizer<ClosingTime>(timeVariationStepSize_s, searchStageExponent));
 				}
-				if (!Time.isUndefinedTime(actParams.getTypicalDuration())) {
+				if (actParams.getTypicalDuration().isDefined()) {
 					final TypicalDuration typicalDuration = new TypicalDuration(config, actParams.getActivityType(),
-							actParams.getTypicalDuration());
+							actParams.getTypicalDuration().seconds());
 					typicalDuration.setMinValue_s(15 * Units.S_PER_MIN);
 					builder.add(typicalDuration,
 							new ScalarRandomizer<TypicalDuration>(timeVariationStepSize_s, searchStageExponent));

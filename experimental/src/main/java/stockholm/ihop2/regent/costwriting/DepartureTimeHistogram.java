@@ -107,7 +107,7 @@ public class DepartureTimeHistogram {
 								prevDptTime_s);
 					}
 					prevAct = currentAct;
-					prevDptTime_s = currentAct.getEndTime();
+					prevDptTime_s = currentAct.getEndTime().seconds();
 				}
 			}
 		}

@@ -85,7 +85,7 @@ public class AdjustPseudoNetwork {
 
 						final Link thisLink = this.network.getLinks().get(stop.getStopFacility().getLinkId());
 						final Node thisStopNode = thisLink.getToNode();
-						final double thisStopArrTime_s = routeDptTime_s + stop.getArrivalOffset();
+						final double thisStopArrTime_s = routeDptTime_s + stop.getArrivalOffset().seconds();
 
 						if (prevStopNode != null) {
 

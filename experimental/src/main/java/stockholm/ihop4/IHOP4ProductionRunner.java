@@ -52,6 +52,8 @@ import org.matsim.contrib.opdyts.buildingblocks.decisionvariables.scalar.ScalarR
 import org.matsim.contrib.opdyts.buildingblocks.decisionvariables.utils.EveryIterationScoringParameters;
 import org.matsim.contrib.opdyts.microstate.MATSimState;
 import org.matsim.contrib.opdyts.microstate.MATSimStateFactoryImpl;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -63,8 +65,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.utilities.TimeDiscretization;
@@ -690,7 +690,9 @@ public class IHOP4ProductionRunner {
 
 			// <<<< TODO FOR TESTING <<<<
 
-			runner.setReplacingModules(new ControlerDefaultsWithRoadPricingModule());
+			// 2020-08-14: changed while moving to MATSim 12
+			// OLD runner.setReplacingModules(new ControlerDefaultsWithRoadPricingModule());
+			runner.setReplacingModules(new RoadPricingModule());
 
 			runner.setOpdytsProgressListener(progressListener);
 
@@ -768,7 +770,9 @@ public class IHOP4ProductionRunner {
 				}
 			});
 
-			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+			// 2020-08-14: changed while moving to MATSim 12
+			// controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+			controler.setModules(new RoadPricingModule());
 
 			// ... and run.
 
@@ -794,13 +798,17 @@ public class IHOP4ProductionRunner {
 		greedo.meet(scenario);
 
 		final Controler controler = new Controler(scenario);
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		controler.setModules(new RoadPricingModule());
+		
 		controler.addOverridingModule(new SampersScoringFunctionModule());
 
 		for (AbstractModule module : greedo.getModules()) {
 			controler.addOverridingModule(module);
 		}
-		
+
 		// The following because Sampers scoring requires it
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -808,7 +816,7 @@ public class IHOP4ProductionRunner {
 				bind(ModeASCContainer.class);
 			}
 		});
-		
+
 		controler.run();
 	}
 

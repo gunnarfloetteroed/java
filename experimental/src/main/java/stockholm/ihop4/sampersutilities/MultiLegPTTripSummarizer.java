@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -141,12 +142,12 @@ public class MultiLegPTTripSummarizer {
 					throw new RuntimeException("Expected " + TransportMode.egress_walk + " but received "
 							+ this.tmpLegs.getLast().getMode() + " in the last leg.");
 				}
-				final double accessEgressTime_s = this.tmpLegs.getFirst().getTravelTime()
-						+ this.tmpLegs.getLast().getTravelTime();
+				final double accessEgressTime_s = this.tmpLegs.getFirst().getTravelTime().seconds()
+						+ this.tmpLegs.getLast().getTravelTime().seconds();
 
 				// "första väntetid"
-				final double firstWaitingTime_s = this.tmpActs.getFirst().getEndTime()
-						- this.tmpActs.getFirst().getStartTime();
+				final double firstWaitingTime_s = this.tmpActs.getFirst().getEndTime().seconds()
+						- this.tmpActs.getFirst().getStartTime().seconds();
 
 				double distance_m = 0.0; // "avstånd"
 				double transferTime_s = 0; // "bytestid"
@@ -155,16 +156,16 @@ public class MultiLegPTTripSummarizer {
 					final Leg leg = this.tmpLegs.get(i);
 					distance_m += leg.getRoute().getDistance();
 					if (TransportMode.transit_walk.equals(leg.getMode())) {
-						transferTime_s += leg.getTravelTime();
+						transferTime_s += leg.getTravelTime().seconds();
 					} else if (this.ptSubmodes.contains(leg.getMode())) {
-						inVehicleTime_s += leg.getTravelTime();
+						inVehicleTime_s += leg.getTravelTime().seconds();
 					} else {
 						throw new RuntimeException("Unknown PT trip-chain mode: " + leg.getMode());
 					}
 				}
 				final int numberOfTransfers = this.tmpActs.size(); // "antal byten"
 				for (Activity transfer : this.tmpActs) {
-					transferTime_s += transfer.getEndTime() - transfer.getStartTime();
+					transferTime_s += transfer.getEndTime().seconds() - transfer.getStartTime().seconds();
 				}
 
 				final double generalizedTravelTime_s = this.pTAccessEgressTimeMultiplier * accessEgressTime_s
@@ -187,9 +188,12 @@ public class MultiLegPTTripSummarizer {
 		}
 	}
 
+	// 2020-08-14: changed while moving to MATSim 12
 	class PTSummaryLeg implements Leg {
 
-		private final double totalTravelTime_s;
+		// OLD: private final double totalTravelTime_s;
+		private final OptionalTime totalTravelTime_s;
+
 		private final double totalDistance_m;
 
 		private final Id<Link> startLinkId;
@@ -197,7 +201,8 @@ public class MultiLegPTTripSummarizer {
 
 		private PTSummaryLeg(final double totalTravelTime_s, final double totalDistance_m,
 				final Id<Link> startLinkId, final Id<Link> endLinkId) {
-			this.totalTravelTime_s = totalTravelTime_s;
+			// this.totalTravelTime_s = totalTravelTime_s;
+			this.totalTravelTime_s = OptionalTime.defined(totalTravelTime_s);
 			this.totalDistance_m = totalDistance_m;
 			this.startLinkId = startLinkId;
 			this.endLinkId = endLinkId;
@@ -209,22 +214,12 @@ public class MultiLegPTTripSummarizer {
 		}
 
 		@Override
-		public double getTravelTime() {
-			return this.totalTravelTime_s;
-		}
-
-		@Override
 		public Route getRoute() {
 			return new Route() {
 
 				@Override
 				public double getDistance() {
 					return totalDistance_m;
-				}
-
-				@Override
-				public double getTravelTime() {
-					return totalTravelTime_s;
 				}
 
 				@Override
@@ -276,6 +271,16 @@ public class MultiLegPTTripSummarizer {
 				public Route clone() {
 					throw new UnsupportedOperationException();
 				}
+
+				@Override
+				public OptionalTime getTravelTime() {
+					return totalTravelTime_s;
+				}
+
+				@Override
+				public void setTravelTimeUndefined() {
+					throw new UnsupportedOperationException();
+				}
 			};
 		}
 
@@ -295,17 +300,32 @@ public class MultiLegPTTripSummarizer {
 		}
 
 		@Override
-		public double getDepartureTime() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public void setDepartureTime(double seconds) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public void setTravelTime(double seconds) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public OptionalTime getDepartureTime() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setDepartureTimeUndefined() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public OptionalTime getTravelTime() {
+			return this.totalTravelTime_s;
+		}
+
+		@Override
+		public void setTravelTimeUndefined() {
 			throw new UnsupportedOperationException();
 		}
 	}

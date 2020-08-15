@@ -44,7 +44,9 @@ public class SimulationEmulatorImpl implements SimulationEmulator {
 	@Inject
 	public SimulationEmulatorImpl(final MatsimServices services) {
 		this.services = services;
-		this.simEndTime_s = services.getConfig().qsim().getEndTime();
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: this.simEndTime_s = services.getConfig().qsim().getEndTime();
+		this.simEndTime_s = services.getConfig().qsim().getEndTime().seconds();
 
 		// Transit-specific parameters and checks below.
 		this.passengerModes = new LinkedHashSet<>();

@@ -51,8 +51,13 @@ public class LinkTravelTimeInMinutes implements TravelDisutility {
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD:
+//		return Units.MIN_PER_S
+//				* this.travelTimeInSeconds.getLinkTravelTime(link,
+//						Time.UNDEFINED_TIME, null, null);
 		return Units.MIN_PER_S
 				* this.travelTimeInSeconds.getLinkTravelTime(link,
-						Time.UNDEFINED_TIME, null, null);
+						Double.NEGATIVE_INFINITY, null, null);
 	}
 }

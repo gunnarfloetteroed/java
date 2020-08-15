@@ -81,7 +81,7 @@ public class AnalyzeBussArrivals {
 								relevantRoute2arrivalTimes.put(route.getId(), arrivalTimes);
 							}
 							for (Departure departure : route.getDepartures().values()) {
-								double time = departure.getDepartureTime() + stop.getArrivalOffset();
+								double time = departure.getDepartureTime() + stop.getArrivalOffset().seconds();
 								if (time < Units.S_PER_D) {
 									data.add(null, timeDiscr.getBin(time), 1);
 								}

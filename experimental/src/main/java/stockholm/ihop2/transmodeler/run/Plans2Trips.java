@@ -16,7 +16,7 @@
  *
  * contact: gunnar.flotterod@gmail.com
  *
- */ 
+ */
 package stockholm.ihop2.transmodeler.run;
 
 import static stockholm.saleem.StockholmTransformationFactory.WGS84_EPSG3857;
@@ -38,6 +38,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import stockholm.ihop2.regent.demandreading.ZonalSystem;
 import stockholm.ihop2.regent.demandreading.experimental.ActivityLocationSampler;
@@ -57,28 +59,29 @@ public class Plans2Trips {
 
 	// -------------------- CONSTRUCTION AND CONFIGURATION --------------------
 
-	public Plans2Trips(final String plansFileName,
-			final String personAttributeFileName, final String networkFileName,
-			final String zoneShapeFileName, final String zonalCoordinateSystem,
-			final String buildingShapeFileName) {
+	public Plans2Trips(final String plansFileName, final String personAttributeFileName, final String networkFileName,
+			final String zoneShapeFileName, final String zonalCoordinateSystem, final String buildingShapeFileName) {
 
 		final Config config = ConfigUtils.createConfig();
 		config.getModule("plans").addParam("inputPlansFile", plansFileName);
-		config.getModule("plans").addParam("inputPersonAttributesFile",
-				personAttributeFileName);
-		config.getModule("network").addParam("inputNetworkFile",
-				networkFileName);
+		config.getModule("plans").addParam("inputPersonAttributesFile", personAttributeFileName);
+		config.getModule("network").addParam("inputNetworkFile", networkFileName);
 		this.scenario = ScenarioUtils.loadScenario(config);
 
-		final ZonalSystem zonalSystem = new ZonalSystem(zoneShapeFileName,
-				zonalCoordinateSystem);
+		final ZonalSystem zonalSystem = new ZonalSystem(zoneShapeFileName, zonalCoordinateSystem);
 		zonalSystem.addNetwork(this.scenario.getNetwork(), WGS84_SWEREF99);
 		if (buildingShapeFileName != null) {
 			zonalSystem.addBuildings(buildingShapeFileName);
 		}
 
-		this.actLocSampler = new ActivityLocationSampler(this.scenario
-				.getPopulation().getPersonAttributes(), zonalSystem,
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD:
+		// this.actLocSampler = new ActivityLocationSampler(this.scenario
+		// .getPopulation().getPersonAttributes(), zonalSystem,
+		// getCoordinateTransformation(WGS84_EPSG3857, WGS84_SWEREF99));
+		final ObjectAttributes personAttributes = new ObjectAttributes();
+		new ObjectAttributesXmlReader(personAttributes).readFile(personAttributeFileName);
+		this.actLocSampler = new ActivityLocationSampler(personAttributes, zonalSystem,
 				getCoordinateTransformation(WGS84_EPSG3857, WGS84_SWEREF99));
 
 		// TODO NEW
@@ -104,14 +107,11 @@ public class Plans2Trips {
 		} else if (act.getType().toUpperCase().startsWith("O")) {
 			act.setCoord(this.actLocSampler.drawOtherCoordinate(personIdStr));
 		} else {
-			throw new RuntimeException("unknown activity " + act.getType()
-					+ " for person " + personIdStr);
+			throw new RuntimeException("unknown activity " + act.getType() + " for person " + personIdStr);
 		}
 		if (act.getCoord() == null) {
-			throw new RuntimeException(
-					"Did not suceed to draw a coordinate for person "
-							+ personIdStr + "'s " + act.getType()
-							+ " activity.");
+			throw new RuntimeException("Did not suceed to draw a coordinate for person " + personIdStr + "'s "
+					+ act.getType() + " activity.");
 		}
 	}
 
@@ -119,48 +119,42 @@ public class Plans2Trips {
 
 		final XY2Links xy2links = new XY2Links(this.scenario);
 
-		for (Person person : new LinkedHashSet<>(this.scenario.getPopulation()
-				.getPersons().values())) {
+		for (Person person : new LinkedHashSet<>(this.scenario.getPopulation().getPersons().values())) {
 			final Plan selectedPlan = person.getSelectedPlan();
 
 			// 1, 3, 5, ...
-			for (int tripPlanElementIndex = 1; tripPlanElementIndex < selectedPlan
-					.getPlanElements().size(); tripPlanElementIndex += 2) {
+			for (int tripPlanElementIndex = 1; tripPlanElementIndex < selectedPlan.getPlanElements()
+					.size(); tripPlanElementIndex += 2) {
 
 				// 1/2 = 0, 3/2 = 1, 5/2 = 2, ...
 				final int tripIndex = tripPlanElementIndex / 2;
 
 				for (int cloneIndex = 0; cloneIndex < cloneCnt; cloneIndex++) {
 
-					final Person clone = this.scenario
-							.getPopulation()
-							.getFactory()
-							.createPerson(
-									Id.create(person.getId().toString()
-											+ "_clone" + cloneIndex + "_trip"
-											+ tripIndex, Person.class));
+					final Person clone = this.scenario.getPopulation().getFactory().createPerson(Id.create(
+							person.getId().toString() + "_clone" + cloneIndex + "_trip" + tripIndex, Person.class));
 					this.scenario.getPopulation().addPerson(clone);
 
-					final Plan clonePlan = this.scenario.getPopulation()
-							.getFactory().createPlan();
+					final Plan clonePlan = this.scenario.getPopulation().getFactory().createPlan();
 					clone.addPlan(clonePlan);
 
-					final Activity newStartAct = PopulationUtils.createActivity((Activity) selectedPlan.getPlanElements().get(
-							tripPlanElementIndex - 1));
+					final Activity newStartAct = PopulationUtils
+							.createActivity((Activity) selectedPlan.getPlanElements().get(tripPlanElementIndex - 1));
 					clonePlan.addActivity(newStartAct);
 					this.resampleLocation(person, newStartAct);
 
-					final Leg newLeg = (Leg) selectedPlan.getPlanElements()
-							.get(tripPlanElementIndex);
+					final Leg newLeg = (Leg) selectedPlan.getPlanElements().get(tripPlanElementIndex);
 					clonePlan.addLeg(newLeg);
 					newLeg.setRoute(null);
 
-					final Activity newEndAct = PopulationUtils.createActivity((Activity) selectedPlan.getPlanElements().get(
-							tripPlanElementIndex + 1));
+					final Activity newEndAct = PopulationUtils
+							.createActivity((Activity) selectedPlan.getPlanElements().get(tripPlanElementIndex + 1));
 					clonePlan.addActivity(newEndAct);
 					this.resampleLocation(person, newEndAct);
-					newEndAct.setEndTime(Time.UNDEFINED_TIME);
-					
+					// 2020-08-14: changed while moving to MATSim 12					
+					// OLD: newEndAct.setEndTime(Time.UNDEFINED_TIME);
+					newEndAct.setEndTime(Double.NEGATIVE_INFINITY);
+
 					xy2links.run(clone);
 				}
 			}
@@ -168,8 +162,8 @@ public class Plans2Trips {
 			this.scenario.getPopulation().getPersons().remove(person.getId());
 		}
 
-		PopulationWriter populationWriter = new PopulationWriter(
-				this.scenario.getPopulation(), this.scenario.getNetwork());
+		PopulationWriter populationWriter = new PopulationWriter(this.scenario.getPopulation(),
+				this.scenario.getNetwork());
 		populationWriter.write(tripsFileName);
 	}
 
@@ -184,12 +178,10 @@ public class Plans2Trips {
 		final String zonesFile = "./ihop2-data/demand-input/sverige_TZ_EPSG3857.shp";
 		final String buildingsFile = "./ihop2-data/demand-input/by_full_EPSG3857_2.shp";
 
-		final Plans2Trips p2t = new Plans2Trips(
-				"./ihop2-data/without-toll/ITERS/it.200/200.plans.xml.gz",
-				populationFile, networkFile, zonesFile, WGS84_EPSG3857,
-				buildingsFile);
+		final Plans2Trips p2t = new Plans2Trips("./ihop2-data/without-toll/ITERS/it.200/200.plans.xml.gz",
+				populationFile, networkFile, zonesFile, WGS84_EPSG3857, buildingsFile);
 		p2t.createTripMakers("./ihop2-data/without-toll/ITERS/it.200/200.trips-from-plans_0.50.xml",
-		// "./ihop2-data/playground/initial-trips.xml",
+				// "./ihop2-data/playground/initial-trips.xml",
 				cloneCnt);
 
 		// extractFirstTrip(configFile, from, to);

@@ -145,7 +145,7 @@ public class InterZonalStatistics implements LegHandler, ActivityHandler {
 						final Zone toZone = this.zonalSystem
 								.getZone(this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getFromNode());
 						if ((fromZone != null) && (toZone != null)) {
-							this.getOrCreateEntry(fromZone, toZone).register(route.getTravelTime(),
+							this.getOrCreateEntry(fromZone, toZone).register(route.getTravelTime().seconds(),
 									route.getDistance());
 							this.valid++;
 						} else {

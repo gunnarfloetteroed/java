@@ -107,6 +107,8 @@ public class OnlyDepartureArrivalLegEmulator implements LegEmulator {
 	// Hook for stuff that happens between departure and arrival.
 	public double emulateBetweenDepartureAndArrivalAndReturnEndTime_s(final Leg leg, final Person person,
 			double time_s) {
-		return (time_s + leg.getTravelTime());
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: return (time_s + leg.getTravelTime());
+		return (time_s + leg.getTravelTime().seconds());
 	}
 }

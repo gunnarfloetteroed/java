@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -45,32 +46,62 @@ public class ScheduleBasedTransitLegEmulator extends OnlyDepartureArrivalLegEmul
 	// -------------------- CONSTRUCTION --------------------
 
 	public ScheduleBasedTransitLegEmulator(final EventsManager eventsManager, final Scenario scenario) {
-		super(eventsManager, scenario.getActivityFacilities(), scenario.getConfig().qsim().getEndTime());
+		// 2020-08-14: changed while moving to MATSim 12
+		// OLD: super(eventsManager, scenario.getActivityFacilities(),
+		// scenario.getConfig().qsim().getEndTime());
+		super(eventsManager, scenario.getActivityFacilities(), scenario.getConfig().qsim().getEndTime().seconds());
 		this.transitSchedule = scenario.getTransitSchedule();
 	}
 
 	// -------------------- INTERNALS --------------------
 
-	private boolean isBadDouble(final double val) {
-		return (Double.isNaN(val) || Double.isInfinite(val));
-	}
+	// 2020-08-14: changed while moving to MATSim 12
+	//	private boolean isBadDouble(final double val) {
+	//		return (Double.isNaN(val) || Double.isInfinite(val));
+	//	}
 
-	private double guessArrivalOffset_s(final double arrivalOffset_s, final double departureOffset_s) {
-		if (!this.isBadDouble(arrivalOffset_s)) {
-			return arrivalOffset_s;
-		} else if (!this.isBadDouble(departureOffset_s)) {
-			return departureOffset_s;
+	// 2020-08-14: changed while moving to MATSim 12
+	// private double guessArrivalOffset_s(final double arrivalOffset_s, final
+	// double departureOffset_s) {
+	// if (!this.isBadDouble(arrivalOffset_s)) {
+	// return arrivalOffset_s;
+	// } else if (!this.isBadDouble(departureOffset_s)) {
+	// return departureOffset_s;
+	// } else {
+	// throw new RuntimeException(
+	// "arrival offset = " + arrivalOffset_s + ", departure offset = " +
+	// departureOffset_s);
+	// }
+	// }
+	private double guessArrivalOffset_s(final OptionalTime arrivalOffset_s, final OptionalTime departureOffset_s) {
+		if (arrivalOffset_s.isDefined()) {
+			return arrivalOffset_s.seconds();
+		} else if (departureOffset_s.isDefined()) {
+			return departureOffset_s.seconds();
 		} else {
 			throw new RuntimeException(
 					"arrival offset = " + arrivalOffset_s + ", departure offset = " + departureOffset_s);
 		}
 	}
 
-	private double guessDepartureOffset_s(final double arrivalOffset_s, final double departureOffset_s) {
-		if (!this.isBadDouble(departureOffset_s)) {
-			return departureOffset_s;
-		} else if (!this.isBadDouble(arrivalOffset_s)) {
-			return arrivalOffset_s;
+	// 2020-08-14: changed while moving to MATSim 12
+	// private double guessDepartureOffset_s(final double arrivalOffset_s, final
+	// double departureOffset_s) {
+	// if (!this.isBadDouble(departureOffset_s)) {
+	// return departureOffset_s;
+	// } else if (!this.isBadDouble(arrivalOffset_s)) {
+	// return arrivalOffset_s;
+	// } else {
+	// throw new RuntimeException(
+	// "arrival offset = " + arrivalOffset_s + ", departure offset = " +
+	// departureOffset_s);
+	// }
+	// }
+	private double guessDepartureOffset_s(final OptionalTime arrivalOffset_s, final OptionalTime departureOffset_s) {
+		if (departureOffset_s.isDefined()) {
+			return departureOffset_s.seconds();
+		} else if (arrivalOffset_s.isDefined()) {
+			return arrivalOffset_s.seconds();
 		} else {
 			throw new RuntimeException(
 					"arrival offset = " + arrivalOffset_s + ", departure offset = " + departureOffset_s);

@@ -65,7 +65,7 @@ public class HumanReadableLineSchedule {
 				final List<String> routeDepartureTimes = new ArrayList<>();
 				for (TransitRouteStop stop : route.getStops()) {
 					routeDepartureTimes.add(Time
-							.strFromSec(MathHelpers.round(departure.getDepartureTime() + stop.getDepartureOffset())));
+							.strFromSec(MathHelpers.round(departure.getDepartureTime() + stop.getDepartureOffset().seconds())));
 				}
 				allDepartureTimes.add(routeDepartureTimes);
 			}

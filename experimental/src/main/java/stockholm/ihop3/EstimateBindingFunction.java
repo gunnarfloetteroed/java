@@ -277,7 +277,7 @@ class EstimateBindingFunction {
 							// Prev. trip was from activity location to home.
 						}
 						prevAct = currentAct;
-						prevDptTime_s = currentAct.getEndTime();
+						prevDptTime_s = currentAct.getEndTime().seconds();
 					}
 				}
 			}

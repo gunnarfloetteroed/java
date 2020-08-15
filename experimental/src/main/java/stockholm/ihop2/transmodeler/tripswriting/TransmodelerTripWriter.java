@@ -258,7 +258,7 @@ public class TransmodelerTripWriter {
 								}
 								currentTrip = new TransmodelerTrip(++tripCnt,
 										fromNodeTmId, toNodeTmId, fromLink,
-										pathId, toLink, leg.getDepartureTime(),
+										pathId, toLink, leg.getDepartureTime().seconds(),
 										id2personEntry.getKey().toString());
 								// <<<<< TODO NEW <<<<<
 							}

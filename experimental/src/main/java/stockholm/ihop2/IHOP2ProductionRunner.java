@@ -21,18 +21,18 @@ package stockholm.ihop2;
 
 import java.io.IOException;
 
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 
-import stockholm.saleem.StockholmTransformationFactory;
 import stockholm.ihop2.regent.demandreading.ObjectAttributeStatistics;
 import stockholm.ihop2.regent.demandreading.PopulationCreator;
 import stockholm.ihop2.regent.demandreading.PopulationStatistics;
 import stockholm.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork;
+import stockholm.saleem.StockholmTransformationFactory;
 
 /**
  * 
@@ -175,7 +175,9 @@ public class IHOP2ProductionRunner {
 			// .addOverridingModule(new LinkToLinkRoutingGuiceModule());
 			// }
 			if (useRoadPricing) {
-				controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+				// 2020-08-14: changed while moving to MATSim 12
+				// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+				controler.addOverridingModule( new RoadPricingModule() );
 			}
 
 			controler.run();

@@ -1,67 +1,79 @@
-<?xml version="1.0"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+	<modelVersion>4.0.0</modelVersion>
+	
+	<!-- 
+	<groupId>org.matsim</groupId>
+	<artifactId>matsim-example-project</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	-->
 	<parent>
 		<groupId>gunnarfloetteroed</groupId>
 		<artifactId>java</artifactId>
 		<version>MASTER-SNAPSHOT</version>
 	</parent>
-
+	
+	<!--
+	<name>MATSim example project</name>
+	<description>MATSim example project</description>
+	-->
 	<artifactId>experimental</artifactId>
 	<name>experimental</name>
 
 	<properties>
-		<matsim.version>11.0</matsim.version>
+		<!-- release -->
+		<matsim.version>12.0</matsim.version>
+
+		<!-- smapshot release -->
+		<!--<matsim.version>0.13.0-SNAPSHOT</matsim.version>-->
+
+		<!-- weekly release -->
+		<!-- <matsim.version>12.0-2019w48-SNAPSHOT</matsim.version> -->
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+	
 		<geotools.version>20.5</geotools.version>
+	
 	</properties>
 
-	<repositories> <!-- Repositories need to be repeated at every level where needed. -->
-
+	<repositories>
+	  <!--Note that in general repositories are not transitive, so they need to be repeated at every level where needed.-->
 		<repository>
-			<!-- Geotools is not on Maven central. -->
+			<!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
 			<name>Geotools repository</name>
-			<url>http://download.osgeo.org/webdav/geotools</url>
+			<!-- <url>http://download.osgeo.org/webdav/geotools</url> -->
+			<url>https://repo.osgeo.org/repository/release/</url>
 		</repository>
-
 		<repository>
-			<!-- MATSim is not on Maven central. -->
+			<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
 			<id>matsim</id>
 			<url>https://dl.bintray.com/matsim/matsim</url>
 		</repository>
-
-		<repository>
+ 		<repository>
 			<!-- For MATSim snapshots: -->
 			<id>ojo-snapshots</id>
-			<url>http://oss.jfrog.org/libs-snapshot</url>
+			<url>https://oss.jfrog.org/libs-snapshot</url>
 		</repository>
-
-		<repository>
-			<id>mvn-central</id>
-			<name>maven central</name>
-			<url>https://repo1.maven.org/maven2</url>
-		</repository>
-
+		
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
-
-		<!--  				
-  		<repository>
+		
+		<repository>
   	    	<id>SBB</id>
-  	    	<url>https://bintray.com/schweizerischebundesbahnen/simba.mvn/matsim-sbb-extensions</url>
+  	    	<url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
   		</repository>
-		-->
-
+			
 	</repositories>
 
 	<dependencies>
-
+	
 		<dependency>
 			<groupId>gunnarfloetteroed</groupId>
 			<artifactId>utilities</artifactId>
@@ -79,31 +91,25 @@
 			<artifactId>cadyts</artifactId>
 			<version>MASTER-SNAPSHOT</version>
 		</dependency>
-
-		<!-- 
+		
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
- 		-->
 
-		<!-- 
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-referencing</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
-		-->
 	
 		<!-- Dependency for database connections -->	
-		<!--  
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
-		-->
 
 		<!-- Dependency for CQL filtering -->
 		<dependency>
@@ -112,64 +118,10 @@
 			<version>${geotools.version}</version>
 		</dependency>
 
-		<!-- 
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
 			<artifactId>jts-core</artifactId>
 			<version>1.16.1</version>
-		</dependency>
-		-->
-
-		<dependency>
-			<!-- This is the matsim "core": -->
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-
-		<dependency>
-			<!-- Include the JUnit testing library. -->
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-
-
-		<!--MATSim test infrastructure. -->
-		<dependency>
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim</artifactId>
-			<type>test-jar</type>
-			<version>${matsim.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<!--to get ExamplesUtils: -->
-			<groupId>org.matsim</groupId>
-			<artifactId>matsim-examples</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>roadpricing</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-
-		<!--  
-		<dependency>
-			<groupId>com.github.simunto</groupId>
-			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>0.11.0-2018w44</version>
-		</dependency>
-		-->
-		
-		<dependency>
-  			<groupId>com.github.schweizerischebundesbahnen</groupId>
-  			<artifactId>matsim-sbb-extensions</artifactId>
-  			<version>11.0</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/colt/colt -->
@@ -178,8 +130,133 @@
 			<artifactId>colt</artifactId>
 			<version>1.2.0</version>
 		</dependency>
+			
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>roadpricing</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
 
+		<dependency>
+     		<groupId>ch.sbb</groupId>
+     		<artifactId>matsim-sbb-extensions</artifactId>
+     		<version>12.0</version>
+ 		</dependency>
+			
+		<dependency>
+			<!-- This is the matsim "core": -->
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+
+		<dependency>
+			<!-- Include the JUnit testing library.  Not transitive. -->
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<!--MATSim test infrastructure.  Not transitive.-->
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+			<type>test-jar</type>
+			<version>${matsim.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!--dependencies from here to where stated below are added as a service; they can be removed if you don't need them-->
+		<!--to get ExamplesUtils: -->
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>${matsim.version}</version>
+			<!-- Gunnar changed this. -->
+			<!-- <scope>test</scope> -->
+		</dependency>
+
+		<!--some contribs:-->
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>minibus</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>otfvis</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>roadpricing</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>taxi</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>av</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>freight</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>bicycle</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<!--Dependencies from where stated above to here are added as a service; they can be removed if you don't need them-->
 
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.basedir}/${project.build.finalName}.jar</outputFile>
+							<transformers>
+								<!-- This bit sets the main class for the executable jar as you otherwise would with the assembly plugin -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>org.matsim.gui.MATSimGUI</Main-Class>
+										<Specification-Vendor>org.matsim</Specification-Vendor>
+										<Implementation-Vendor>org.matsim</Implementation-Vendor>
+										<Implementation-Version>${project.version}</Implementation-Version>
+									</manifestEntries>
+								</transformer>
+								<!-- This bit merges the various GeoTools META-INF/services files         -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

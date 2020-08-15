@@ -34,12 +34,12 @@ import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
@@ -55,7 +55,6 @@ import stockholm.ihop2.regent.costwriting.LinkTravelDistanceInKilometers;
 import stockholm.ihop2.regent.costwriting.LinkTravelTimeInMinutes;
 import stockholm.ihop2.regent.costwriting.TripCostMatrices;
 import stockholm.ihop2.regent.demandreading.ZonalSystem;
-import stockholm.ihop2.regent.demandreading.experimental.PopulationCreator_DEPRECATED;
 import stockholm.saleem.StockholmTransformationFactory;
 
 /**
@@ -380,23 +379,25 @@ public class MATSimDummy {
 
 				if (DEMANDMODEL.regent.equals(demandModel)) {
 
-					final PopulationCreator_DEPRECATED populationCreator = new PopulationCreator_DEPRECATED(
-							matsimNetworkFileName, zoneShapeFileName, StockholmTransformationFactory.WGS84_EPSG3857,
-							populationFileName);
-					populationCreator.setBuildingsFileName(buildingShapeFileName);
-					populationCreator.setPopulationSampleFactor(matsimPopulationSubSample);
-					final ObjectAttributes linkAttributes = new ObjectAttributes();
-					final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(linkAttributes);
-					reader.readFile(linkAttributeFileName);
-					Logger.getLogger(MATSimDummy.class.getName())
-							.warning("Removing all expanded links. This *should* have no "
-									+ "effect if a non-expanded network is used.");
-					populationCreator.removeExpandedLinks(linkAttributes);
-					try {
-						populationCreator.run(initialPlansFileName);
-					} catch (FileNotFoundException e1) {
-						throw new RuntimeException(e1);
-					}
+					throw new RuntimeException("Unmaintained code");
+					
+//					final PopulationCreator_DEPRECATED populationCreator = new PopulationCreator_DEPRECATED(
+//							matsimNetworkFileName, zoneShapeFileName, StockholmTransformationFactory.WGS84_EPSG3857,
+//							populationFileName);
+//					populationCreator.setBuildingsFileName(buildingShapeFileName);
+//					populationCreator.setPopulationSampleFactor(matsimPopulationSubSample);
+//					final ObjectAttributes linkAttributes = new ObjectAttributes();
+//					final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(linkAttributes);
+//					reader.readFile(linkAttributeFileName);
+//					Logger.getLogger(MATSimDummy.class.getName())
+//							.warning("Removing all expanded links. This *should* have no "
+//									+ "effect if a non-expanded network is used.");
+//					populationCreator.removeExpandedLinks(linkAttributes);
+//					try {
+//						populationCreator.run(initialPlansFileName);
+//					} catch (FileNotFoundException e1) {
+//						throw new RuntimeException(e1);
+//					}
 
 				} else if (DEMANDMODEL.scaper.equals(demandModel)) {
 
@@ -437,7 +438,9 @@ public class MATSimDummy {
 			matsimConfig.getModule("controler").addParam("outputDirectory", "./matsim-output." + iteration + "/");
 
 			if (useToll) {
-				controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+				// 2020-08-14: changed while moving to MATSim 12
+				// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		        controler.addOverridingModule(new RoadPricingModule());
 			}
 
 			controler.run();
