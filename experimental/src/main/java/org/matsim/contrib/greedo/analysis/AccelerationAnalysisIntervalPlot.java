@@ -19,9 +19,6 @@
  */
 package org.matsim.contrib.greedo.analysis;
 
-import java.awt.Color;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -31,7 +28,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.data.xy.YIntervalSeries;
 
-import umontreal.ssj.charts.XYLineChart;
+// import umontreal.ssj.charts.XYLineChart;
 
 /**
  *
@@ -164,79 +161,70 @@ public class AccelerationAnalysisIntervalPlot {
 
 		}
 
-		XYLineChart chart = new XYLineChart(null, null, null, data);
+		/*
+		 * 
+		 * XYLineChart chart = new XYLineChart(null, null, null, data);
+		 * 
+		 * for (int seriesIndex = 0; seriesIndex < this.allSeries.size(); seriesIndex++)
+		 * {
+		 * 
+		 * chart.getSeriesCollection().setColor(seriesIndex * 2 + 0, Color.BLACK);
+		 * chart.getSeriesCollection().setColor(seriesIndex * 2 + 1, Color.BLACK);
+		 * 
+		 * chart.getSeriesCollection().setDashPattern(seriesIndex * 2 + 0,
+		 * this.dashPatterns.get(seriesIndex));
+		 * chart.getSeriesCollection().setDashPattern(seriesIndex * 2 + 1,
+		 * this.dashPatterns.get(seriesIndex));
+		 * 
+		 * chart.getSeriesCollection().setPlotStyle(seriesIndex * 2 + 0, "sharp plot");
+		 * chart.getSeriesCollection().setPlotStyle(seriesIndex * 2 + 1, "sharp plot");
+		 * }
+		 * 
+		 * // override absolute by relative legend if available
+		 * 
+		 * if ((this.range != null) && (this.relLegendLeftX != null)) {
+		 * this.addLegend(this.range[0] + this.relLegendLeftX * (this.range[1] -
+		 * this.range[0]), this.range[2] + this.relLegendTopY * (this.range[3] -
+		 * this.range[2]), this.relLegendLineLength * (this.range[1] - this.range[0]),
+		 * this.relLegendRowDistance * (this.range[3] - this.range[2])); }
+		 * 
+		 * // override absolute by relative legend if available
+		 * 
+		 * if (this.legendLeftX != null) { for (int seriesIndex = 0; seriesIndex <
+		 * this.allSeries.size(); seriesIndex++) { final int lineIndex = chart.add( new
+		 * double[] { this.legendLeftX, this.legendLeftX + this.legendLineLength }, new
+		 * double[] { this.legendTopY - seriesIndex * this.legendRowDistance,
+		 * this.legendTopY - seriesIndex * this.legendRowDistance });
+		 * chart.getSeriesCollection().setColor(lineIndex, Color.BLACK);
+		 * chart.getSeriesCollection().setDashPattern(lineIndex,
+		 * this.dashPatterns.get(seriesIndex));
+		 * chart.getSeriesCollection().setName(lineIndex,
+		 * this.allSeries.get(seriesIndex).getKey().toString()); } }
+		 * 
+		 * if (this.range != null) { chart.setManualRange(this.range); } else {
+		 * chart.setAutoRange00(true, true); }
+		 * 
+		 * if ((this.xGrid != null) && (this.yGrid != null)) {
+		 * chart.enableGrid(this.xGrid, this.yGrid); }
+		 * 
+		 * if (this.xTick != null) { chart.getXAxis().setLabels(this.xTick); } if
+		 * (this.yTick != null) { chart.getYAxis().setLabels(this.yTick); }
+		 * 
+		 * chart.setLatexDocFlag(false);
+		 * 
+		 * String result = chart.toLatex(6, 4); for (String dummy : dummyLabels) {
+		 * result = result.replace(dummy, ""); }
+		 * 
+		 * try { PrintWriter writer = new PrintWriter(fileName); writer.print(result);
+		 * writer.flush(); writer.close(); } catch (FileNotFoundException e) { throw new
+		 * RuntimeException(e); }
+		 * 
+		 * // chart.toLatexFile(fileName, 6, 4); // chart.setLatexDocFlag(true); //
+		 * System.out.println(chart.toLatex(12, 8));
+		 * 
+		 */
 
-		for (int seriesIndex = 0; seriesIndex < this.allSeries.size(); seriesIndex++) {
-
-			chart.getSeriesCollection().setColor(seriesIndex * 2 + 0, Color.BLACK);
-			chart.getSeriesCollection().setColor(seriesIndex * 2 + 1, Color.BLACK);
-
-			chart.getSeriesCollection().setDashPattern(seriesIndex * 2 + 0, this.dashPatterns.get(seriesIndex));
-			chart.getSeriesCollection().setDashPattern(seriesIndex * 2 + 1, this.dashPatterns.get(seriesIndex));
-
-			chart.getSeriesCollection().setPlotStyle(seriesIndex * 2 + 0, "sharp plot");
-			chart.getSeriesCollection().setPlotStyle(seriesIndex * 2 + 1, "sharp plot");
-		}
-
-		// override absolute by relative legend if available
-
-		if ((this.range != null) && (this.relLegendLeftX != null)) {
-			this.addLegend(this.range[0] + this.relLegendLeftX * (this.range[1] - this.range[0]),
-					this.range[2] + this.relLegendTopY * (this.range[3] - this.range[2]),
-					this.relLegendLineLength * (this.range[1] - this.range[0]),
-					this.relLegendRowDistance * (this.range[3] - this.range[2]));
-		}
-
-		// override absolute by relative legend if available
-
-		if (this.legendLeftX != null) {
-			for (int seriesIndex = 0; seriesIndex < this.allSeries.size(); seriesIndex++) {
-				final int lineIndex = chart.add(
-						new double[] { this.legendLeftX, this.legendLeftX + this.legendLineLength },
-						new double[] { this.legendTopY - seriesIndex * this.legendRowDistance,
-								this.legendTopY - seriesIndex * this.legendRowDistance });
-				chart.getSeriesCollection().setColor(lineIndex, Color.BLACK);
-				chart.getSeriesCollection().setDashPattern(lineIndex, this.dashPatterns.get(seriesIndex));
-				chart.getSeriesCollection().setName(lineIndex, this.allSeries.get(seriesIndex).getKey().toString());
-			}
-		}
-
-		if (this.range != null) {
-			chart.setManualRange(this.range);
-		} else {
-			chart.setAutoRange00(true, true);
-		}
-
-		if ((this.xGrid != null) && (this.yGrid != null)) {
-			chart.enableGrid(this.xGrid, this.yGrid);
-		}
-
-		if (this.xTick != null) {
-			chart.getXAxis().setLabels(this.xTick);
-		}
-		if (this.yTick != null) {
-			chart.getYAxis().setLabels(this.yTick);
-		}
-
-		chart.setLatexDocFlag(false);
-
-		String result = chart.toLatex(6, 4);
-		for (String dummy : dummyLabels) {
-			result = result.replace(dummy, "");
-		}
-
-		try {
-			PrintWriter writer = new PrintWriter(fileName);
-			writer.print(result);
-			writer.flush();
-			writer.close();
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-
-		// chart.toLatexFile(fileName, 6, 4);
-		// chart.setLatexDocFlag(true);
-		// System.out.println(chart.toLatex(12, 8));
+		throw new RuntimeException("Had to take out all ssj functionality due to incompatibility with jfreechart 1.5");
 	}
 
 	public static void main(String[] args) {
