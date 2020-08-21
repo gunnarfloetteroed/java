@@ -255,6 +255,7 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener 
 		AtomicBoolean finished = new AtomicBoolean(false);
 
 		// Maybe there is a better way to do this... Turn logging off.
+		final Level originalLogLevel = Logger.getLogger("org.matsim").getLevel();
 		Logger.getLogger("org.matsim").setLevel(Level.ERROR); // WARN);
 
 		// Here we set up all the runner threads and start them
@@ -335,6 +336,6 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener 
 		logger.info("Emulation finished.");
 
 		// Maybe there is a better way to do this... Turn logging on.
-		Logger.getLogger("org.matsim").setLevel(null);
+		Logger.getLogger("org.matsim").setLevel(originalLogLevel);
 	}
 }
