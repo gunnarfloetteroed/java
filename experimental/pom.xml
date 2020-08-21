@@ -93,12 +93,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>18.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-referencing</artifactId>
 			<version>${geotools.version}</version>
@@ -177,43 +171,23 @@
 			<!-- <scope>test</scope> -->
 		</dependency>
 
-		<!--some contribs:-->
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>minibus</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>otfvis</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
 			<version>${matsim.version}</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>taxi</artifactId>
-			<version>${matsim.version}</version>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>28.2-jre</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>av</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>freight</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>bicycle</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-		<!--Dependencies from where stated above to here are added as a service; they can be removed if you don't need them-->
+          <groupId>jfree</groupId>
+          <artifactId>jfreechart</artifactId>
+          <version>1.0.12</version>
+        </dependency>
 
 	</dependencies>
 
