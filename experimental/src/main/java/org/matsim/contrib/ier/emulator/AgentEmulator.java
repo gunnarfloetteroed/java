@@ -1,5 +1,6 @@
 package org.matsim.contrib.ier.emulator;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -47,6 +48,8 @@ public final class AgentEmulator {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 
+	static int warnCnt = 0;
+
 	/**
 	 * Emulates an agent's plan given the SimulationEmulator that has been defined
 	 * previously. In particular, the whole class encapsulates one iteration of
@@ -54,12 +57,15 @@ public final class AgentEmulator {
 	 * the scoring doesn't care about the timing of events of independent agents.
 	 */
 	public void emulate(Person person, Plan plan, EventHandler eventHandler) {
+		
+		if (warnCnt++ < 10) {
+			Logger.getLogger(this.getClass())
+					.warn("Removed road pricing related code. (2020-08-14: changed while moving to MATSim 12)");
+		}
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(eventHandler);
 
-		Logger.getLogger(this.getClass())
-				.warn("Removed road pricing related code. (2020-08-14: changed while moving to MATSim 12)");
 //		if (this.scenario.getConfig().getModules().containsKey(RoadPricingConfigGroup.GROUP_NAME)) {
 //			// RoadPricingTollCalculator ADDS ITSELF as a handler to the EventsManager.
 //			// Creates then suitable PersonMoneyEvents and passes them to the manager.
@@ -89,7 +95,7 @@ public final class AgentEmulator {
 		eventsToActivities.finish();
 		scoringFunction.finish();
 
-		plan.setScore(scoringFunction.getScore());
+		plan.setScore(scoringFunction.getScore());		
 	}
 
 	static private class ScoringFunctionWrapper

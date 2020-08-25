@@ -50,20 +50,20 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 	public static final Set<String> PT_SUBMODES = Collections.unmodifiableSet(new LinkedHashSet<>(
 			Arrays.asList("busPassenger", "tramPassenger", "subwayPassenger", "railPassenger", "ferryPassenger")));
 
-	// -------------------- CONSTANTS --------------------	
-	
+	// -------------------- CONSTANTS --------------------
+
 	private final StockholmConfigGroup sthlmConfig;
-	
-	// -------------------- MEMBERS --------------------	
-	
+
+	// -------------------- MEMBERS --------------------
+
 	private final LinkedList<Leg> tmpLegs = new LinkedList<>();
 
 	private final LinkedList<Activity> tmpActs = new LinkedList<>();
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public SampersDifferentiatedPTScoringFunction(final Person person,
-			final SampersTourUtilityFunction utilityFunction, final StockholmConfigGroup sthlmConfig) {
+	public SampersDifferentiatedPTScoringFunction(final Person person, final SampersTourUtilityFunction utilityFunction,
+			final StockholmConfigGroup sthlmConfig) {
 		super(person, utilityFunction);
 		this.sthlmConfig = sthlmConfig;
 	}
@@ -111,14 +111,14 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 				// More than one trip in the previous leg: Expected to be a PT trip chain.
 
 				// "anslutningstid"
-				if (!TransportMode.access_walk.equals(this.tmpLegs.getFirst().getMode())) {
-					throw new RuntimeException("Expected " + TransportMode.access_walk + " but received "
-							+ this.tmpLegs.getFirst().getMode() + " in the first leg.");
-				}
-				if (!TransportMode.egress_walk.equals(this.tmpLegs.getLast().getMode())) {
-					throw new RuntimeException("Expected " + TransportMode.egress_walk + " but received "
-							+ this.tmpLegs.getLast().getMode() + " in the last leg.");
-				}
+//				if (!TransportMode.access_walk.equals(this.tmpLegs.getFirst().getMode())) {
+//					throw new RuntimeException("Expected " + TransportMode.access_walk + " but received "
+//							+ this.tmpLegs.getFirst().getMode() + " in the first leg.");
+//				}
+//				if (!TransportMode.egress_walk.equals(this.tmpLegs.getLast().getMode())) {
+//					throw new RuntimeException("Expected " + TransportMode.egress_walk + " but received "
+//							+ this.tmpLegs.getLast().getMode() + " in the last leg.");
+//				}
 				final double accessEgressTime_s = this.tmpLegs.getFirst().getTravelTime().seconds()
 						+ this.tmpLegs.getLast().getTravelTime().seconds();
 
@@ -130,7 +130,8 @@ public class SampersDifferentiatedPTScoringFunction extends SampersScoringFuncti
 				double inVehicleTime_s = 0.0; // "restid i fordonet"
 				for (int i = 1; i < this.tmpLegs.size() - 1; i++) { // leave out access and egress
 					final Leg leg = this.tmpLegs.get(i);
-					if (TransportMode.transit_walk.equals(leg.getMode())) {
+// if (TransportMode.transit_walk.equals(leg.getMode())) {
+					if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
 						transferTime_s += leg.getTravelTime().seconds();
 					} else if (PT_SUBMODES.contains(leg.getMode())) {
 						if (this.sthlmConfig.isFerryPassengerMode(leg.getMode())) {
