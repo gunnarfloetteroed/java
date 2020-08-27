@@ -41,8 +41,8 @@ import org.matsim.core.utils.collections.Tuple;
 import floetteroed.utilities.math.MathHelpers;
 import stockholm.ihop2.regent.demandreading.ZonalSystem;
 import stockholm.ihop2.regent.demandreading.Zone;
-import stockholm.ihop4.sampersutilities.MultiLegPTTripSummarizer;
 import stockholm.ihop4.sampersutilities.SampersDifferentiatedPTScoringFunction;
+import stockholm.ihop4.sampersutilities.analysis.MultiLegPTTripSummarizer;
 
 /**
  *

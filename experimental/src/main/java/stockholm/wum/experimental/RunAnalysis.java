@@ -35,7 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -163,8 +163,8 @@ public class RunAnalysis {
 			for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 				if (planElement instanceof Leg) {
 					final Leg leg = (Leg) planElement;
-					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-						final TransitRoute route = id2transitRoute.get(((ExperimentalTransitRoute) leg.getRoute()).getRouteId());
+					if (leg.getRoute() instanceof TransitPassengerRoute) {
+						final TransitRoute route = id2transitRoute.get(((TransitPassengerRoute) leg.getRoute()).getRouteId());
 						Set<Person> users = mode2users.get(route.getTransportMode());
 						if (users == null) {
 							users = new LinkedHashSet<>();

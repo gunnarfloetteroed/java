@@ -17,7 +17,7 @@
  * contact: gunnar.flotterod@gmail.com
  *
  */
-package stockholm.ihop4.sampersutilities;
+package stockholm.ihop4.sampersutilities.generation;
 
 import static stockholm.ihop4.sampersutilities.SampersAttributeUtils.setPlannedActivityDuration_h;
 import static stockholm.ihop4.sampersutilities.SampersAttributeUtils.setPlannedActivityStart_h;

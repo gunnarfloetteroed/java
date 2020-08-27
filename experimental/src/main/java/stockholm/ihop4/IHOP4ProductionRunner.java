@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,6 +64,7 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
@@ -801,7 +803,8 @@ public class IHOP4ProductionRunner {
 		
 		// 2020-08-14: changed while moving to MATSim 12
 		// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-		controler.setModules(new RoadPricingModule());
+		// controler.setModules(new RoadPricingModule());
+		controler.addOverridingModule(new RoadPricingModule());
 		
 		controler.addOverridingModule(new SampersScoringFunctionModule());
 
@@ -817,6 +820,13 @@ public class IHOP4ProductionRunner {
 			}
 		});
 
+		controler.addControlerListener(new StartupListener() {			
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);								
+			}
+		});
+		
 		controler.run();
 	}
 

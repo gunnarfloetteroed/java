@@ -19,6 +19,7 @@
  */
 package stockholm.wum;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,6 +38,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.population.PersonUtils;
@@ -57,6 +61,7 @@ import modalsharecalibrator.ModalShareCalibrationConfigGroup;
 import modalsharecalibrator.ModeASCContainer;
 import modalsharecalibrator.WireModalShareCalibratorIntoMATSimControlerListener;
 import stockholm.ihop4.sampersutilities.SampersDifferentiatedPTScoringFunctionModule;
+import stockholm.wum.utils.PTInteractionsRemover;
 
 /**
  *
@@ -115,25 +120,31 @@ public class WUMProductionRunner {
 	static void runProductionScenarioWithSampersDynamics(final String configFileName) {
 
 		final boolean terminateUponBoardingDenied = false;
-		// final boolean removeModeInformation = true;
-		final boolean removeModeInformation = false;
+		final boolean useGreedo = true;
 
 		final Config config = ConfigUtils.loadConfig(configFileName, new SwissRailRaptorConfigGroup(),
 				new SBBTransitConfigGroup(), new RoadPricingConfigGroup(), new ModalShareCalibrationConfigGroup(),
 				new GreedoConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		final Greedo greedo = new Greedo();
-		greedo.meet(config);
+		final Greedo greedo;
+		if (useGreedo) {
+			greedo = new Greedo();
+			greedo.meet(config);
+		}
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		if (removeModeInformation) {
-			removeModeInformation(scenario);
+
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			PTInteractionsRemover.run(person, false);
 		}
+
 		scaleTransitCapacities(scenario, config.qsim().getStorageCapFactor());
 		fixCarAvailability(scenario);
 		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "tr_").createNetwork();
-		greedo.meet(scenario);
+		if (useGreedo) {
+			greedo.meet(scenario);
+		}
 
 		// {
 		// ValidationResult result =
@@ -143,11 +154,9 @@ public class WUMProductionRunner {
 		// }
 
 		final Controler controler = new Controler(scenario);
-		
-		// 2020-08-14: changed while moving to MATSim 12
-		// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+
 		controler.addOverridingModule(new RoadPricingModule());
-		
+
 		controler.addOverridingModule(new SampersDifferentiatedPTScoringFunctionModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -165,10 +174,9 @@ public class WUMProductionRunner {
 			}
 		});
 
-		greedo.meet(controler);
-		// for (AbstractModule module : greedo.getModules()) {
-		// controler.addOverridingModule(module);
-		// }
+		if (useGreedo) {
+			greedo.meet(controler);
+		}
 
 		if (terminateUponBoardingDenied) {
 			controler.addOverridingModule(new AbstractModule() {
@@ -202,7 +210,6 @@ public class WUMProductionRunner {
 					bind(CalibrationModeExtractor.class).toInstance(new WUMModeExtractor(
 							ConfigUtils.addOrGetModule(getConfig(), ModalShareCalibrationConfigGroup.class), "home",
 							"work", "other", "intermediate_home"));
-					// addControlerListenerBinding().to(WireCadytsModalShareCalibratorIntoMATSimControlerListener.class);
 					addControlerListenerBinding().to(WireModalShareCalibratorIntoMATSimControlerListener.class);
 				}
 			});
@@ -212,6 +219,13 @@ public class WUMProductionRunner {
 			@Override
 			public void install() {
 				addControlerListenerBinding().to(WUMASCInstaller.class);
+			}
+		});
+
+		controler.addControlerListener(new StartupListener() {
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);
 			}
 		});
 

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
@@ -72,9 +72,9 @@ public class DifferentiatedPTUsageAnalyzer {
 			for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 				if (planElement instanceof Leg) {
 					final Leg leg = (Leg) planElement;
-					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+					if (leg.getRoute() instanceof TransitPassengerRoute) {
 						final TransitRoute route = id2transitRoute
-								.get(((ExperimentalTransitRoute) leg.getRoute()).getRouteId());
+								.get(((TransitPassengerRoute) leg.getRoute()).getRouteId());
 						Set<Id<Person>> users = this.mode2userIds.get(route.getTransportMode());
 						if (users == null) {
 							users = new LinkedHashSet<>();

@@ -17,7 +17,7 @@
  * contact: gunnar.flotterod@gmail.com
  *
  */
-package stockholm.ihop4.sampersutilities;
+package stockholm.ihop4.sampersutilities.analysis;
 
 import java.util.LinkedList;
 import java.util.Set;
