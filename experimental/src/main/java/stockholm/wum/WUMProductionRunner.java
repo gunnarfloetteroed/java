@@ -160,7 +160,7 @@ public class WUMProductionRunner {
 		controler.addOverridingModule(new SampersDifferentiatedPTScoringFunctionModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public void install() {
+			public void install() { 
 				this.install(new SBBTransitModule());
 				this.install(new SwissRailRaptorModule());
 			}

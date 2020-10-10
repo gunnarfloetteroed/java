@@ -28,7 +28,7 @@ public class DynamicDataUtils {
 
 	private DynamicDataUtils() {
 	}
-	
+
 	public static <L> double sumOfEntries2(final DynamicData<L> data) {
 		double result = 0.0;
 		for (L locObj : data.keySet()) {
@@ -70,5 +70,22 @@ public class DynamicDataUtils {
 		}
 		return result;
 	}
-}
 
+	public static <L> DynamicData<L> newWeightedSum(final DynamicData<L> data1, final double weight1,
+			final DynamicData<L> data2, final double weight2) {
+		if (data1.getBinCnt() != data2.getBinCnt()) {
+			throw new RuntimeException(
+					"arg1 has " + data1.getBinCnt() + " bins, but arg2 has " + data2.getBinCnt() + " bins.");
+		}
+		final DynamicData<L> result = new DynamicData<L>(data1.getStartTime_s(), data1.getBinSize_s(),
+				data1.getBinCnt());
+		for (L locObj : SetUtils.union(data1.keySet(), data2.keySet())) {
+			for (int bin = 0; bin < data1.getBinCnt(); bin++) {
+				result.put(locObj, bin,
+						weight1 * data1.getBinValue(locObj, bin) + weight2 * data2.getBinValue(locObj, bin));
+			}
+		}
+		return result;
+	}
+
+}

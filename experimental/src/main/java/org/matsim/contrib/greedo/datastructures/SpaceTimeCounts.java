@@ -49,6 +49,10 @@ public class SpaceTimeCounts<L> {
 
 	// -------------------- CONSTRUCTION --------------------
 
+	// TODO 2020-09-10 NEW
+	public SpaceTimeCounts() {		
+	}
+
 	public SpaceTimeCounts(final SpaceTimeIndicators<L> parent, final boolean useParticleWeight,
 			final boolean useSlotWeight) {
 		if (parent != null) {
@@ -98,7 +102,15 @@ public class SpaceTimeCounts<L> {
 		}
 	}
 
-	// NEW
+	// TODO NEW 2020-09-05
+	public double get(final L key, final int timeBin) {
+		return this.get(new Tuple<>(key, timeBin));
+	}
+
+	// TODO NEW 2020-09-10
+	public void add(final L key, final int timeBin, final double addend) {
+		this.add(new Tuple<>(key, timeBin), addend);
+	}
 
 	public double sumOfSquareEntries() {
 		double result = 0.0;

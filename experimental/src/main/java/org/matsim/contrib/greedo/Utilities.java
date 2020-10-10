@@ -76,12 +76,14 @@ class Utilities {
 	class SummaryStatistics {
 
 		final Map<Id<Person>, Double> personId2expectedUtilityChange;
+		final Map<Id<Person>, Double> personId2realizedUtilityChange; // TODO NEW
 		final Map<Id<Person>, Double> personId2experiencedUtility;
 		final public Double realizedUtilitySum;
 		final public Double realizedUtilityChangeSum;
 
 		private SummaryStatistics() {
 			final Map<Id<Person>, Double> personId2expectedUtilityChange = new LinkedHashMap<>();
+			final Map<Id<Person>, Double> personId2realizedUtilityChange = new LinkedHashMap<>(); // TODO NEW
 			final Map<Id<Person>, Double> personId2experiencedUtility = new LinkedHashMap<>();
 			Double realizedUtilitySum = null;
 			Double realizedUtilityChangeSum = null;
@@ -91,6 +93,10 @@ class Utilities {
 				personId2experiencedUtility.put(personId, entry.lastRealizedUtility);
 				if (entry.getLastExpectedUtilityChange() != null) {
 					personId2expectedUtilityChange.put(personId, entry.getLastExpectedUtilityChange());
+				}
+				if (entry.getLastRealizedUtilityChange() != null) {
+					// TODO NEW
+					personId2realizedUtilityChange.put(personId, entry.getLastRealizedUtilityChange());
 				}
 				if (entry.getLastRealizedUtility() != null) {
 					if (realizedUtilitySum == null) {
@@ -108,6 +114,7 @@ class Utilities {
 				}
 			}
 			this.personId2expectedUtilityChange = Collections.unmodifiableMap(personId2expectedUtilityChange);
+			this.personId2realizedUtilityChange = Collections.unmodifiableMap(personId2realizedUtilityChange); // TODO NEW
 			this.personId2experiencedUtility = Collections.unmodifiableMap(personId2experiencedUtility);
 			this.realizedUtilitySum = realizedUtilitySum;
 			this.realizedUtilityChangeSum = realizedUtilityChangeSum;

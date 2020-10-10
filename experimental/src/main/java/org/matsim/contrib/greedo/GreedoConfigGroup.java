@@ -133,6 +133,50 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		return Math.pow(1.0 / (1.0 + age), this.getAgeWeightExponent());
 	}
 
+	// ---------- VARIABILITY ANALYSIS minPhysLinkSize_veh ----------
+
+	// TODO This could be used even in the slot definition.
+	
+	private double minPhysLinkSize_veh = 0.0;
+
+	@StringGetter("minPhysLinkSize_veh")
+	public double getMinPhysLinkSize_veh() {
+		return this.minPhysLinkSize_veh;
+	}
+
+	@StringSetter("minPhysLinkSize_veh")
+	public void setMinPhysLinkSize_veh(final double minPhysLinkSize_veh) {
+		this.minPhysLinkSize_veh = minPhysLinkSize_veh;
+	}
+
+	// -------------------- VARIABILITY ANALYSIS: nonnegativeB --------------------
+
+	private boolean nonnegativeB = false;
+
+	@StringGetter("nonnegativeB")
+	public boolean getNonnegativeB() {
+		return this.nonnegativeB;
+	}
+
+	@StringSetter("nonnegativeB")
+	public void setNonnegativeB(final boolean nonnegativeB) {
+		this.nonnegativeB = nonnegativeB;
+	}
+
+	// --------------- VARIABILITY ANALYSIS: selfInteraction ---------------
+
+	private boolean selfInteraction = false;
+
+	@StringGetter("selfInteraction")
+	public boolean getSelfInteraction() {
+		return this.selfInteraction;
+	}
+
+	@StringSetter("selfInteraction")
+	public void setSelfInteraction(final boolean selfInteraction) {
+		this.selfInteraction = selfInteraction;
+	}
+
 	// --------------- adaptiveMSADenominatorIncreaseIfSuccess ---------------
 
 	private double adaptiveMSADenominatorIncreaseIfSuccess = 0.1;

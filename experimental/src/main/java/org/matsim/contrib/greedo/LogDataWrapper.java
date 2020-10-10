@@ -35,13 +35,13 @@ public class LogDataWrapper {
 
 	private final Utilities.SummaryStatistics utilitySummaryStatistics;
 
-	private final ReplannerIdentifier.SummaryStatistics replanningSummaryStatistics;
+	private final ReplannerIdentifierTII.SummaryStatistics replanningSummaryStatistics;
 
 	private final int iteration;
 
 	public LogDataWrapper(final GreedoConfigGroup greedoConfig,
 			final Utilities.SummaryStatistics utilitySummaryStatistics,
-			final ReplannerIdentifier.SummaryStatistics replanningSummaryStatistics, final int iteration) {
+			final ReplannerIdentifierTII.SummaryStatistics replanningSummaryStatistics, final int iteration) {
 		this.greedoConfig = greedoConfig;
 		this.utilitySummaryStatistics = utilitySummaryStatistics;
 		this.replanningSummaryStatistics = replanningSummaryStatistics;
@@ -73,7 +73,7 @@ public class LogDataWrapper {
 		return this.iteration;
 	}
 
-	public ReplannerIdentifier.SummaryStatistics getReplanningSummaryStatistics() {
+	public ReplannerIdentifierTII.SummaryStatistics getReplanningSummaryStatistics() {
 		return this.replanningSummaryStatistics;
 	}
 }
