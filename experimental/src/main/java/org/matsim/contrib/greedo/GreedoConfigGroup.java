@@ -149,6 +149,20 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		this.minPhysLinkSize_veh = minPhysLinkSize_veh;
 	}
 
+	// -------------------- VARIABILITY ANALYSIS: zeroB --------------------
+
+	private boolean zeroB = false;
+
+	@StringGetter("zeroB")
+	public boolean getZeroB() {
+		return this.zeroB;
+	}
+
+	@StringSetter("zeroB")
+	public void setZeroB(final boolean zeroB) {
+		this.zeroB = zeroB;
+	}
+
 	// -------------------- VARIABILITY ANALYSIS: nonnegativeB --------------------
 
 	private boolean nonnegativeB = false;

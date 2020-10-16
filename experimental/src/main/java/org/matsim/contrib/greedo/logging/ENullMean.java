@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Gunnar Flötteröd
+ * Copyright 2020 Gunnar Flötteröd
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@ import org.matsim.contrib.greedo.LogDataWrapper;
  * @author Gunnar Flötteröd
  *
  */
-public class NormalizedWeightedNonReplannerCountDifferences2 extends PopulationAverageStatistic {
+public class ENullMean extends PopulationAverageStatistic {
 
 	@Override
-	public String value(LogDataWrapper arg0) {
-		return this.averageOrEmpty(arg0.getReplanningSummaryStatistics().sumOfWeightedNonReplannerCountDifferences2,
-				arg0.getReplanningSummaryStatistics().numberOfNonReplanners);
+	public String value(final LogDataWrapper arg0) {
+		return this.averageOrEmpty(arg0.getDisappoinmentSummaryStatistics().sumOfNullE,
+				arg0.getReplanningSummaryStatistics().getNumberOfReplanningCandidates());
 	}
 
 }

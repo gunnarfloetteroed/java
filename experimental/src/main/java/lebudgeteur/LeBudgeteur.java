@@ -59,7 +59,7 @@ public class LeBudgeteur {
 		if (this.label2proj.containsKey(label)) {
 			throw new RuntimeException("Project " + label + " exists already.");
 		}
-		this.label2proj.put(label, new Project(this.duration, this.label2proj.size()));
+		this.label2proj.put(label, new Project(label, this.duration, this.label2proj.size()));
 		return this.label2proj.get(label);
 	}
 
@@ -71,8 +71,12 @@ public class LeBudgeteur {
 		this.label2proj.get(label).setMaxDeferrals(maxDeferrals);
 	}
 
-	public void setMinConsumptions(String label, double... minConsumptions) {
-		this.label2proj.get(label).setMinConsumptions(minConsumptions);
+	public void setMinTotalConsumptions(String label, double... minConsumptions) {
+		this.label2proj.get(label).setMinTotalConsumptions(minConsumptions);
+	}
+
+	public void putOtherConsumptions(String projectLabel, String consumptionLabel, double... otherConsumptions) {
+		this.label2proj.get(projectLabel).putOtherConsumptions(consumptionLabel, otherConsumptions);
 	}
 
 	private int _P() {
@@ -173,14 +177,18 @@ public class LeBudgeteur {
 							coeffs[z_index(proj, y - 1)] = -1.0;
 						}
 						prn("defer(p=" + proj.getIndex() + ",y=" + y + ")", coeffs);
-						constraints.add(new LinearConstraint(coeffs, Relationship.EQ, proj.getTargetFunding(y)));
+						constraints.add(new LinearConstraint(coeffs, Relationship.EQ, proj.getAvailableFunding(y)));
+						// constraints.add(new LinearConstraint(coeffs, Relationship.EQ,
+						// proj.getTargetFunding(y)));
 					}
 					{
 						// min-consumptions
 						double[] coeffs = new double[dim];
 						coeffs[x_index(proj, y)] = 1.0;
 						prn("min-cons(p=" + proj.getIndex() + ",y=" + y + ")", coeffs);
-						constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, proj.getMinConsumption(y)));
+						// constraints.add(new LinearConstraint(coeffs, Relationship.GEQ,
+						// proj.getMinConsumption(y)));
+						constraints.add(new LinearConstraint(coeffs, Relationship.GEQ, proj.getMinOwnConsumption(y)));
 					}
 					{
 						// max-deferral
@@ -216,7 +224,8 @@ public class LeBudgeteur {
 		System.out.print("Year\t");
 		for (String label : this.label2proj.keySet()) {
 			System.out.print(label + "(target)\t");
-			System.out.print(label + "(used)\t");
+			System.out.print(label + "(used, other)\t");
+			System.out.print(label + "(used, self)\t");
 			System.out.print(label + "(deferred)\t");
 		}
 		System.out.println("salary\tdeficit");
@@ -225,6 +234,7 @@ public class LeBudgeteur {
 			System.out.print((firstYear + y) + "\t");
 			for (Project proj : this.label2proj.values()) {
 				roundPrintTab(proj.getTargetFunding(y));
+				roundPrintTab(proj.getOtherConsumptions(y));
 				roundPrintTab(result[x_index(proj, y)]);
 				roundPrintTab(result[z_index(proj, y)]);
 			}

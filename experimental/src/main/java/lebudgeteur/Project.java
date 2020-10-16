@@ -21,6 +21,9 @@ package lebudgeteur;
 
 import static java.lang.System.arraycopy;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  *
  * @author Gunnar Flötteröd
@@ -34,21 +37,43 @@ class Project {
 
 	private final double[] minConsumptions;
 
+	private final Map<String, double[]> otherConsumption = new LinkedHashMap<>();
+
 	private final int index;
 
-	Project(int duration, int index) {
+	private final String label;
+
+	Project(String label, int duration, int index) {
 		this.targetFundings = new double[duration];
 		this.maxDeferrals = new double[duration];
 		this.minConsumptions = new double[duration];
 		this.index = index;
+		this.label = label;
 	}
-	
+
 	int getIndex() {
 		return this.index;
 	}
 
 	double getTargetFunding(int timeBin) {
 		return this.targetFundings[timeBin];
+	}
+
+	double getOtherConsumptions(int timeBin) {
+		double result = 0;
+		for (double[] otherConsumptions : this.otherConsumption.values()) {
+			result += otherConsumptions[timeBin];
+		}
+		return result;
+	}
+
+	double getAvailableFunding(int timeBin) {
+		double result = this.targetFundings[timeBin] - this.getOtherConsumptions(timeBin);
+		if (result < 0) {
+			throw new RuntimeException(label + ", time bin " + timeBin
+					+ ": Other consumption exceeds target funding, result is " + result + ".");
+		}
+		return result;
 	}
 
 	double getMaxDeferral(int timeBin) {
@@ -59,6 +84,10 @@ class Project {
 		return this.minConsumptions[timeBin];
 	}
 
+	double getMinOwnConsumption(int timeBin) {
+		return Math.max(0.0, this.minConsumptions[timeBin] - this.getOtherConsumptions(timeBin));
+	}
+
 	void setTargetFundings(double[] targetFundings) {
 		arraycopy(targetFundings, 0, this.targetFundings, 0, this.targetFundings.length);
 	}
@@ -67,7 +96,12 @@ class Project {
 		arraycopy(maxDeferrals, 0, this.maxDeferrals, 0, this.maxDeferrals.length);
 	}
 
-	void setMinConsumptions(double[] minConsumptions) {
+	void setMinTotalConsumptions(double[] minConsumptions) {
 		arraycopy(minConsumptions, 0, this.minConsumptions, 0, this.minConsumptions.length);
 	}
+
+	void putOtherConsumptions(String label, double[] otherConsumptions) {
+		this.otherConsumption.put(label, otherConsumptions);
+	}
+
 }

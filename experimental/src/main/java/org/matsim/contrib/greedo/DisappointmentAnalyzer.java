@@ -19,6 +19,8 @@
  */
 package org.matsim.contrib.greedo;
 
+import static java.util.Collections.unmodifiableMap;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.greedo.datastructures.SpaceTimeCounts;
 import org.matsim.contrib.greedo.datastructures.SpaceTimeIndicators;
 
-import floetteroed.utilities.DynamicData;
 import floetteroed.utilities.Tuple;
 
 /**
@@ -44,25 +45,24 @@ public class DisappointmentAnalyzer {
 
 	private final Map<Id<?>, Double> _B;
 
-	// TODO Find more representative statistics.
-	//	private Double lastNaiveIndividualAbsE = null;
-	//	private Double lastEstimIndividualAbsE = null;
+	private SummaryStatistics summaryStatistics;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public DisappointmentAnalyzer(final GreedoConfigGroup conf) {
 		this.conf = conf;
 		this._B = new LinkedHashMap<>();
+		this.summaryStatistics = new SummaryStatistics();
 	}
 
 	// -------------------- INTERNALS --------------------
 
-	private double predictVariability(final Id<Person> personId, final SpaceTimeCounts<Id<?>> interactions) {
+	private double disappointment(final Id<Person> personId, final SpaceTimeCounts<Id<?>> interactions) {
 		double result = 0;
 		for (Map.Entry<Tuple<Id<?>, Integer>, Double> entry : interactions.entriesView()) {
-			final Id<?> loc = entry.getKey().getA();
+			final Id<?> location = entry.getKey().getA();
 			final double interaction = entry.getValue();
-			result += interaction * this._B.getOrDefault(loc, 0.0);
+			result += interaction * this._B.getOrDefault(location, 0.0);
 		}
 		return result;
 	}
@@ -71,92 +71,101 @@ public class DisappointmentAnalyzer {
 
 	public void update(final Map<Id<Person>, SpaceTimeIndicators<Id<?>>> currentIndicators,
 			final Map<Id<Person>, SpaceTimeIndicators<Id<?>>> anticipatedIndicators,
-			final Map<Id<Person>, Double> personId2realizedUtilityChange,
-			final Map<Id<Person>, Double> personId2anticipatedUtilityChange, final Set<Id<Person>> replannerIds,
-			final Map<Id<Person>, SpaceTimeCounts<Id<?>>> personId2interactions, final double stepSize) {
+			final Map<Id<Person>, Double> realizedUtilityChanges,
+			final Map<Id<Person>, Double> anticipatedUtilityChanges, final Set<Id<Person>> replannerIds,
+			final Map<Id<Person>, SpaceTimeCounts<Id<?>>> interactions, final double stepSize) {
 
-//		this.lastEstimIndividualAbsE = 0.0;
-//		this.lastNaiveIndividualAbsE = 0.0;
+		double sumOfNullE = 0.0;
+		double sumOfNaiveE = 0.0;
+		double sumOfEstimE = 0.0;
+
+		double sumOfNullE2 = 0.0;
+		double sumOfNaiveE2 = 0.0;
+		double sumOfEstimE2 = 0.0;
 
 		final Map<Id<?>, Double> deltaB = new LinkedHashMap<>();
 
-		double etaNumerator = 0.0; // TODO revisit step size logic
-		// vector in eta denominator equals deltaDiagonal2 + ... other ^2 terms
-
-		for (Id<Person> personId : personId2realizedUtilityChange.keySet()) {
-
-			final SpaceTimeCounts<Id<?>> interactions = personId2interactions.get(personId);
-			final double variability = this.predictVariability(personId, interactions);
+		for (Map.Entry<Id<Person>, Double> personEntry : realizedUtilityChanges.entrySet()) {
+			final Id<Person> personId = personEntry.getKey();
+			final double realizedUtilityChange = personEntry.getValue();
 
 			final double anticipatedUtilityChange;
 			if (replannerIds.contains(personId)) {
-				anticipatedUtilityChange = personId2anticipatedUtilityChange.get(personId);
+				anticipatedUtilityChange = anticipatedUtilityChanges.get(personId);
 			} else {
 				anticipatedUtilityChange = 0.0;
 			}
 
-			final double naiveEn = anticipatedUtilityChange - personId2realizedUtilityChange.get(personId);
+			sumOfNullE += realizedUtilityChange;
+			sumOfNullE2 += realizedUtilityChange * realizedUtilityChange;
 
-			// TODO >>> Used this code before >>>
-//			double en;
-//			if (this.variabilityConfig.getUseAbsoluteVariability()) {
-//				throw new RuntimeException("unsupported");
-//			} else {
-//				if (this.variabilityConfig.getTruncateImprovement()) {
-//					throw new RuntimeException("unsupported");
-//				} else {
-//					en = this.beta * anticipatedUtilityChange - (this.variabilityConfig.getEstimateStationaryB() ? 0.0
-//							: personId2realizedUtilityChange.get(personId)) - variability;
-//				}
-//			}
-			// TODO <<< Used this code before <<<
-			final double en = (anticipatedUtilityChange - variability) - personId2realizedUtilityChange.get(personId);
+			final double naiveEn = realizedUtilityChange - anticipatedUtilityChange;
+			sumOfNaiveE += naiveEn;
+			sumOfNaiveE2 += naiveEn * naiveEn;
 
-//			this.lastEstimIndividualAbsE += Math.abs(en);
-			etaNumerator += en * en;
+			final double estimEn = realizedUtilityChange
+					- (anticipatedUtilityChange - this.disappointment(personId, interactions.get(personId)));
+			sumOfEstimE += estimEn;
+			sumOfEstimE2 += estimEn * estimEn;
 
-			for (Map.Entry<Tuple<Id<?>, Integer>, Double> entry : interactions.entriesView()) {
-				final Id<?> loc = entry.getKey().getA();
-				double interaction = entry.getValue();
-				deltaB.put(loc, deltaB.getOrDefault(loc, 0.0) + en * interaction);
+			for (Map.Entry<Tuple<Id<?>, Integer>, Double> interactionEntry : interactions.get(personId).entriesView()) {
+				final Id<?> location = interactionEntry.getKey().getA();
+				double interaction = interactionEntry.getValue();
+				deltaB.put(location, deltaB.getOrDefault(location, 0.0) - estimEn * interaction);
 			}
-
 		}
 
-		double etaDenominator = 0.0; // TODO stream
+		double deltaBSum2 = 0.0;
 		for (double val : deltaB.values()) {
-			etaDenominator += val * val;
+			deltaBSum2 += val * val;
 		}
 
-		if (etaDenominator >= 1e-8) {
-			final double eta = stepSize * etaNumerator / etaDenominator;
+		if ((!this.conf.getZeroB()) && (deltaBSum2 >= 1e-8)) {
+			final double eta = stepSize * sumOfEstimE2 / deltaBSum2;
 			for (Map.Entry<Id<?>, Double> entry : deltaB.entrySet()) {
-				final Id<?> loc = entry.getKey();
-				double newBValue = this._B.getOrDefault(loc, 0.0) + eta * entry.getValue();
+				final Id<?> location = entry.getKey();
+				double newBValue = this._B.getOrDefault(location, 0.0) + eta * entry.getValue();
 				if (this.conf.getNonnegativeB()) {
 					newBValue = Math.max(0.0, newBValue);
 				}
-				this._B.put(loc, newBValue);
+				this._B.put(location, newBValue);
 			}
 		}
+
+		this.summaryStatistics = new SummaryStatistics(sumOfNullE, sumOfNaiveE, sumOfEstimE, sumOfNullE2, sumOfNaiveE2,
+				sumOfEstimE2);
 	}
 
-//	public Double getLastNaiveAbsE() {
-//		return this.lastNaiveIndividualAbsE;
-//	}
+	public Map<Id<?>, Double> getBView() {
+		return unmodifiableMap(this._B);
+	}
 
-//	public Double getLastEstimAbsE() {
-//		return this.lastEstimIndividualAbsE;
-//	}
+	public SummaryStatistics getSummaryStatistics() {
+		return this.summaryStatistics;
+	}
 
-	// TODO Stick to a map; take out dynamics.
-	public DynamicData<Id<?>> getB() { 
-		final DynamicData<Id<?>> result = new DynamicData<>(this.conf.newTimeDiscretization());
-		for (Map.Entry<Id<?>, Double> entry : this._B.entrySet()) {
-			for (int timeBin = 0; timeBin < result.getBinCnt(); timeBin++) {
-				result.put(entry.getKey(), timeBin, entry.getValue());
-			}
+	public static class SummaryStatistics {
+
+		public final Double sumOfNullE;
+		public final Double sumOfNaiveE;
+		public final Double sumOfEstimE;
+
+		public final Double sumOfNullE2;
+		public final Double sumOfNaiveE2;
+		public final Double sumOfEstimE2;
+
+		private SummaryStatistics() {
+			this(null, null, null, null, null, null);
 		}
-		return result;
+		
+		private SummaryStatistics(final Double sumOfNullE, final Double sumOfNaiveE, final Double sumOfEstimE,
+				final Double sumOfNullE2, final Double sumOfNaiveE2, final Double sumOfEstimE2) {
+			this.sumOfNullE = sumOfNullE;
+			this.sumOfNaiveE = sumOfNaiveE;
+			this.sumOfEstimE = sumOfEstimE;
+			this.sumOfNullE2 = sumOfNullE2;
+			this.sumOfNaiveE2 = sumOfNaiveE2;
+			this.sumOfEstimE2 = sumOfEstimE2;
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Gunnar Flötteröd
+ * Copyright 2020 Gunnar Flötteröd
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,23 +21,17 @@ package org.matsim.contrib.greedo.logging;
 
 import org.matsim.contrib.greedo.LogDataWrapper;
 
-import floetteroed.utilities.statisticslogging.Statistic;
-
 /**
  *
  * @author Gunnar Flötteröd
  *
  */
-public class LambdaBar implements Statistic<LogDataWrapper> {
+public class ENaive2Mean extends PopulationAverageStatistic {
 
 	@Override
-	public String label() {
-		return this.getClass().getSimpleName();
-	}
-
-	@Override
-	public String value(LogDataWrapper arg0) {
-		return Statistic.toString(arg0.getReplanningSummaryStatistics().lambdaBar);
+	public String value(final LogDataWrapper arg0) {
+		return this.averageOrEmpty(arg0.getDisappoinmentSummaryStatistics().sumOfNaiveE2,
+				arg0.getReplanningSummaryStatistics().getNumberOfReplanningCandidates());
 	}
 
 }

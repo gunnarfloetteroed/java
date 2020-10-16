@@ -38,7 +38,7 @@ public class Example {
 		// Planned funding: 700 per year over two years.
 		lb.setTargetFundings("Project 1", 700, 700, 0, 0, 0);
 		// No minimum work requirement on the project.
-		lb.setMinConsumptions("Project 1", 0, 0, 0, 0, 0);
+		lb.setMinTotalConsumptions("Project 1", 0, 0, 0, 0, 0);
 		// We can defer as much funding as we want during the first year but must not
 		// defer beyond year two.
 		lb.setMaxDeferrals("Project 1", POSITIVE_INFINITY, 0, 0, 0, 0);
@@ -48,7 +48,7 @@ public class Example {
 		// Planned funding: 500 per year over four years.
 		lb.setTargetFundings("Project 2", 500, 500, 500, 500, 0);
 		// No minimum work requirement on the project.
-		lb.setMinConsumptions("Project 2", 0, 0, 0, 0, 0);
+		lb.setMinTotalConsumptions("Project 2", 0, 0, 0, 0, 0);
 		// We can defer as much funding as we want during the first three years but must
 		// not defer beyond year four.
 		lb.setMaxDeferrals("Project 2", POSITIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY, 0, 0);

@@ -17,7 +17,7 @@
  * contact: gunnar.flotterod@gmail.com
  *
  */
-package org.matsim.contrib.greedo.stationaryreplanningregulation;
+package utils;
 
 import java.util.Random;
 
@@ -29,46 +29,50 @@ import java.util.Random;
  */
 public class AdaptiveQuantileEstimator {
 
+	// -------------------- MEMBERS --------------------
+
 	private double stepSize;
 
-	private double proba;
+	private double probability;
 
 	private double quantile;
 
-	public AdaptiveQuantileEstimator(final double stepSize, final double proba, final double initialQuantileGuess) {
+	// -------------------- CONSTRUCTION --------------------
+
+	public AdaptiveQuantileEstimator(final double stepSize, final double probability,
+			final double initialQuantileGuess) {
 		this.stepSize = stepSize;
-		this.proba = proba;
+		this.probability = probability;
 		this.quantile = initialQuantileGuess;
 	}
-	
+
+	// -------------------- IMPLEMENTATION --------------------
+
 	public void setStepSize(final double stepSize) {
 		this.stepSize = stepSize;
 	}
 
-	public void update(final double realization) {
-
-		final double dLoss_dQuantile;
-		if (realization > this.quantile) {
-			dLoss_dQuantile = -this.proba;
-		} else {
-			dLoss_dQuantile = 1.0 - this.proba;
-		}
-
-		// Step size one as we are only estimating a constant.
-		this.quantile -= this.stepSize * dLoss_dQuantile;
-	}
-	
 	public void setProbability(final double probability) {
-		this.proba = probability;
+		this.probability = probability;
 	}
-	
+
+	public void update(final double realization) {
+		if (realization > this.quantile) {
+			this.quantile += this.stepSize * this.probability;
+		} else if (realization < this.quantile) {
+			this.quantile -= this.stepSize * (1.0 - this.probability);
+		}
+	}
+
 	public double getQuantile() {
 		return this.quantile;
 	}
 
+	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
+
 	public static void main(String[] args) {
 		Random rnd = new Random();
-		AdaptiveQuantileEstimator aqe = new AdaptiveQuantileEstimator(0.1, 0.1359, 0.0);
+		AdaptiveQuantileEstimator aqe = new AdaptiveQuantileEstimator(0.1, 0.5, 0); // 1.0 - 0.1359, 0.0);
 		for (int i = 0; i < 100; i++) {
 			double realization = rnd.nextGaussian();
 			aqe.update(realization);

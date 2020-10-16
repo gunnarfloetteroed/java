@@ -31,14 +31,7 @@ public class TimeStampStatistic<D extends Object> implements Statistic<D> {
 
 	public static final String TIMESTAMP = "Timestamp";
 
-	private final String label;
-
 	public TimeStampStatistic() {
-		this.label = TIMESTAMP;
-	}
-
-	public TimeStampStatistic(final String label) {
-		this.label = label;
 	}
 
 	@Override
@@ -48,7 +41,7 @@ public class TimeStampStatistic<D extends Object> implements Statistic<D> {
 
 	@Override
 	public String value(final D data) {
-		return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date(
+		return (new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")).format(new Date(
 				System.currentTimeMillis()));
 	}
 }

@@ -19,10 +19,13 @@
  */
 package org.matsim.contrib.greedo;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+
+import floetteroed.utilities.math.BasicStatistics;
 
 /**
  *
@@ -35,17 +38,27 @@ public class LogDataWrapper {
 
 	private final Utilities.SummaryStatistics utilitySummaryStatistics;
 
-	private final ReplannerIdentifierTII.SummaryStatistics replanningSummaryStatistics;
+	private final ReplannerIdentifier.SummaryStatistics replanningSummaryStatistics;
+
+	private final DisappointmentAnalyzer.SummaryStatistics disappointmentSummaryStatistics;
+
+	private final BasicStatistics cnStats;
 
 	private final int iteration;
 
 	public LogDataWrapper(final GreedoConfigGroup greedoConfig,
 			final Utilities.SummaryStatistics utilitySummaryStatistics,
-			final ReplannerIdentifierTII.SummaryStatistics replanningSummaryStatistics, final int iteration) {
+			final ReplannerIdentifier.SummaryStatistics replanningSummaryStatistics,
+			final DisappointmentAnalyzer.SummaryStatistics disappointmentSummaryStatistics, final int iteration,
+			final Collection<Double> cnValues) {
 		this.greedoConfig = greedoConfig;
 		this.utilitySummaryStatistics = utilitySummaryStatistics;
 		this.replanningSummaryStatistics = replanningSummaryStatistics;
+		this.disappointmentSummaryStatistics = disappointmentSummaryStatistics;
 		this.iteration = iteration;
+
+		this.cnStats = new BasicStatistics();
+		this.cnStats.addAll(cnValues);
 	}
 
 	public GreedoConfigGroup getGreedoConfig() {
@@ -69,11 +82,31 @@ public class LogDataWrapper {
 		return this.utilitySummaryStatistics.realizedUtilityChangeSum;
 	}
 
+	public ReplannerIdentifier.SummaryStatistics getReplanningSummaryStatistics() {
+		return this.replanningSummaryStatistics;
+	}
+
+	public DisappointmentAnalyzer.SummaryStatistics getDisappoinmentSummaryStatistics() {
+		return this.disappointmentSummaryStatistics;
+	}
+
 	public int getIteration() {
 		return this.iteration;
 	}
 
-	public ReplannerIdentifierTII.SummaryStatistics getReplanningSummaryStatistics() {
-		return this.replanningSummaryStatistics;
+	public Double getCnMean() {
+		if (this.cnStats.size() > 0) {
+			return this.cnStats.getAvg();
+		} else {
+			return null;
+		}
+	}
+
+	public Double getCnStddev() {
+		if (this.cnStats.size() > 1) {
+			return this.cnStats.getStddev();
+		} else {
+			return null;
+		}
 	}
 }

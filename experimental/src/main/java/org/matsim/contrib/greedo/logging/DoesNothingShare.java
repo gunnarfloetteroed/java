@@ -21,23 +21,17 @@ package org.matsim.contrib.greedo.logging;
 
 import org.matsim.contrib.greedo.LogDataWrapper;
 
-import floetteroed.utilities.statisticslogging.Statistic;
-
 /**
  *
  * @author Gunnar Flötteröd
  *
  */
-public class Beta implements Statistic<LogDataWrapper> {
-
-	@Override
-	public String label() {
-		return this.getClass().getSimpleName();
-	}
+public class DoesNothingShare extends PopulationAverageStatistic {
 
 	@Override
 	public String value(LogDataWrapper arg0) {
-		return Statistic.toString(arg0.getReplanningSummaryStatistics().beta);
+		return this.averageOrEmpty(arg0.getReplanningSummaryStatistics().doesNothingCnt,
+				arg0.getReplanningSummaryStatistics().getNumberOfReplanningCandidates());
 	}
 
 }

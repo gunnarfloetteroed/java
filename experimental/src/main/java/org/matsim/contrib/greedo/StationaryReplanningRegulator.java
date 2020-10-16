@@ -17,8 +17,10 @@
  * contact: gunnar.flotterod@gmail.com
  *
  */
-package org.matsim.contrib.greedo.stationaryreplanningregulation;
+package org.matsim.contrib.greedo;
 
+import static java.lang.Math.max;
+import static java.lang.Math.sqrt;
 import static java.util.Collections.unmodifiableMap;
 
 import java.util.LinkedHashMap;
@@ -26,6 +28,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+
+import utils.AdaptiveQuantileEstimator;
 
 /**
  *
@@ -43,6 +47,7 @@ public class StationaryReplanningRegulator {
 	private final Map<Id<Person>, AdaptiveQuantileEstimator> personId2cn = new LinkedHashMap<>();
 
 	private final Map<Id<Person>, Double> personId2expDn0 = new LinkedHashMap<>();
+
 	private Double avgSqrtOfExpDn0;
 
 	// -------------------- CONSTRUCTION --------------------
@@ -73,30 +78,27 @@ public class StationaryReplanningRegulator {
 		return unmodifiableMap(result);
 	}
 
-	// TODO CONTINUE HERE
-
 	public void update(final Map<Id<Person>, Double> personId2deltaUn0, final Map<Id<Person>, Double> personId2Dn0,
 			final Map<Id<Person>, Double> personId2Tn) {
 
-		// Update disappointment when not replanning.
+		// Update expected disappointment of not replanning.
 
 		this.avgSqrtOfExpDn0 = 0.0;
 		for (Map.Entry<Id<Person>, Double> entry : personId2Dn0.entrySet()) {
 			final Id<Person> personId = entry.getKey();
 			final double dn0 = entry.getValue();
-
-			final double newExpDn0 = Math.max(0.0,
+			final double newExpDn0 = max(0.0,
 					(1.0 - this.stepSize) * this.personId2expDn0.getOrDefault(personId, 0.0) + this.stepSize * dn0);
 			this.personId2expDn0.put(personId, newExpDn0);
-			this.avgSqrtOfExpDn0 += Math.sqrt(newExpDn0);
+			this.avgSqrtOfExpDn0 += sqrt(newExpDn0);
 
 		}
 		this.avgSqrtOfExpDn0 /= this.personId2expDn0.size();
 		this.avgSqrtOfExpDn0 = Math.max(1e-8, this.avgSqrtOfExpDn0);
 
-		// Adjust cn replanning thresholds.
+		// Update cn replanning thresholds.
 
-		for (Id<Person> personId : personId2deltaUn0.keySet()) {
+		for (Id<Person> personId : personId2Dn0.keySet()) {
 			final double targetReplanningRate = this.meanReplanningRate * Math.sqrt(this.personId2expDn0.get(personId))
 					/ this.avgSqrtOfExpDn0;
 			AdaptiveQuantileEstimator cn = this.personId2cn.get(personId);

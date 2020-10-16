@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Gunnar Flötteröd
+ * Copyright 2020 Gunnar Flötteröd
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,32 +21,17 @@ package org.matsim.contrib.greedo.logging;
 
 import org.matsim.contrib.greedo.LogDataWrapper;
 
-import floetteroed.utilities.statisticslogging.Statistic;
-
 /**
  *
  * @author Gunnar Flötteröd
  *
  */
-public class Beta0 implements Statistic<LogDataWrapper> {
+public class ENaiveMean extends PopulationAverageStatistic {
 
 	@Override
-	public String label() {
-		return this.getClass().getSimpleName();
-	}
-
-	@Override
-	public String value(LogDataWrapper arg0) {
-		final Double lambdaBar = arg0.getReplanningSummaryStatistics().lambdaBar;
-		final Double deltaX2 = arg0.getReplanningSummaryStatistics().sumOfWeightedReplannerCountDifferences2;
-		final Double deltaU = arg0.getReplanningSummaryStatistics().sumOfReplannerUtilityChanges;
-		final Double deltaUStar = arg0.getRealizedUtilityChangeSum();
-		if ((lambdaBar != null) && (deltaX2 != null) && (deltaU != null) && (deltaUStar != null)) {
-			return Statistic.toString(deltaX2 / lambdaBar / (deltaU - deltaUStar));
-		} else {
-			return "";
-		}
+	public String value(final LogDataWrapper arg0) {
+		return this.averageOrEmpty(arg0.getDisappoinmentSummaryStatistics().sumOfNaiveE,
+				arg0.getReplanningSummaryStatistics().getNumberOfReplanningCandidates());
 	}
 
 }
-

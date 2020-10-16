@@ -51,6 +51,7 @@ package org.matsim.contrib.greedo.deprecated;
 // * @author Gunnar Flötteröd
 // *
 // */
+@Deprecated
 class ReplanningEfficiencyEstimator2_DEPRECATED {
 //
 //	// -------------------- CONSTANTS --------------------

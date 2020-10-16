@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Gunnar Flötteröd
+ * Copyright 2020 Gunnar Flötteröd
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@ import org.matsim.contrib.greedo.LogDataWrapper;
  * @author Gunnar Flötteröd
  *
  */
-public class AvgNonReplannerUtilityChange_DEPRECATED extends PopulationAverageStatistic {
+public class EEstimMean extends PopulationAverageStatistic {
 
 	@Override
-	public String value(LogDataWrapper arg0) {
-		return this.averageOrEmpty(arg0.getReplanningSummaryStatistics().sumOfNonReplannerUtilityChanges,
-				arg0.getReplanningSummaryStatistics().numberOfNonReplanners);
+	public String value(final LogDataWrapper arg0) {
+		return this.averageOrEmpty(arg0.getDisappoinmentSummaryStatistics().sumOfEstimE,
+				arg0.getReplanningSummaryStatistics().getNumberOfReplanningCandidates());
 	}
 
 }
