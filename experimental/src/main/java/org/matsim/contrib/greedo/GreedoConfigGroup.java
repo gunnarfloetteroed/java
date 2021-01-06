@@ -89,7 +89,8 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 				this.concurrentLinkWeights.put(link.getId(), 1.0 / cap_veh_timeBin);
 			}
 		}
-		Logger.getLogger(this.getClass()).info("Average road link capacity is " + (road_capSum_veh_timBin / roadCnt) + " veh / timeBin.");
+		Logger.getLogger(this.getClass())
+				.info("Average road link capacity is " + (road_capSum_veh_timBin / roadCnt) + " veh / timeBin.");
 
 		double ptCapSum_persons_veh = 0;
 		int ptVehCnt = 0;
@@ -109,8 +110,9 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 				this.concurrentTransitVehicleWeights.put(transitVehicle.getId(), 1.0 / cap_persons);
 			}
 		}
-		Logger.getLogger(this.getClass()).info("Average transit vehicle capacity is " + (ptCapSum_persons_veh / ptVehCnt) + " persons / veh.");
-		
+		Logger.getLogger(this.getClass())
+				.info("Average transit vehicle capacity is " + (ptCapSum_persons_veh / ptVehCnt) + " persons / veh.");
+
 	}
 
 	public void configure(final Scenario scenario) {
@@ -136,7 +138,7 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	// ---------- VARIABILITY ANALYSIS minPhysLinkSize_veh ----------
 
 	// TODO This could be used even in the slot definition.
-	
+
 	private double minPhysLinkSize_veh = 0.0;
 
 	@StringGetter("minPhysLinkSize_veh")
@@ -147,6 +149,48 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("minPhysLinkSize_veh")
 	public void setMinPhysLinkSize_veh(final double minPhysLinkSize_veh) {
 		this.minPhysLinkSize_veh = minPhysLinkSize_veh;
+	}
+
+	// --------------- Invert replanning rate ---------------
+
+	private boolean invertReplanningRate = false;
+
+	@StringGetter("invertReplanningRate")
+	public boolean getInvertReplanningRate() {
+		return this.invertReplanningRate;
+	}
+
+	@StringSetter("invertReplanningRate")
+	public void setInvertReplanningRate(final boolean invertReplanningRate) {
+		this.invertReplanningRate = invertReplanningRate;
+	}
+
+	// --------------- VARIABILITY ANALYSIS: use Dn1-Dn0 in T ---------------
+
+	private boolean useDinT = true;
+
+	@StringGetter("useDinT")
+	public boolean getUseDinT() {
+		return this.useDinT;
+	}
+
+	@StringSetter("useDinT")
+	public void setUseDinT(final boolean useDinT) {
+		this.useDinT = useDinT;
+	}
+
+	// --------------- VARIABILITY ANALYSIS: use Cn1 in T ---------------
+
+	private boolean useCinT = true;
+
+	@StringGetter("useCinT")
+	public boolean getUseCinT() {
+		return this.useCinT;
+	}
+
+	@StringSetter("useCinT")
+	public void setUseCinT(final boolean useCinT) {
+		this.useCinT = useCinT;
 	}
 
 	// -------------------- VARIABILITY ANALYSIS: zeroB --------------------
@@ -246,7 +290,7 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	public void setCorrectAgentSize(final boolean correctAgentSize) {
 		this.correctAgentSize = correctAgentSize;
 	}
-	
+
 	// -------------------- acceptNegativeDisappointment --------------------
 
 	@Deprecated
@@ -401,8 +445,14 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		this.replanningRateIterationExponent = replanningRateIterationExponent;
 	}
 
-	public double getMSAReplanningRate(final int iteration) {
-		return this.getInitialMeanReplanningRate() * Math.pow(iteration + 1, this.getReplanningRateIterationExponent());
+	public double getMSAReplanningRate(final int iteration, final boolean useInvert) {
+		final double regularReplanningRate = this.getInitialMeanReplanningRate()
+				* Math.pow(iteration + 1, this.getReplanningRateIterationExponent());
+		if (useInvert && this.getInvertReplanningRate()) {
+			return (1.0 - regularReplanningRate);
+		} else {
+			return regularReplanningRate;
+		}
 	}
 
 	// -------------------- ageWeightExponent --------------------

@@ -92,7 +92,7 @@ class AccelerationLogHandler extends AbstractTabularFileHandlerWithHeaderLine {
 	@Override
 	public void startDataRow(final String[] row) {
 		final int iteration = this.getIntValue(MATSimIteration.class.getSimpleName());
-		this.betas[iteration] = this.doubleOrNull(this.getStringValue("Beta"));
+		// this.betas[iteration] = this.doubleOrNull(this.getStringValue("Beta"));
 		this.realizedLambdas[iteration] = this.doubleOrNull(this.getStringValue(LambdaRealized.class.getSimpleName()));
 		this.realizedUtilities[iteration] = this
 				.doubleOrNull(this.getStringValue(AvgRealizedUtility.class.getSimpleName()));
@@ -106,8 +106,8 @@ class AccelerationLogHandler extends AbstractTabularFileHandlerWithHeaderLine {
 
 //		this.performanceCorrelations[iteration] = this
 //				.doubleOrNull(this.getStringValue("Corr(DeltaX2,DeltaU-DeltaU*)"));
-		this.ageCorrelations[iteration] = this
-				.doubleOrNull(this.getStringValue("Corr(Age*ExpDeltaUtility;Similarity)"));
+//		this.ageCorrelations[iteration] = this
+//				.doubleOrNull(this.getStringValue("Corr(Age*ExpDeltaUtility;Similarity)"));
 		
 		this.agePercentiles10[iteration] = this.doubleOrNull(this.getStringValue("agePercentile10"));
 		this.agePercentiles20[iteration] = this.doubleOrNull(this.getStringValue("agePercentile20"));

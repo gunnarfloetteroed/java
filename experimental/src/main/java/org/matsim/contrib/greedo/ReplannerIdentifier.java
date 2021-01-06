@@ -123,6 +123,7 @@ class ReplannerIdentifier {
 
 		final Map<Id<Person>, SpaceTimeCounts<Id<?>>> personId2interactions = new LinkedHashMap<>();
 		final Map<Id<Person>, Double> personId2Dn0 = new LinkedHashMap<>();
+		final Map<Id<Person>, Double> personId2Dn1 = new LinkedHashMap<>();
 		final Map<Id<Person>, Double> personId2Tn = new LinkedHashMap<>();
 
 		final Set<Id<Person>> replanners = new LinkedHashSet<>();
@@ -136,9 +137,14 @@ class ReplannerIdentifier {
 					this.personId2physicalSlotUsage.get(personId), this.personId2hypothetialSlotUsage.get(personId),
 					this.personId2hypotheticalUtilityChange.get(personId), this.changeResiduals,
 					this.anticipatedMeanReplanningRate, this._B, this.greedoConfig, this.network);
+//			final boolean isReplanner = this.greedoConfig.getReplannerIdentifierRecipe().isReplanner(personId,
+//					scoreUpdater.getScoreChangeIfOne(),
+//					scoreUpdater.getScoreChangeIfZero() - this.personId2cn.getOrDefault(personId, 0.0),
+//					this.personId2currentUtility.get(personId), this.personId2hypotheticalUtilityChange.get(personId));
 			final boolean isReplanner = this.greedoConfig.getReplannerIdentifierRecipe().isReplanner(personId,
 					scoreUpdater.getScoreChangeIfOne(),
-					scoreUpdater.getScoreChangeIfZero() - this.personId2cn.getOrDefault(personId, 0.0),
+					scoreUpdater.getScoreChangeIfZero()
+							- (this.greedoConfig.getUseCinT() ? this.personId2cn.getOrDefault(personId, 0.0) : 0.0),
 					this.personId2currentUtility.get(personId), this.personId2hypotheticalUtilityChange.get(personId));
 			scoreUpdater.updateResiduals(isReplanner ? 1.0 : 0.0);
 
@@ -154,23 +160,22 @@ class ReplannerIdentifier {
 					nonReplannerSizeSum += this.personId2physicalSlotUsage.get(personId).size();
 				}
 			}
-			
+
 			if (scoreUpdater.doesNothing()) {
 				doesNothingCnt++;
 			}
 
 			personId2interactions.put(personId, scoreUpdater.getRealizedInteractions(isReplanner));
 			personId2Dn0.put(personId, scoreUpdater.getDn0());
+			personId2Dn1.put(personId, scoreUpdater.getDn1());
 			personId2Tn.put(personId, scoreUpdater.getTn());
 		}
 
 		this.lastReplanningSummaryStats = new SummaryStatistics(replannerHypotheticalUtilityChangeSum,
 				nonReplannerHypotheticalUtilityChangeSum, replannerSizeSum, nonReplannerSizeSum, replanners.size(),
 				this.personId2hypotheticalUtilityChange.size() - replanners.size(),
-				this.greedoConfig.getReplannerIdentifierRecipe().getDeployedRecipeName(), 
-				(double) doesNothingCnt,
-				personId2interactions,
-				personId2Dn0, personId2Tn);
+				this.greedoConfig.getReplannerIdentifierRecipe().getDeployedRecipeName(), (double) doesNothingCnt,
+				personId2interactions, personId2Dn0, personId2Dn1, personId2Tn);
 
 		return replanners;
 	}
@@ -198,22 +203,23 @@ class ReplannerIdentifier {
 
 		private final Map<Id<Person>, SpaceTimeCounts<Id<?>>> personId2interactionsView;
 		private final Map<Id<Person>, Double> personId2Dn0View;
+		private final Map<Id<Person>, Double> personId2Dn1View;
 		private final Map<Id<Person>, Double> personId2TnView;
 
 		private Map<Id<Person>, Integer> replannerId2ageAtReplanningView = null;
 
 		SummaryStatistics() {
 			this(null, null, null, null, null, null, null, null, new LinkedHashMap<>(), new LinkedHashMap<>(),
-					new LinkedHashMap<>());
+					new LinkedHashMap<>(), new LinkedHashMap<>());
 		}
 
 		private SummaryStatistics(final Double sumOfReplannerUtilityChanges,
 				final Double sumOfNonReplannerUtilityChanges, final Double replannerSizeSum,
 				final Double nonReplannerSizeSum, final Integer numberOfReplanners, final Integer numberOfNonReplanners,
-				final String replannerIdentifierRecipeName,
-				final Double doesNothingCnt,
+				final String replannerIdentifierRecipeName, final Double doesNothingCnt,
 				final Map<Id<Person>, SpaceTimeCounts<Id<?>>> personId2interactions,
-				final Map<Id<Person>, Double> personId2Dn0, final Map<Id<Person>, Double> personId2Tn) {
+				final Map<Id<Person>, Double> personId2Dn0, final Map<Id<Person>, Double> personId2Dn1,
+				final Map<Id<Person>, Double> personId2Tn) {
 			this.sumOfReplannerUtilityChanges = sumOfReplannerUtilityChanges;
 			this.sumOfNonReplannerUtilityChanges = sumOfNonReplannerUtilityChanges;
 			this.replannerSizeSum = replannerSizeSum;
@@ -224,6 +230,7 @@ class ReplannerIdentifier {
 			this.doesNothingCnt = doesNothingCnt;
 			this.personId2interactionsView = unmodifiableMap(personId2interactions);
 			this.personId2Dn0View = unmodifiableMap(personId2Dn0);
+			this.personId2Dn1View = unmodifiableMap(personId2Dn1);
 			this.personId2TnView = unmodifiableMap(personId2Tn);
 		}
 
@@ -241,6 +248,19 @@ class ReplannerIdentifier {
 
 		public Map<Id<Person>, Double> getPersonId2Dn0View() {
 			return this.personId2Dn0View;
+		}
+
+		public Map<Id<Person>, Double> getPersonId2Dn1View() {
+			return this.personId2Dn1View;
+		}
+
+		public Map<Id<Person>, Double> getPersonId2Dn1MinusDn0View() {
+			final LinkedHashMap<Id<Person>, Double> result = new LinkedHashMap<>();
+			result.putAll(this.personId2Dn1View);
+			for (Map.Entry<Id<Person>, Double> entry0 : this.personId2Dn0View.entrySet()) {
+				result.put(entry0.getKey(), result.getOrDefault(entry0.getKey(), 0.0) - entry0.getValue());
+			}
+			return result;
 		}
 
 		public Map<Id<Person>, Double> getPersonId2TnView() {

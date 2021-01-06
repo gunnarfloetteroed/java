@@ -60,12 +60,13 @@ class ScoreUpdater<L> {
 	private final SpaceTimeCounts<L> interactionsWhenMoving;
 
 	private final boolean doesNothing;
-	
+
 	private final double scoreChangeIfZero;
 	private final double scoreChangeIfOne;
 
 	private final double tn;
 	private final double dn0;
+	private final double dn1;
 
 	private boolean residualsUpdated = false;
 
@@ -90,8 +91,7 @@ class ScoreUpdater<L> {
 		this.weightedDeltaXn = new SpaceTimeCounts<L>(upcomingIndicators, true, true);
 		this.weightedDeltaXn.subtract(new SpaceTimeCounts<>(currentIndicators, true, true));
 		this.doesNothing = (this.weightedDeltaXn.entriesView().size() == 0);
-		
-		
+
 		/*
 		 * Removing the anticipated effect of this individual's replanning (based on
 		 * anticipatedMeanLambda) from the change residuals.
@@ -155,14 +155,32 @@ class ScoreUpdater<L> {
 
 		final double disappointmentIfOne = this.disappointment(1.0);
 		final double disappointmentIfZero = this.disappointment(0.0);
-
 		this.dn0 = disappointmentIfZero;
-		this.tn = disappointmentIfOne - disappointmentIfZero;
+		this.dn1 = disappointmentIfOne;
 
-		final double scoreIfOne = -(1.0 * individualUtilityChange - disappointmentIfOne);
-		final double scoreIfMean = -(anticipatedMeanLambda * individualUtilityChange
-				- this.disappointment(anticipatedMeanLambda));
-		final double scoreIfZero = -(0.0 * individualUtilityChange - disappointmentIfZero);
+//		this.dn0 = disappointmentIfZero;
+//		this.tn = disappointmentIfOne - disappointmentIfZero;
+//
+//		final double scoreIfOne = -(1.0 * individualUtilityChange - disappointmentIfOne);
+//		final double scoreIfMean = -(anticipatedMeanLambda * individualUtilityChange
+//				- this.disappointment(anticipatedMeanLambda));
+//		final double scoreIfZero = -(0.0 * individualUtilityChange - disappointmentIfZero);
+
+		final double scoreIfOne;
+		final double scoreIfMean;
+		final double scoreIfZero;
+		if (this.greedoConfig.getUseDinT()) {
+			this.tn = disappointmentIfOne - disappointmentIfZero;
+			scoreIfOne = -(1.0 * individualUtilityChange - disappointmentIfOne);
+			scoreIfMean = -(anticipatedMeanLambda * individualUtilityChange
+					- this.disappointment(anticipatedMeanLambda));
+			scoreIfZero = -(0.0 * individualUtilityChange - disappointmentIfZero);
+		} else {
+			this.tn = 0.0;
+			scoreIfOne = -(1.0 * individualUtilityChange - 0.0);
+			scoreIfMean = -(anticipatedMeanLambda * individualUtilityChange - 0.0);
+			scoreIfZero = -(0.0 * individualUtilityChange - 0.0);
+		}
 
 		this.scoreChangeIfOne = scoreIfOne - scoreIfMean;
 		this.scoreChangeIfZero = scoreIfZero - scoreIfMean;
@@ -229,7 +247,7 @@ class ScoreUpdater<L> {
 	boolean doesNothing() {
 		return this.doesNothing;
 	}
-	
+
 	double getScoreChangeIfOne() {
 		return this.scoreChangeIfOne;
 	}
@@ -244,6 +262,10 @@ class ScoreUpdater<L> {
 
 	double getDn0() {
 		return this.dn0;
+	}
+
+	double getDn1() {
+		return this.dn1;
 	}
 
 	SpaceTimeCounts<L> getRealizedInteractions(final boolean isReplanner) {

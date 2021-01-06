@@ -120,8 +120,8 @@ public class WireGreedoIntoMATSimControlerListener implements Provider<EventHand
 
 		this.disappointmentAnalyzer = new DisappointmentAnalyzer(this.greedoConfig);
 		this.stationaryReplanningRegulator = new StationaryReplanningRegulator(
-				this.greedoConfig.getMSAReplanningRate(services.getConfig().controler().getFirstIteration()),
-				this.greedoConfig.getMSAReplanningRate(services.getConfig().controler().getFirstIteration()));
+				this.greedoConfig.getMSAReplanningRate(services.getConfig().controler().getFirstIteration(), false),
+				this.greedoConfig.getMSAReplanningRate(services.getConfig().controler().getFirstIteration(), true));
 
 		// TODO CONTINUE HERE
 
@@ -224,14 +224,19 @@ public class WireGreedoIntoMATSimControlerListener implements Provider<EventHand
 			this.disappointmentAnalyzer.update(this.previousCurrentSlotUsages, this.previousAnticipatedSlotUsages,
 					utilityStats.personId2realizedUtilityChange, utilityStats.personId2expectedUtilityChange,
 					this.previousReplannerIds, this.lastReplanningSummaryStatistics.getPersonId2InteractionsView(),
-					this.greedoConfig.getMSAReplanningRate(this.iteration()));
+					this.greedoConfig.getMSAReplanningRate(this.iteration(), false));
 
 			this.stationaryReplanningRegulator
-					.setMeanReplanningRate(this.greedoConfig.getMSAReplanningRate(this.iteration()));
-			this.stationaryReplanningRegulator.setStepSize(this.greedoConfig.getMSAReplanningRate(this.iteration()));
+					.setMeanReplanningRate(this.greedoConfig.getMSAReplanningRate(this.iteration(), true));
+			this.stationaryReplanningRegulator.setStepSize(this.greedoConfig.getMSAReplanningRate(this.iteration(), false));
+			// ORIGINAL BELOW
 			this.stationaryReplanningRegulator.update(utilityStats.personId2expectedUtilityChange,
 					this.lastReplanningSummaryStatistics.getPersonId2Dn0View(),
 					this.lastReplanningSummaryStatistics.getPersonId2TnView());
+			// EXPERIMENTAL VARIATIONS BELOW
+//			this.stationaryReplanningRegulator.update(utilityStats.personId2expectedUtilityChange,
+//					this.lastReplanningSummaryStatistics.getPersonId2Dn1MinusDn0View(),
+//					this.lastReplanningSummaryStatistics.getPersonId2TnView());
 
 			BasicStatistics stats = new BasicStatistics();
 			for (Double cn : this.stationaryReplanningRegulator.getCnView().values()) {

@@ -60,7 +60,7 @@ public class Sbayti2007Recipe implements ReplannerIdentifierRecipe {
 				return o2.getValue().compareTo(o1.getValue()); // largest values first
 			}
 		});
-		final double meanLambda = logDataWrapper.getGreedoConfig().getMSAReplanningRate(logDataWrapper.getIteration());
+		final double meanLambda = logDataWrapper.getGreedoConfig().getMSAReplanningRate(logDataWrapper.getIteration(), true);
 		this.replannerIds = new LinkedHashSet<>();
 		for (int i = 0; i < meanLambda * entryList.size(); i++) {
 			this.replannerIds.add(entryList.get(i).getKey());

@@ -96,11 +96,19 @@ public class StationaryReplanningRegulator {
 		this.avgSqrtOfExpDn0 /= this.personId2expDn0.size();
 		this.avgSqrtOfExpDn0 = Math.max(1e-8, this.avgSqrtOfExpDn0);
 
-		// Update cn replanning thresholds.
+		/*
+		 * Update cn replanning thresholds.
+		 * 
+		 * The version below is *wrong*, it does not set cn such that the target
+		 * replanning rate is achieved but sets it (approximately) to the 
+		 * targetReplanningRate-percentile of the as the DeltaUn0 distribution.
+		 * 
+		 * cn.setProbability(1.0 - targetReplanningRate) would be "correct".
+		 */
 
 		for (Id<Person> personId : personId2Dn0.keySet()) {
-			final double targetReplanningRate = this.meanReplanningRate * Math.sqrt(this.personId2expDn0.get(personId))
-					/ this.avgSqrtOfExpDn0;
+			final double targetReplanningRate = Math.min(1.0,
+					this.meanReplanningRate * Math.sqrt(this.personId2expDn0.get(personId)) / this.avgSqrtOfExpDn0);
 			AdaptiveQuantileEstimator cn = this.personId2cn.get(personId);
 			if (cn == null) {
 				cn = new AdaptiveQuantileEstimator(this.stepSize, targetReplanningRate, 0.0);
