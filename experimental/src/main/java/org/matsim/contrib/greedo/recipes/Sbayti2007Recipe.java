@@ -52,15 +52,43 @@ public class Sbayti2007Recipe implements ReplannerIdentifierRecipe {
 
 	@Override
 	public void update(final LogDataWrapper logDataWrapper) {
-		final List<Map.Entry<Id<Person>, Double>> entryList = new ArrayList<>(
-				logDataWrapper.getPersonId2expectedUtilityChange().entrySet());
+		throw new UnsupportedOperationException("Experimental modification");
+	}
+
+	@Override
+	public void update(final LogDataWrapper logDataWrapper, Map<Id<Person>, Double> personId2avgExpDeltaUn0) {
+		List<Map.Entry<Id<Person>, Double>> entryList = new ArrayList<>();
+		for (Map.Entry<Id<Person>, Double> entry : logDataWrapper.getPersonId2expectedUtilityChange().entrySet()) {
+			entryList.add(new Map.Entry<Id<Person>, Double>() {
+				final Id<Person> key = entry.getKey();
+				final double value = entry.getValue()
+						/ (1e-3 + Math.max(0, personId2avgExpDeltaUn0.getOrDefault(entry.getKey(), 1e-3)));
+
+				@Override
+				public Id<Person> getKey() {
+					return this.key;
+				}
+
+				@Override
+				public Double getValue() {
+					return this.value;
+				}
+
+				@Override
+				public Double setValue(Double value) {
+					throw new UnsupportedOperationException();
+				}
+			});
+		}
+
 		Collections.sort(entryList, new Comparator<Map.Entry<?, Double>>() {
 			@Override
 			public int compare(final Entry<?, Double> o1, final Entry<?, Double> o2) {
 				return o2.getValue().compareTo(o1.getValue()); // largest values first
 			}
 		});
-		final double meanLambda = logDataWrapper.getGreedoConfig().getMSAReplanningRate(logDataWrapper.getIteration(), true);
+		final double meanLambda = logDataWrapper.getGreedoConfig().getMSAReplanningRate(logDataWrapper.getIteration(),
+				true);
 		this.replannerIds = new LinkedHashSet<>();
 		for (int i = 0; i < meanLambda * entryList.size(); i++) {
 			this.replannerIds.add(entryList.get(i).getKey());

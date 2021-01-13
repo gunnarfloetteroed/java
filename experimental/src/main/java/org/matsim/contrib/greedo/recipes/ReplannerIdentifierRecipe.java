@@ -33,7 +33,12 @@ import org.matsim.contrib.greedo.LogDataWrapper;
 public interface ReplannerIdentifierRecipe {
 
 	public void update(LogDataWrapper logDataWrapper);
-	
+
+	// TODO experimental
+	public default void update(LogDataWrapper logDataWrapper, Map<Id<Person>, Double> personId2avgExpDeltaUn0) {
+		this.update(logDataWrapper);
+	}
+
 	public boolean isReplanner(Id<Person> personId, double deltaScoreIfYes, double deltaScoreIfNo,
 			double currentUtility, double anticipatedUtilityChange);
 

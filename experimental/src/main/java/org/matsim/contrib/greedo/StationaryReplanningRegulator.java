@@ -19,8 +19,6 @@
  */
 package org.matsim.contrib.greedo;
 
-import static java.lang.Math.max;
-import static java.lang.Math.sqrt;
 import static java.util.Collections.unmodifiableMap;
 
 import java.util.LinkedHashMap;
@@ -83,40 +81,69 @@ public class StationaryReplanningRegulator {
 
 		// Update expected disappointment of not replanning.
 
-		this.avgSqrtOfExpDn0 = 0.0;
-		for (Map.Entry<Id<Person>, Double> entry : personId2Dn0.entrySet()) {
-			final Id<Person> personId = entry.getKey();
-			final double dn0 = entry.getValue();
-			final double newExpDn0 = max(0.0,
-					(1.0 - this.stepSize) * this.personId2expDn0.getOrDefault(personId, 0.0) + this.stepSize * dn0);
-			this.personId2expDn0.put(personId, newExpDn0);
-			this.avgSqrtOfExpDn0 += sqrt(newExpDn0);
+//		this.avgSqrtOfExpDn0 = 0.0;
+//		for (Map.Entry<Id<Person>, Double> entry : personId2Dn0.entrySet()) {
+//			final Id<Person> personId = entry.getKey();
+//			final double dn0 = entry.getValue();
+//			final double newExpDn0 = max(0.0,
+//					(1.0 - this.stepSize) * this.personId2expDn0.getOrDefault(personId, 0.0) + this.stepSize * dn0);
+//			this.personId2expDn0.put(personId, newExpDn0);
+//			this.avgSqrtOfExpDn0 += sqrt(newExpDn0);
+//
+//		}
+//		this.avgSqrtOfExpDn0 /= this.personId2expDn0.size();
+//		this.avgSqrtOfExpDn0 = Math.max(1e-8, this.avgSqrtOfExpDn0);
 
+		double maxCn = 0.0;
+		for (Id<Person> personId : personId2deltaUn0.keySet()) {
+			AdaptiveQuantileEstimator cn = this.personId2cn.get(personId);
+			if (cn != null) {
+				maxCn = Math.max(maxCn, cn.getQuantile());
+			}
 		}
-		this.avgSqrtOfExpDn0 /= this.personId2expDn0.size();
-		this.avgSqrtOfExpDn0 = Math.max(1e-8, this.avgSqrtOfExpDn0);
+		
+		final Map<Id<Person>, Double> personId2expCn = new LinkedHashMap<>();
+		double expCnSum = 0.0;
+		for (Id<Person> personId : personId2deltaUn0.keySet()) {
+			AdaptiveQuantileEstimator cn = this.personId2cn.get(personId);
+			if (cn == null) {
+				cn = new AdaptiveQuantileEstimator(this.stepSize, 0.0, 0.0);
+				this.personId2cn.put(personId, cn);
+			}
+			final double expCn = Math.exp(-(cn.getQuantile() - maxCn)); // could use a scale parameter
+			personId2expCn.put(personId, expCn);
+			expCnSum += expCn;
+		}
 
 		/*
 		 * Update cn replanning thresholds.
 		 * 
 		 * The version below is *wrong*, it does not set cn such that the target
-		 * replanning rate is achieved but sets it (approximately) to the 
+		 * replanning rate is achieved but sets it (approximately) to the
 		 * targetReplanningRate-percentile of the as the DeltaUn0 distribution.
 		 * 
 		 * cn.setProbability(1.0 - targetReplanningRate) would be "correct".
 		 */
 
+//		for (Id<Person> personId : personId2Dn0.keySet()) {
+//			final double targetReplanningRate = Math.min(1.0,
+//					this.meanReplanningRate * Math.sqrt(this.personId2expDn0.get(personId)) / this.avgSqrtOfExpDn0);
+//			AdaptiveQuantileEstimator cn = this.personId2cn.get(personId);
+//			if (cn == null) {
+//				cn = new AdaptiveQuantileEstimator(this.stepSize, targetReplanningRate, 0.0);
+//				this.personId2cn.put(personId, cn);
+//			} else {
+//				cn.setProbability(targetReplanningRate);
+//			}
+//			cn.update(personId2deltaUn0.get(personId) - personId2Tn.get(personId));
+//		}
+
 		for (Id<Person> personId : personId2Dn0.keySet()) {
 			final double targetReplanningRate = Math.min(1.0,
-					this.meanReplanningRate * Math.sqrt(this.personId2expDn0.get(personId)) / this.avgSqrtOfExpDn0);
-			AdaptiveQuantileEstimator cn = this.personId2cn.get(personId);
-			if (cn == null) {
-				cn = new AdaptiveQuantileEstimator(this.stepSize, targetReplanningRate, 0.0);
-				this.personId2cn.put(personId, cn);
-			} else {
-				cn.setProbability(targetReplanningRate);
-			}
-			cn.update(personId2deltaUn0.get(personId) - personId2Tn.get(personId));
+					this.meanReplanningRate * personId2Dn0.size() * personId2expCn.get(personId) / expCnSum);
+			final AdaptiveQuantileEstimator cn = this.personId2cn.get(personId);
+			cn.setProbability(1.0 - targetReplanningRate);
+			cn.update(personId2deltaUn0.get(personId));
 		}
 	}
 }

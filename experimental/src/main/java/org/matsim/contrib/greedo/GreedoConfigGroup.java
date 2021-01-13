@@ -151,6 +151,20 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		this.minPhysLinkSize_veh = minPhysLinkSize_veh;
 	}
 
+	// ---------- percentileStepSize ----------
+
+	private double percentileStepSize = 1.0;
+
+	@StringGetter("percentileStepSize")
+	public double getPercentileStepSize() {
+		return this.percentileStepSize;
+	}
+
+	@StringSetter("percentileStepSize")
+	public void setPercentileStepSize(final double percentileStepSize) {
+		this.percentileStepSize = percentileStepSize;
+	}
+
 	// --------------- Invert replanning rate ---------------
 
 	private boolean invertReplanningRate = false;
