@@ -72,7 +72,7 @@ public class AdaptiveQuantileEstimator {
 
 	public static void main(String[] args) {
 		Random rnd = new Random();
-		AdaptiveQuantileEstimator aqe = new AdaptiveQuantileEstimator(0.1, 0.5, 0); // 1.0 - 0.1359, 0.0);
+		AdaptiveQuantileEstimator aqe = new AdaptiveQuantileEstimator(0.1, 0.1, 0); // 1.0 - 0.1359, 0.0);
 		for (int i = 0; i < 100; i++) {
 			double realization = rnd.nextGaussian();
 			aqe.update(realization);

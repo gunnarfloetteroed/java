@@ -151,6 +151,48 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		this.minPhysLinkSize_veh = minPhysLinkSize_veh;
 	}
 
+	// ---------- randomReplanningProba ----------
+
+	private double randomReplanningProba = 0.0;
+
+	@StringGetter("randomReplanningProba")
+	public double getRandomReplanningProba() {
+		return this.randomReplanningProba;
+	}
+
+	@StringSetter("randomReplanningProba")
+	public void setRandomReplanningProba(final double randomReplanningProba) {
+		this.randomReplanningProba = randomReplanningProba;
+	}
+
+	// ---------- costExponent ----------
+
+	private double costExponent = 2.0;
+
+	@StringGetter("costExponent")
+	public double getCostExponent() {
+		return this.costExponent;
+	}
+
+	@StringSetter("costExponent")
+	public void setCostExponent(final double costExponent) {
+		this.costExponent = costExponent;
+	}
+
+	// ---------- competitionSize ----------
+
+	private double competitionSize = 2.0;
+
+	@StringGetter("competitionSize")
+	public double getCompetitionSize() {
+		return this.competitionSize;
+	}
+
+	@StringSetter("competitionSize")
+	public void setCompetitionSize(final double competitionSize) {
+		this.competitionSize = competitionSize;
+	}
+
 	// ---------- percentileStepSize ----------
 
 	private double percentileStepSize = 1.0;

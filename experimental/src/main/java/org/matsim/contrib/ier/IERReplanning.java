@@ -120,9 +120,11 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener 
 					personId2oldSelectedPlan.put(person.getId(), person.getSelectedPlan());
 				}
 
+				// >>>>> ORIGINAL STARTING HERE >>>>>
+				
 				// We run replanning on all agents (exactly as it is defined in the config)
 				this.strategyManager.run(this.scenario.getPopulation(), replanningContext);
-
+				
 				// NEW ONLY EMULATE AND SCORE PLANS THAT HAVE CHANGED
 				final Set<Person> personsToEmulate = new LinkedHashSet<>();
 				final IEREventHandlerProvider currentEventHandlerProvider;
@@ -137,6 +139,36 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener 
 						}
 					}
 				}
+
+				// >>> EXP STARTING HERE >>>
+//
+//				// We run replanning on all agents (exactly as it is defined in the config)
+//				if (i > 0) { // in the first iteration, we re-score the agents
+//					for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//						if (person.getSelectedPlan() == null) {
+//							person.setSelectedPlan(person.getPlans().get(0));
+//						}
+//					}					
+//					this.strategyManager.run(this.scenario.getPopulation(), replanningContext);
+//				}
+//
+//				// NEW ONLY EMULATE AND SCORE PLANS THAT HAVE CHANGED
+//				final Set<Person> personsToEmulate = new LinkedHashSet<>();
+//				final IEREventHandlerProvider currentEventHandlerProvider;
+//				if (i == this.ierConfig.getIterationsPerCycle() - 1) {
+//					currentEventHandlerProvider = handlerForLastReplanningIterationProvider;
+//					personsToEmulate.addAll(this.scenario.getPopulation().getPersons().values());
+//				} else {
+//					currentEventHandlerProvider = handlerForOtherReplanningIterationsProvider;
+//					for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//						// if (person.getSelectedPlan() != personId2oldSelectedPlan.get(person.getId()))
+//						// {
+//						personsToEmulate.add(person);
+//						// }
+//					}
+//				}
+
+				// <<< EXP ENDING HERE HERE <<<
 
 				// if (this.ierConfig.getParallel()) {
 				// emulateInParallel(this.scenario.getPopulation(), event.getIteration(),
