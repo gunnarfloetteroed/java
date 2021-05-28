@@ -19,8 +19,6 @@
  */
 package org.matsim.contrib.greedo;
 
-import static java.lang.Math.exp;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -30,6 +28,7 @@ import java.util.OptionalDouble;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.greedo.datastructures.SpaceTimeIndicators;
@@ -62,14 +61,19 @@ class UniformDissapointmentReplannerIdentifier {
 			this.frequencies = new int[10];
 		}
 
-		void add(final double score) {
-//			final int bin = (int) score;
-//			if ((this.frequencies.length - 1) < bin) {
-//				final int[] newFrequencies = new int[bin + 10];
-//				System.arraycopy(this.frequencies, 0, newFrequencies, 0, this.frequencies.length);
-//				this.frequencies = newFrequencies;
-//			}
-//			this.frequencies[bin]++;
+		void add(final double deltaScore) {
+			if (deltaScore < 0) {
+				Logger.getLogger(this.getClass()).warn("negative deltaScore: " + deltaScore);
+				return;
+			}
+
+			final int bin = (int) deltaScore;
+			if ((this.frequencies.length - 1) < bin) {
+				final int[] newFrequencies = new int[bin + 10];
+				System.arraycopy(this.frequencies, 0, newFrequencies, 0, this.frequencies.length);
+				this.frequencies = newFrequencies;
+			}
+			this.frequencies[bin]++;
 		}
 
 		void dumpAndClear() {
@@ -120,7 +124,7 @@ class UniformDissapointmentReplannerIdentifier {
 //		meanDn /= personId2DeltaUn0.size();
 		final double meanLambda = ((double) replanners.size()) / personId2DeltaUn0.size();
 		this.mu = stepSize * (meanLambda - lambdaTarget) + this.mu;
-		// this.mu = (this.mu + 1.0) * exp(stepSize * (meanLambda - lambdaTarget)) - 1.0;
+//		this.mu = (this.mu + 1.0) * Math.exp(stepSize * (meanLambda - lambdaTarget)) - 1.0;
 
 //		for (Map.Entry<Id<Person>, Double> entry : personId2DeltaUn0.entrySet()) {
 //			final Id<Person> personId = entry.getKey();
@@ -189,7 +193,8 @@ class UniformDissapointmentReplannerIdentifier {
 		for (Map.Entry<Id<Person>, Double> entry : personId2DeltaUn0.entrySet()) {
 			final Id<Person> personId = entry.getKey();
 			final double deltaUn0 = entry.getValue();
-			// if (deltaUn0 >= this.personId2meanDeltaUn0.getOrDefault(personId, 0.0) * (1.0 + this.mu)) {
+//			if (deltaUn0 >= lambdaTarget / (1.0 - lambdaTarget) * this.personId2meanDeltaUn0.getOrDefault(personId, 0.0)
+//					+ this.mu) {
 			if (deltaUn0 >= this.personId2meanDeltaUn0.getOrDefault(personId, 0.0) + this.mu) {
 				replanners.add(personId);
 			}

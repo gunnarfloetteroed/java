@@ -31,6 +31,16 @@ public class DynamicDataUtils2 {
 	private DynamicDataUtils2() {
 	}
 
+	public static <K> double getMaxNorm(final DynamicData<K> data) {
+		double result = 0.0;
+		for (K key : data.keySet()) {
+			for (int bin = 0; bin < data.getBinCnt(); bin++) {
+				result = Math.max(result, Math.abs(data.getBinValue(key, bin)));
+			}
+		}
+		return result;
+	}
+
 	public static <K> void makeEntriesAbsolute(final DynamicData<K> data) {
 		for (K key : data.keySet()) {
 			for (int bin = 0; bin < data.getBinCnt(); bin++) {

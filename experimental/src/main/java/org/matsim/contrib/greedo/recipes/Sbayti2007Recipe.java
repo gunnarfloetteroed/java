@@ -52,17 +52,11 @@ public class Sbayti2007Recipe implements ReplannerIdentifierRecipe {
 
 	@Override
 	public void update(final LogDataWrapper logDataWrapper) {
-		throw new UnsupportedOperationException("Experimental modification");
-	}
-
-	@Override
-	public void update(final LogDataWrapper logDataWrapper, Map<Id<Person>, Double> personId2avgExpDeltaUn0) {
 		List<Map.Entry<Id<Person>, Double>> entryList = new ArrayList<>();
 		for (Map.Entry<Id<Person>, Double> entry : logDataWrapper.getPersonId2expectedUtilityChange().entrySet()) {
 			entryList.add(new Map.Entry<Id<Person>, Double>() {
 				final Id<Person> key = entry.getKey();
-				final double value = entry.getValue()
-						/ (1e-3 + Math.max(0, personId2avgExpDeltaUn0.getOrDefault(entry.getKey(), 1e-3)));
+				final double value = entry.getValue();
 
 				@Override
 				public Id<Person> getKey() {
@@ -97,8 +91,7 @@ public class Sbayti2007Recipe implements ReplannerIdentifierRecipe {
 	}
 
 	@Override
-	public boolean isReplanner(final Id<Person> personId, final double deltaScoreIfYes, final double deltaScoreIfNo,
-			final double currentUtility, final double anticipatedUtilityChange) {
+	public boolean isReplanner(final Id<Person> personId, final double anticipatedUtilityChange) {
 		return this.replannerIds.contains(personId);
 	}
 

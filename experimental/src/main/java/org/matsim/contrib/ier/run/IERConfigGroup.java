@@ -36,6 +36,20 @@ public class IERConfigGroup extends ReflectiveConfigGroup {
 
 	// -------------------- writePerformanceOutput --------------------
 
+	private boolean overrideExperiencedScores = false;
+
+	@StringGetter("overrideExperiencedScores")
+	public boolean getOverrideExperiencedScores() {
+		return this.overrideExperiencedScores;
+	}
+
+	@StringSetter("overrideExperiencedScores")
+	public void setOverrideExperiencedScores(boolean overrideExperiencedScores) {
+		this.overrideExperiencedScores = overrideExperiencedScores;
+	}
+
+	// -------------------- writePerformanceOutput --------------------
+
 	private boolean writePerformanceOutput = false;
 
 	@StringGetter("writePerformanceOutput")

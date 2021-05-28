@@ -93,9 +93,9 @@ class Plans {
 		}
 		person.setSelectedPlan(getSelectedPlan(copiedPlans, this.person2selectedPlanIndex.get(person.getId())));
 	}
-	
+
 	// TODO 2019-07-20 NEW
-	void add(final HasPlansAndId<Plan, Person> person) {				
+	void add(final HasPlansAndId<Plan, Person> person) {
 		final List<? extends Plan> copiedPlans = newDeepCopy(this.personId2planList.get(person.getId()));
 		for (Plan plan : copiedPlans) {
 			person.addPlan(plan);
@@ -104,6 +104,23 @@ class Plans {
 
 	Plan getSelectedPlan(Id<Person> personId) {
 		return getSelectedPlan(this.personId2planList.get(personId), this.person2selectedPlanIndex.get(personId));
+	}
+
+	Double getSumOfSelectedPlanScores() {
+		double sum = 0.0;
+		for (Map.Entry<Id<Person>, Integer> entry : this.person2selectedPlanIndex.entrySet()) {
+			final Plan plan = getSelectedPlan(this.personId2planList.get(entry.getKey()), entry.getValue());
+			if (plan == null) {
+				return null;
+			} else {
+				sum += plan.getScore();
+			}
+		}
+		return sum;
+	}
+	
+	int getPersonCnt() {
+		return this.personId2planList.size();
 	}
 
 	// -------------------- HELPERS AND INTERNALS --------------------

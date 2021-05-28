@@ -33,9 +33,12 @@ import org.matsim.contrib.ier.run.IERConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -62,7 +65,7 @@ import floetteroed.utilities.math.BasicStatistics;
  * @author shoerl
  */
 @Singleton
-public final class IERReplanning implements PlansReplanning, ReplanningListener {
+public final class IERReplanning implements PlansReplanning, ReplanningListener, IterationEndsListener {
 	private final static Logger logger = Logger.getLogger(IERReplanning.class);
 
 	private final int numberOfEmulationThreads;
@@ -87,6 +90,20 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener 
 		this.ierConfig = ConfigUtils.addOrGetModule(config, IERConfigGroup.class);
 		this.agentEmulatorProvider = agentEmulatorProvider;
 		this.replannerSelector = replannerSelector;
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		if (this.ierConfig.getOverrideExperiencedScores()) {
+			try {
+				final Set<Person> personsToEmulate = new LinkedHashSet<>(
+						event.getServices().getScenario().getPopulation().getPersons().values());
+				this.emulateInParallel(personsToEmulate, event.getIteration(),
+						this.replannerSelector.getOverrideExperiencedScoresEventHandlerProvider());
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	@Override
@@ -121,10 +138,10 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener 
 				}
 
 				// >>>>> ORIGINAL STARTING HERE >>>>>
-				
+
 				// We run replanning on all agents (exactly as it is defined in the config)
 				this.strategyManager.run(this.scenario.getPopulation(), replanningContext);
-				
+
 				// NEW ONLY EMULATE AND SCORE PLANS THAT HAVE CHANGED
 				final Set<Person> personsToEmulate = new LinkedHashSet<>();
 				final IEREventHandlerProvider currentEventHandlerProvider;
@@ -183,10 +200,26 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener 
 						this.ierConfig.getIterationsPerCycle()));
 			}
 
+//			Logger.getLogger(this.getClass()).info("===== AFTER IER =====");
+//			logPlans(this.scenario.getPopulation());
+
 			this.replannerSelector.afterReplanning();
+
+//			Logger.getLogger(this.getClass()).info("===== AFTER afterReplanning() =====");
+//			logPlans(this.scenario.getPopulation());
 
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private void logPlans(Population population) {
+		for (Person person : population.getPersons().values()) {
+			Logger.getLogger(this.getClass()).info("Person: " + person.getId());
+			for (Plan plan : person.getPlans()) {
+				Logger.getLogger(this.getClass()).info(
+						(PersonUtils.isSelected(plan) ? "(selected)" : "") + " plan with score: " + plan.getScore());
+			}
 		}
 	}
 

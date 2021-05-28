@@ -55,5 +55,14 @@ public class SlotUsageUtilities {
 		}
 		return totals;
 	}
+		
+//	public static <L> double innerProduct(final SpaceTimeIndicators<L> x, final SpaceTimeIndicators<L> y) {
+//		double result = 0.0;
+//		for (int timeBin = 0; timeBin < Math.min(x.getTimeBinCnt(), y.getTimeBinCnt()); timeBin++) {
+//			x.getVisits(timeBin);
+//			y.getVisits(timeBin);
+//		}
+//		return result;
+//	}
 
 }

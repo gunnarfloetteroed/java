@@ -21,9 +21,11 @@ package stockholm.ihop4;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -33,9 +35,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.greedo.Greedo;
 import org.matsim.contrib.greedo.GreedoConfigGroup;
 import org.matsim.contrib.opdyts.MATSimOpdytsRunner;
@@ -60,13 +65,19 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.utils.misc.OptionalTime;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.utilities.TimeDiscretization;
@@ -87,6 +98,10 @@ public class IHOP4ProductionRunner {
 	static void keepOnlyStrictCarUsers(final Scenario scenario) {
 		final Set<Id<Person>> remove = new LinkedHashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
+
+			// 2021-02-01 new
+			PersonUtils.removeUnselectedPlans(person);
+
 			for (PlanElement planEl : person.getSelectedPlan().getPlanElements()) {
 				if (planEl instanceof Leg && !TransportMode.car.equals(((Leg) planEl).getMode())) {
 					remove.add(person.getId());
@@ -592,6 +607,7 @@ public class IHOP4ProductionRunner {
 			final MATSimOpdytsRunner<CompositeDecisionVariable, MATSimState> runner = new MATSimOpdytsRunner<>(scenario,
 					new MATSimStateFactoryImpl<>());
 			runner.addOverridingModule(new AbstractModule() {
+
 				@Override
 				public void install() {
 					bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
@@ -785,10 +801,11 @@ public class IHOP4ProductionRunner {
 
 	static void runWithSampersDynamics(final Config config) {
 
-		Logger.getLogger(IHOP4ProductionRunner.class).warn("Overriding plans input file in-codes.");
-		config.plans().setInputFile("1PctAllModes_enriched.xml");
+		// Logger.getLogger(IHOP4ProductionRunner.class).warn("Overriding plans input
+		// file in-codes.");
+		// config.plans().setInputFile("1PctAllModes_enriched.xml");
 
-		config.getModules().remove(IhopConfigGroup.GROUP_NAME);
+		// config.getModules().remove(IhopConfigGroup.GROUP_NAME);
 		// config.getModules().remove(PSimConfigGroup.GROUP_NAME);
 		// config.getModules().remove(GreedoConfigGroup.GROUP_NAME);
 
@@ -800,12 +817,13 @@ public class IHOP4ProductionRunner {
 		greedo.meet(scenario);
 
 		final Controler controler = new Controler(scenario);
-		
+
 		// 2020-08-14: changed while moving to MATSim 12
 		// OLD: controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		// controler.setModules(new RoadPricingModule());
+
 		controler.addOverridingModule(new RoadPricingModule());
-		
+
 		controler.addOverridingModule(new SampersScoringFunctionModule());
 
 		for (AbstractModule module : greedo.getModules()) {
@@ -820,19 +838,28 @@ public class IHOP4ProductionRunner {
 			}
 		});
 
-		controler.addControlerListener(new StartupListener() {			
+		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);								
+				Logger.getLogger(EventsManagerImpl.class).setLevel(Level.OFF);
 			}
 		});
-		
+
+//		controler.addControlerListener(new BeforeMobsimListener() {
+//			@Override
+//			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+//				Logger.getLogger(this.getClass()).warn("Resetting random seed.");
+//				MatsimRandom.reset(event.getServices().getConfig().global().getRandomSeed());
+//			}
+//		});
+
 		controler.run();
 	}
 
 	public static void main(String[] args) {
 
 		final Config config = ConfigUtils.loadConfig(args[0], new RoadPricingConfigGroup());
+		// final Config config = ConfigUtils.loadConfig(args[0]);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -843,5 +870,104 @@ public class IHOP4ProductionRunner {
 		// run(config);
 
 		runWithSampersDynamics(config);
+
+		// testRun(config);
+	}
+	
+	static void testRun(Config config) {
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Controler controler = new Controler(scenario);
+		controler.addControlerListener(new PlanChecker());
+		controler.run();		
+	}
+
+	static class PlanChecker implements AfterMobsimListener {
+
+		private Map<Id<Person>, Plan> personId2selectedPlan = null;
+
+		private boolean defined(OptionalTime t) {
+			return t != null && t.isDefined();
+		}
+
+		private boolean different(OptionalTime r, OptionalTime s) {
+			if (defined(r) && defined(s)) {
+				return r.seconds() != s.seconds();
+			} else {
+				return defined(r) || defined(s);
+			}
+		}
+
+		@Override
+		public void notifyAfterMobsim(AfterMobsimEvent event) {
+
+			Logger.getLogger(this.getClass()).info("Checking plans in iteration " + event.getIteration());
+
+//			Logger.getLogger(this.getClass()).warn("Resetting random seed.");
+//			MatsimRandom.reset(event.getServices().getConfig().global().getRandomSeed());
+
+			final Population population = event.getServices().getScenario().getPopulation();
+			if (this.personId2selectedPlan == null) {
+				this.personId2selectedPlan = new LinkedHashMap<>();
+				for (Person person : population.getPersons().values()) {
+					final Plan copiedPlan = PopulationUtils.createPlan();
+					PopulationUtils.copyFromTo(person.getSelectedPlan(), copiedPlan);
+					this.personId2selectedPlan.put(person.getId(), copiedPlan);
+				}
+			} else {
+				boolean changeDetected = false;
+				for (Person person : population.getPersons().values()) {
+					final Plan oldPlan = this.personId2selectedPlan.get(person.getId());
+					final Plan newPlan = person.getSelectedPlan();
+//					if (newPlan.getScore() != oldPlan.getScore()) {
+//						changeDetected = true;
+//						System.out.println("scores: " + oldPlan.getScore() + " vs " + newPlan.getScore());
+//					}
+					final List<PlanElement> newPlanElements = newPlan.getPlanElements();
+					final List<PlanElement> oldPlanElements = oldPlan.getPlanElements();
+					if (newPlanElements.size() != oldPlanElements.size()) {
+						changeDetected = true;
+						System.out.println(
+								"plan elements size: " + oldPlanElements.size() + " vs " + newPlanElements.size());
+					}
+					for (int i = 0; i < oldPlanElements.size(); i++) {
+						if (oldPlanElements.get(i) instanceof Activity) {
+							final Activity oldAct = (Activity) oldPlanElements.get(i);
+							final Activity newAct = (Activity) newPlanElements.get(i);
+							if (different(oldAct.getStartTime(), newAct.getStartTime())) {
+								changeDetected = true;
+								System.out.println(
+										"act. start time: " + oldAct.getStartTime() + " vs " + newAct.getStartTime());
+							}
+							if (different(oldAct.getEndTime(), newAct.getEndTime())) {
+								changeDetected = true;
+								System.out.println(
+										"act. end time: " + oldAct.getEndTime() + " vs " + newAct.getEndTime());
+							}
+						} else {
+							final Leg oldLeg = (Leg) oldPlanElements.get(i);
+							final Leg newLeg = (Leg) newPlanElements.get(i);
+							if (different(oldLeg.getDepartureTime(), newLeg.getDepartureTime())) {
+								changeDetected = true;
+								System.out.println("leg dpt time: " + oldLeg.getDepartureTime() + " vs "
+										+ newLeg.getDepartureTime());
+							}
+							if (different(oldLeg.getTravelTime(), newLeg.getTravelTime())) {
+								changeDetected = true;
+								System.out.println(
+										"leg travel time: " + oldLeg.getTravelTime() + " vs " + newLeg.getTravelTime());
+							}
+							if (different(oldLeg.getRoute().getTravelTime(), newLeg.getRoute().getTravelTime())) {
+								changeDetected = true;
+								System.out.println("route travel time: " + oldLeg.getRoute().getTravelTime() + " vs "
+										+ newLeg.getRoute().getTravelTime());
+							}
+						}
+					}
+				}
+				if (changeDetected) {
+					System.exit(0);
+				}
+			}
+		}
 	}
 }

@@ -38,9 +38,8 @@ public class AccelerationRecipe implements ReplannerIdentifierRecipe {
 	}
 
 	@Override
-	public boolean isReplanner(final Id<Person> personId, final double deltaScoreIfYes, final double deltaScoreIfNo,
-			final double currentUtility, final double anticipatedUtilityChange) {
-		return (deltaScoreIfYes < deltaScoreIfNo);
+	public boolean isReplanner(final Id<Person> personId, final double anticipatedUtilityChange) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

@@ -463,7 +463,7 @@ public class SampersUtilityParameters {
 	}
 
 	public double getScheduleDelaySlack_min() {
-		return 60.0;
+		return 5.0; // TODO 2021-02-02 Was 60 before!
 	}
 
 	public double getPTAccessEgressTimeMultiplier() {

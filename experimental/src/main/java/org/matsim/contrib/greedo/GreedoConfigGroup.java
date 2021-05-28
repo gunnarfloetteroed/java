@@ -135,6 +135,34 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		return Math.pow(1.0 / (1.0 + age), this.getAgeWeightExponent());
 	}
 
+	// ---------- iterationReplications ----------
+
+	private int iterationReplications = 1;
+
+	@StringGetter("iterationReplications")
+	public int getIterationReplications() {
+		return this.iterationReplications;
+	}
+
+	@StringSetter("iterationReplications")
+	public void setIterationReplications(final int iterationReplications) {
+		this.iterationReplications = iterationReplications;
+	}
+
+	// ---------- TRUST REGION APPROACH ----------
+
+	private int trustRegion = 1;
+
+	@StringGetter("trustRegion")
+	public int getTrustRegion() {
+		return this.trustRegion;
+	}
+
+	@StringSetter("trustRegion")
+	public void setTrustRegion(final int trustRegion) {
+		this.trustRegion = trustRegion;
+	}
+
 	// ---------- VARIABILITY ANALYSIS minPhysLinkSize_veh ----------
 
 	// TODO This could be used even in the slot definition.
@@ -207,6 +235,20 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		this.percentileStepSize = percentileStepSize;
 	}
 
+	// --------------- Sbaytify ---------------
+
+	private boolean sbaytify = false;
+
+	@StringGetter("sbaytify")
+	public boolean getSbaytify() {
+		return this.sbaytify;
+	}
+
+	@StringSetter("sbaytify")
+	public void setSbaytify(final boolean sbaytify) {
+		this.sbaytify = sbaytify;
+	}
+
 	// --------------- Invert replanning rate ---------------
 
 	private boolean invertReplanningRate = false;
@@ -219,6 +261,20 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("invertReplanningRate")
 	public void setInvertReplanningRate(final boolean invertReplanningRate) {
 		this.invertReplanningRate = invertReplanningRate;
+	}
+
+	// --------------- VARIABILITY ANALYSIS: use Dn1-Dn0 in T ---------------
+
+	private boolean rejectFailure = false;
+
+	@StringGetter("rejectFailure")
+	public boolean getRejectFailure() {
+		return this.rejectFailure;
+	}
+
+	@StringSetter("rejectFailure")
+	public void setRejectFailure(final boolean rejectFailure) {
+		this.rejectFailure = rejectFailure;
 	}
 
 	// --------------- VARIABILITY ANALYSIS: use Dn1-Dn0 in T ---------------
@@ -586,6 +642,8 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	// -------------------- adjustStrategyWeights --------------------
+
+	// TODO Remove, all code is written around the assumption that this is "true".
 
 	private boolean adjustStrategyWeights = true;
 

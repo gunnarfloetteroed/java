@@ -141,11 +141,13 @@ class ReplannerIdentifier {
 //					scoreUpdater.getScoreChangeIfOne(),
 //					scoreUpdater.getScoreChangeIfZero() - this.personId2cn.getOrDefault(personId, 0.0),
 //					this.personId2currentUtility.get(personId), this.personId2hypotheticalUtilityChange.get(personId));
+//			final boolean isReplanner = this.greedoConfig.getReplannerIdentifierRecipe().isReplanner(personId,
+//					scoreUpdater.getScoreChangeIfOne(),
+//					scoreUpdater.getScoreChangeIfZero()
+//							- (this.greedoConfig.getUseCinT() ? this.personId2cn.getOrDefault(personId, 0.0) : 0.0),
+//					this.personId2currentUtility.get(personId), this.personId2hypotheticalUtilityChange.get(personId));
 			final boolean isReplanner = this.greedoConfig.getReplannerIdentifierRecipe().isReplanner(personId,
-					scoreUpdater.getScoreChangeIfOne(),
-					scoreUpdater.getScoreChangeIfZero()
-							- (this.greedoConfig.getUseCinT() ? this.personId2cn.getOrDefault(personId, 0.0) : 0.0),
-					this.personId2currentUtility.get(personId), this.personId2hypotheticalUtilityChange.get(personId));
+					this.personId2hypotheticalUtilityChange.get(personId));
 			scoreUpdater.updateResiduals(isReplanner ? 1.0 : 0.0);
 
 			if (isReplanner) {

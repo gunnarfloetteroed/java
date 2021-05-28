@@ -26,7 +26,7 @@ import java.util.Set;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import floetteroed.cadyts.calibrators.Calibrator;
+// import floetteroed.cadyts.calibrators.Calibrator;
 import utils.MyConfigUtils;
 
 /**
@@ -70,7 +70,7 @@ public class ModalShareCalibrationConfigGroup extends ReflectiveConfigGroup {
 
 	// -------------------- inertia --------------------
 
-	private double inertia = Calibrator.DEFAULT_REGRESSION_INERTIA;
+	private double inertia = 0.05; // Calibrator.DEFAULT_REGRESSION_INERTIA;
 
 	@StringGetter("inertia")
 	public Double getInertia() {

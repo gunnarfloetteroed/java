@@ -59,8 +59,7 @@ public class SelfRegulatingMSA implements ReplannerIdentifierRecipe {
 	}
 
 	@Override
-	public boolean isReplanner(final Id<Person> personId, final double deltaScoreIfYes, final double deltaScoreIfNo,
-			final double currentUtility, final double anticipatedUtilityChange) {
+	public boolean isReplanner(final Id<Person> personId, final double anticipatedUtilityChange) {
 		return (MatsimRandom.getRandom().nextDouble() < (1.0 / this.denominator));
 	}
 

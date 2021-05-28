@@ -44,8 +44,19 @@ public class AllReplannersSelector implements ReplannerSelector {
 			}
 		};
 	}
-	
+
 	@Override
 	public void afterReplanning() {
+	}
+
+	@Override
+	public IEREventHandlerProvider getOverrideExperiencedScoresEventHandlerProvider() {
+		return new IEREventHandlerProvider() {
+			@Override
+			public EventHandler get(Set<Id<Person>> personIds) {
+				return new EventHandler() {
+				};
+			}
+		};
 	}
 }

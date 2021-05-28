@@ -32,7 +32,7 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  */
 @Deprecated
-public class Mah2009Recipe implements ReplannerIdentifierRecipe {
+public class Mah2009Recipe { // implements ReplannerIdentifierRecipe {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -92,20 +92,20 @@ public class Mah2009Recipe implements ReplannerIdentifierRecipe {
 
 	// --------------- IMPLEMENTATION OF ReplannerIdentifierRecipe ---------------
 
-	@Override
+	// @Override
 	public boolean isReplanner(final Id<Person> personId, final double deltaScoreIfYes, final double deltaScoreIfNo,
 			final double currentUtility, final double anticipatedUtilityChange) {
 		final double replanProba = this.replanProbaConstant * this.meanLambda * this.person2utilityGain.get(personId);
 		return (MatsimRandom.getRandom().nextDouble() < replanProba);
 	}
 
-	@Override
+	// @Override
 	public void update(LogDataWrapper logDataWrapper) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	// @Override
 	public String getDeployedRecipeName() {
 		// TODO Auto-generated method stub
 		return null;

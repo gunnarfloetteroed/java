@@ -154,7 +154,7 @@ public class DisappointmentAnalyzer {
 		public final Double sumOfNaiveE2;
 		public final Double sumOfEstimE2;
 
-		private SummaryStatistics() {
+		public SummaryStatistics() {
 			this(null, null, null, null, null, null);
 		}
 		

@@ -88,4 +88,19 @@ public class DynamicDataUtils {
 		return result;
 	}
 
+	public static <L> double innerProduct(final DynamicData<L> data1, final DynamicData<L> data2) {
+		if (data1.getBinCnt() != data2.getBinCnt()) {
+			throw new RuntimeException(
+					"arg1 has " + data1.getBinCnt() + " bins, but arg2 has " + data2.getBinCnt() + " bins.");
+		}
+
+		double result = 0;
+		for (L locObj : SetUtils.union(data1.keySet(), data2.keySet())) {
+			for (int bin = 0; bin < data1.getBinCnt(); bin++) {
+				result += data1.getBinValue(locObj, bin) * data2.getBinValue(locObj, bin);
+			}
+		}
+		return result;
+	}
+
 }

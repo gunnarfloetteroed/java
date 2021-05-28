@@ -19,6 +19,7 @@
  */
 package floetteroed.utilities;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -42,4 +43,12 @@ public class SetUtils {
 		result.retainAll(arg1);
 		return result;
 	}
+
+	public static <T> Set<T> difference(final Collection<? extends T> minuend,
+			final Collection<? extends T> subtrahend) {
+		final Set<T> result = new LinkedHashSet<>(minuend);
+		result.removeAll(subtrahend);
+		return result;
+	}
+
 }
