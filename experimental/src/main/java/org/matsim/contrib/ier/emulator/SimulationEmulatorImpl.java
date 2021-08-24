@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.config.TransitConfigGroup;
 
 import com.google.inject.Inject;
@@ -80,7 +81,8 @@ public class SimulationEmulatorImpl implements SimulationEmulator {
 	// --------------- IMPLEMENTATION OF SimulationEmulator ---------------
 
 	@Override
-	public void emulate(final Person person, final Plan plan, final EventsManager eventsManager) {
+	public void emulate(final Person person, final Plan plan, final EventsManager eventsManager,
+			final TravelTime overridingCarTravelTime) {
 		List<? extends PlanElement> elements = plan.getPlanElements();
 
 		double time_s = 0.0;
@@ -121,8 +123,9 @@ public class SimulationEmulatorImpl implements SimulationEmulator {
 				final LegEmulator legEmulator;
 				if (TransportMode.car.equals(leg.getMode())) { // TODO Other network modes?
 					legEmulator = new CarLegEmulator(eventsManager, this.services.getScenario().getNetwork(),
-							this.services.getLinkTravelTimes(), this.services.getScenario().getActivityFacilities(),
-							this.simEndTime_s);
+							(overridingCarTravelTime != null) ? overridingCarTravelTime
+									: this.services.getLinkTravelTimes(),
+							this.services.getScenario().getActivityFacilities(), this.simEndTime_s);
 				} else if (TransportMode.pt.equals(leg.getMode()) || this.passengerModes.contains(leg.getMode())) {
 					legEmulator = new ScheduleBasedTransitLegEmulator(eventsManager, this.services.getScenario());
 				} else {

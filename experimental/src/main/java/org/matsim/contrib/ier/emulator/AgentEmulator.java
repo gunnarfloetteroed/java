@@ -1,6 +1,5 @@
 package org.matsim.contrib.ier.emulator;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -13,6 +12,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.PersonExperiencedActivity;
@@ -56,7 +56,7 @@ public final class AgentEmulator {
 	 * scoring while events are generated per agent. The reason this works is that
 	 * the scoring doesn't care about the timing of events of independent agents.
 	 */
-	public void emulate(Person person, Plan plan, EventHandler eventHandler) {
+	public void emulate(Person person, Plan plan, EventHandler eventHandler, TravelTime overridingCarTravelTime) {
 		
 		if (warnCnt++ < 10) {
 			Logger.getLogger(this.getClass())
@@ -89,7 +89,7 @@ public final class AgentEmulator {
 
 		eventsManager.resetHandlers(this.iteration);
 
-		this.simulationEmulator.emulate(person, plan, eventsManager);
+		this.simulationEmulator.emulate(person, plan, eventsManager, overridingCarTravelTime);
 
 		eventsManager.finishProcessing();
 		eventsToActivities.finish();

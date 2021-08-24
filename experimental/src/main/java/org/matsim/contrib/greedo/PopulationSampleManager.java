@@ -46,28 +46,28 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.greedo.datastructures.SpaceTimeIndicators;
 import org.matsim.contrib.greedo.trustregion.Slot;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.utils.ParetoSet;
 
 import floetteroed.utilities.Tuple;
+import utils.ParetoSet;
 
 /**
  *
  * @author Gunnar Flötteröd
  *
  */
-class PopulationSampleManager {
+public class PopulationSampleManager {
 
 	// -------------------- INNER CLASSES --------------------
 
-	private class Particle {
-		final Id<Person> id;
-		final double deltaUn0;
-		final List<Slot> anticipatedSlots;
-		final List<Slot> currentSlots;
+	public static class Particle {
+		public final Id<Person> id;
+		public final double deltaUn0;
+		public final List<Slot> anticipatedSlots;
+		public final List<Slot> currentSlots;
 
 		final double anticipatedDeltaXNorm2;
 
-		Particle(Id<Person> personId, double deltaUn0, List<Slot> anticipatedSlots, List<Slot> currentSlots) {
+		public Particle(Id<Person> personId, double deltaUn0, List<Slot> anticipatedSlots, List<Slot> currentSlots) {
 			this.id = personId;
 			this.deltaUn0 = deltaUn0;
 			this.anticipatedSlots = unmodifiableList(anticipatedSlots);
@@ -120,7 +120,7 @@ class PopulationSampleManager {
 
 	// -------------------- INTERNALS --------------------
 
-	private List<Slot> createSlots(final SpaceTimeIndicators<Id<?>> indicators) {
+	public static List<Slot> createSlots(final SpaceTimeIndicators<Id<?>> indicators) {
 		if (indicators != null) {
 			final List<Slot> result = new ArrayList<>(indicators.size());
 			for (int timeBin = 0; timeBin < indicators.getTimeBinCnt(); timeBin++) {

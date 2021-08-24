@@ -26,16 +26,18 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.ier.IERModule;
+import org.matsim.contrib.greedo.greedoreplanning.GreedoReplanningSequential;
+import org.matsim.contrib.ier.emulator.AgentEmulator;
+import org.matsim.contrib.ier.emulator.SimulationEmulator;
+import org.matsim.contrib.ier.emulator.SimulationEmulatorImpl;
 import org.matsim.contrib.ier.run.IERConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
-
-import com.google.inject.Singleton;
 
 /**
  *
@@ -376,16 +378,25 @@ public class Greedo {
 		}
 	}
 
-	// TODO Can these be summarized into one module?
 	public AbstractModule[] getModules() {
+//		final AbstractModule greedoModule = new AbstractModule() {
+//			@Override
+//			public void install() {
+//				this.bind(WireGreedoIntoMATSimControlerListener.class).in(Singleton.class);
+//				this.addEventHandlerBinding().toProvider(WireGreedoIntoMATSimControlerListener.class);
+//			}
+//		};
+//		final AbstractModule ierModule = new IERModule(WireGreedoIntoMATSimControlerListener.class);
+//		return new AbstractModule[] { greedoModule, ierModule };
 		final AbstractModule greedoModule = new AbstractModule() {
 			@Override
 			public void install() {
-				this.bind(WireGreedoIntoMATSimControlerListener.class).in(Singleton.class);
-				this.addEventHandlerBinding().toProvider(WireGreedoIntoMATSimControlerListener.class);
+				bind(PlansReplanning.class).to(GreedoReplanningSequential.class);
+				// this.addControlerListenerBinding().to(GreedoReplanning.class);
+				bind(AgentEmulator.class);
+				bind(SimulationEmulator.class).to(SimulationEmulatorImpl.class);			
 			}
 		};
-		final AbstractModule ierModule = new IERModule(WireGreedoIntoMATSimControlerListener.class);
-		return new AbstractModule[] { greedoModule, ierModule };
+		return new AbstractModule[] { greedoModule };
 	}
 }

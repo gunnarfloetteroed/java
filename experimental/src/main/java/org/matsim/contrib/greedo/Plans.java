@@ -39,7 +39,7 @@ import org.matsim.core.population.PopulationUtils;
  * @author Gunnar Flötteröd
  * 
  */
-class Plans {
+public class Plans {
 
 	// -------------------- MEMBERS --------------------
 
@@ -60,7 +60,7 @@ class Plans {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	Plans(final Population population) {
+	public Plans(final Population population) {
 		for (Person person : population.getPersons().values()) {
 			if (person.getSelectedPlan() == null) {
 				this.person2selectedPlanIndex.put(person.getId(), null);
@@ -78,14 +78,14 @@ class Plans {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	void set(final Population population) {
+	public void set(final Population population) {
 		for (Id<Person> personId : this.personId2planList.keySet()) {
 			final Person person = population.getPersons().get(personId);
 			this.set(person);
 		}
 	}
 
-	void set(final HasPlansAndId<Plan, Person> person) {
+	public void set(final HasPlansAndId<Plan, Person> person) {
 		person.getPlans().clear();
 		final List<? extends Plan> copiedPlans = newDeepCopy(this.personId2planList.get(person.getId()));
 		for (Plan plan : copiedPlans) {
@@ -102,7 +102,7 @@ class Plans {
 		}
 	}
 
-	Plan getSelectedPlan(Id<Person> personId) {
+	public Plan getSelectedPlan(Id<Person> personId) {
 		return getSelectedPlan(this.personId2planList.get(personId), this.person2selectedPlanIndex.get(personId));
 	}
 

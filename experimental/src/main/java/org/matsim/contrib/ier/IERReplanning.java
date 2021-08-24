@@ -1,11 +1,6 @@
 package org.matsim.contrib.ier;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -20,11 +15,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.ier.emulator.AgentEmulator;
 import org.matsim.contrib.ier.emulator.SimulationEmulator;
 import org.matsim.contrib.ier.replannerselection.ReplannerSelector;
@@ -38,17 +30,14 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.collections.Tuple;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-
-import floetteroed.utilities.math.BasicStatistics;
 
 /**
  * This class replaces the standard MATSim replanning. It fullfills a number of
@@ -99,7 +88,7 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener,
 				final Set<Person> personsToEmulate = new LinkedHashSet<>(
 						event.getServices().getScenario().getPopulation().getPersons().values());
 				this.emulateInParallel(personsToEmulate, event.getIteration(),
-						this.replannerSelector.getOverrideExperiencedScoresEventHandlerProvider());
+						this.replannerSelector.getOverrideExperiencedScoresEventHandlerProvider(), null);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -107,12 +96,23 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener,
 	}
 
 	@Override
-	public void notifyReplanning(ReplanningEvent event) {
+	public void notifyReplanning(final ReplanningEvent event) {
+		final IERReplanningEngine engine = new IERReplanningEngine(this.strategyManager,
+				event.getServices().getScenario(), this.replanningContextProvider, this.agentEmulatorProvider,
+				event.getServices().getConfig());
+		engine.replan(event.getIteration(), event.getServices().getLinkTravelTimes(),
+				this.replannerSelector.beforeReplanningAndGetEventHandlerProvider());
+		this.replannerSelector.afterReplanning();
+	}
+
+	private void notifyReplanningORIGINAL(ReplanningEvent event) {
 
 		try {
 
 			if (this.ierConfig.getWritePerformanceOutput()) {
-				this.writePerformanceOutput(event.getIteration());
+				Logger.getLogger(this.getClass())
+						.warn("Writing of IER performance output needs to be revisited, currently not included.");
+				// this.writePerformanceOutput(event.getIteration());
 			}
 
 			final IEREventHandlerProvider handlerForLastReplanningIterationProvider = this.replannerSelector
@@ -190,7 +190,7 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener,
 				// if (this.ierConfig.getParallel()) {
 				// emulateInParallel(this.scenario.getPopulation(), event.getIteration(),
 				// currentEventHandlerProvider);
-				emulateInParallel(personsToEmulate, event.getIteration(), currentEventHandlerProvider);
+				emulateInParallel(personsToEmulate, event.getIteration(), currentEventHandlerProvider, null);
 				// } else {
 				// emulateSequentially(this.scenario.getPopulation(), event.getIteration(),
 				// currentEventHandlerProvider.get(this.scenario.getPopulation().getPersons().keySet()));
@@ -213,66 +213,66 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener,
 		}
 	}
 
-	private void logPlans(Population population) {
-		for (Person person : population.getPersons().values()) {
-			Logger.getLogger(this.getClass()).info("Person: " + person.getId());
-			for (Plan plan : person.getPlans()) {
-				Logger.getLogger(this.getClass()).info(
-						(PersonUtils.isSelected(plan) ? "(selected)" : "") + " plan with score: " + plan.getScore());
-			}
-		}
-	}
+//	private void logPlans(Population population) {
+//		for (Person person : population.getPersons().values()) {
+//			Logger.getLogger(this.getClass()).info("Person: " + person.getId());
+//			for (Plan plan : person.getPlans()) {
+//				Logger.getLogger(this.getClass()).info(
+//						(PersonUtils.isSelected(plan) ? "(selected)" : "") + " plan with score: " + plan.getScore());
+//			}
+//		}
+//	}
 
-	private void writePerformanceOutput(final int iteration) throws InterruptedException {
-		final Map<Id<Person>, Double> personId2OriginalScore = new LinkedHashMap<>();
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			personId2OriginalScore.put(person.getId(), person.getSelectedPlan().getScore());
-		}
-		this.emulateInParallel(this.scenario.getPopulation(), iteration, new IEREventHandlerProvider() {
-			@Override
-			public EventHandler get(Set<Id<Person>> personIds) {
-				return new EventHandler() {
-				};
-			}
-		});
-		final BasicStatistics scoreErrorStats = new BasicStatistics();
-		final List<Tuple<Double, List<String>>> scoreErrorAndModesList = new ArrayList<>();
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			final double scoreError = person.getSelectedPlan().getScore() - personId2OriginalScore.get(person.getId());
-			scoreErrorStats.add(scoreError);
-			List<String> modes = new ArrayList<>();
-			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof Leg) {
-					modes.add(((Leg) pe).getMode());
-				}
-			}
-			scoreErrorAndModesList.add(new Tuple<>(scoreError, modes));
-			person.getSelectedPlan().setScore(personId2OriginalScore.get(person.getId()));
-		}
-		Collections.sort(scoreErrorAndModesList, new Comparator<Tuple<Double, List<String>>>() {
-			@Override
-			public int compare(Tuple<Double, List<String>> o1, Tuple<Double, List<String>> o2) {
-				return o1.getFirst().compareTo(o2.getFirst());
-			}
-		});
-		try {
-			final PrintWriter writer = new PrintWriter(new File(
-					this.scenario.getConfig().controler().getOutputDirectory(), "scoreErrors_" + iteration + ".txt"));
-			for (int i = 0; i < scoreErrorAndModesList.size(); i++) {
-				writer.println(i + "\t" + scoreErrorAndModesList.get(i).getFirst() + "\t"
-						+ scoreErrorAndModesList.get(i).getSecond().size() + "\t"
-						+ scoreErrorAndModesList.get(i).getSecond());
-			}
-			final String msg = "Mean score error: " + scoreErrorStats.getAvg() + "; stddev = "
-					+ scoreErrorStats.getStddev();
-			Logger.getLogger(this.getClass()).info(msg);
-			writer.println(msg);
-			writer.flush();
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+//	private void writePerformanceOutput(final int iteration) throws InterruptedException {
+//		final Map<Id<Person>, Double> personId2OriginalScore = new LinkedHashMap<>();
+//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//			personId2OriginalScore.put(person.getId(), person.getSelectedPlan().getScore());
+//		}
+//		this.emulateInParallel(this.scenario.getPopulation(), iteration, new IEREventHandlerProvider() {
+//			@Override
+//			public EventHandler get(Set<Id<Person>> personIds) {
+//				return new EventHandler() {
+//				};
+//			}
+//		});
+//		final BasicStatistics scoreErrorStats = new BasicStatistics();
+//		final List<Tuple<Double, List<String>>> scoreErrorAndModesList = new ArrayList<>();
+//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//			final double scoreError = person.getSelectedPlan().getScore() - personId2OriginalScore.get(person.getId());
+//			scoreErrorStats.add(scoreError);
+//			List<String> modes = new ArrayList<>();
+//			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+//				if (pe instanceof Leg) {
+//					modes.add(((Leg) pe).getMode());
+//				}
+//			}
+//			scoreErrorAndModesList.add(new Tuple<>(scoreError, modes));
+//			person.getSelectedPlan().setScore(personId2OriginalScore.get(person.getId()));
+//		}
+//		Collections.sort(scoreErrorAndModesList, new Comparator<Tuple<Double, List<String>>>() {
+//			@Override
+//			public int compare(Tuple<Double, List<String>> o1, Tuple<Double, List<String>> o2) {
+//				return o1.getFirst().compareTo(o2.getFirst());
+//			}
+//		});
+//		try {
+//			final PrintWriter writer = new PrintWriter(new File(
+//					this.scenario.getConfig().controler().getOutputDirectory(), "scoreErrors_" + iteration + ".txt"));
+//			for (int i = 0; i < scoreErrorAndModesList.size(); i++) {
+//				writer.println(i + "\t" + scoreErrorAndModesList.get(i).getFirst() + "\t"
+//						+ scoreErrorAndModesList.get(i).getSecond().size() + "\t"
+//						+ scoreErrorAndModesList.get(i).getSecond());
+//			}
+//			final String msg = "Mean score error: " + scoreErrorStats.getAvg() + "; stddev = "
+//					+ scoreErrorStats.getStddev();
+//			Logger.getLogger(this.getClass()).info(msg);
+//			writer.println(msg);
+//			writer.flush();
+//			writer.close();
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 
 	// @Deprecated
 	// private void emulateSequentially(Population population, int iteration,
@@ -301,13 +301,14 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener,
 	// eventsToScore.finish();
 	// }
 
-	private void emulateInParallel(Population population, int iteration,
-			final IEREventHandlerProvider eventHandlerProvider) throws InterruptedException {
-		this.emulateInParallel(population.getPersons().values(), iteration, eventHandlerProvider);
-	}
+//	private void emulateInParallel(Population population, int iteration,
+//			final IEREventHandlerProvider eventHandlerProvider) throws InterruptedException {
+//		this.emulateInParallel(population.getPersons().values(), iteration, eventHandlerProvider);
+//	}
 
 	private void emulateInParallel(Collection<? extends Person> persons, int iteration,
-			final IEREventHandlerProvider eventHandlerProvider) throws InterruptedException {
+			final IEREventHandlerProvider eventHandlerProvider, final TravelTime overridingCarTravelTime)
+			throws InterruptedException {
 
 		// Iterator<? extends Person> personIterator =
 		// population.getPersons().values().iterator();
@@ -353,7 +354,7 @@ public final class IERReplanning implements PlansReplanning, ReplanningListener,
 					// And here we send all the agents to the emulator. The score will be written to
 					// the plan directly.
 					for (Person person : batch.values()) {
-						agentEmulator.emulate(person, person.getSelectedPlan(), eventHandler);
+						agentEmulator.emulate(person, person.getSelectedPlan(), eventHandler, overridingCarTravelTime);
 					}
 
 					processedNumberOfPersons.addAndGet(batch.size());

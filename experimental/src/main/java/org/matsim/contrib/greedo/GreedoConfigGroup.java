@@ -135,6 +135,191 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 		return Math.pow(1.0 / (1.0 + age), this.getAgeWeightExponent());
 	}
 
+	// ==========================================================================
+
+	private double initialReplanProba = 0.1;
+
+	@StringGetter("initialReplanProba")
+	public double getInitialReplanProba() {
+		return this.initialReplanProba;
+	}
+
+	@StringSetter("initialReplanProba")
+	public void setInitialReplanProba(final double initialReplanProba) {
+		this.initialReplanProba = initialReplanProba;
+	}
+
+	//
+
+	private int minTravelTimeMemory = 10;
+
+	@StringGetter("minTravelTimeMemory")
+	public int getMinTravelTimeMemory() {
+		return this.minTravelTimeMemory;
+	}
+
+	@StringSetter("minTravelTimeMemory")
+	public void setMinTravelTimeMemory(final int minTravelTimeMemory) {
+		this.minTravelTimeMemory = minTravelTimeMemory;
+	}
+
+	//
+
+	private double relTravelTimeMemory = 0.5;
+
+	@StringGetter("relTravelTimeMemory")
+	public double getRelTravelTimeMemory() {
+		return this.relTravelTimeMemory;
+	}
+
+	@StringSetter("relTravelTimeMemory")
+	public void setRelTravelTimeMemory(final double relTravelTimeMemory) {
+		this.relTravelTimeMemory = relTravelTimeMemory;
+	}
+
+	//
+
+	private int maxTravelTimeMemory = 100;
+
+	@StringGetter("maxTravelTimeMemory")
+	public int getMaxTravelTimeMemory() {
+		return this.maxTravelTimeMemory;
+	}
+
+	@StringSetter("maxTravelTimeMemory")
+	public void setMaxTravelTimeMemory(final int maxTravelTimeMemory) {
+		this.maxTravelTimeMemory = maxTravelTimeMemory;
+	}
+
+	//
+
+	private double trustRegionReductionFactor = 0.5;
+
+	@StringGetter("trustRegionReductionFactor")
+	public double getTrustRegionReductionFactor() {
+		return this.trustRegionReductionFactor;
+	}
+
+	@StringSetter("trustRegionReductionFactor")
+	public void setTrustRegionReductionFactor(final double trustRegionReductionFactor) {
+		this.trustRegionReductionFactor = trustRegionReductionFactor;
+	}
+	
+	//
+
+	private int maxEvaluatedGaps = 100;
+
+	@StringGetter("maxEvaluatedGaps")
+	public int getMaxEvaluatedGaps() {
+		return this.maxEvaluatedGaps;
+	}
+
+	@StringSetter("maxEvaluatedGaps")
+	public void setMaxEvaluatedGaps(final int maxEvaluatedGaps) {
+		this.maxEvaluatedGaps = maxEvaluatedGaps;
+	}
+
+	//
+
+	private int maxEvaluatedNetstates = 100;
+
+	@StringGetter("maxEvaluatedNetstates")
+	public int getMaxEvaluatedNetstates() {
+		return this.maxEvaluatedNetstates;
+	}
+
+	@StringSetter("maxEvaluatedNetstates")
+	public void setMaxEvaluatedNetstates(final int maxEvaluatedNetstates) {
+		this.maxEvaluatedNetstates = maxEvaluatedNetstates;
+	}
+
+
+	//
+
+	private double dickeyFullerThreshold = -3.0;
+
+	@StringGetter("dickeyFullerThreshold")
+	public double getDickeyFullerThreshold() {
+		return this.dickeyFullerThreshold;
+	}
+
+	@StringSetter("dickeyFullerThreshold")
+	public void setDickeyFullerThreshold(final double dickeyFullerThreshold) {
+		this.dickeyFullerThreshold = dickeyFullerThreshold;
+	}
+
+	//
+
+	private double maxCV = 0.5;
+
+	@StringGetter("maxCV")
+	public double getMaxCV() {
+		return this.maxCV;
+	}
+
+	@StringSetter("maxCV")
+	public void setMaxCV(final double maxCV) {
+		this.maxCV = maxCV;
+	}
+
+	//
+
+	private boolean penalizeDepartures = false;
+
+	@StringGetter("penalizeDepartures")
+	public boolean getPenalizeDepartures() {
+		return this.penalizeDepartures;
+	}
+
+	@StringSetter("penalizeDepartures")
+	public void setPenalizeDepartures(final boolean penalizeDepartures) {
+		this.penalizeDepartures = penalizeDepartures;
+	}
+
+	// ==========================================================================
+
+	// ---------- VARIABILITY ANALYSIS minPhysLinkSize_veh ----------
+
+	private double relativeSystematicChange = 1.0;
+
+	@StringGetter("relativeSystematicChange")
+	public double getRelativeSystematicChange() {
+		return this.relativeSystematicChange;
+	}
+
+	@StringSetter("relativeSystematicChange")
+	public void setRelativeSystematicChange(final double relativeSystematicChange) {
+		this.relativeSystematicChange = relativeSystematicChange;
+	}
+
+	// ---------- transientIterations ----------
+
+	private int transientIterations = 3;
+
+	@StringGetter("transientIterations")
+	public int getTransientIterations() {
+		return this.transientIterations;
+	}
+
+	@StringSetter("transientIterations")
+	public void setTransientIterations(final int transientIterations) {
+		this.transientIterations = transientIterations;
+	}
+
+	// ---------- stationaryIterations ----------
+
+	private int stationaryIterations = 32;
+
+	@StringGetter("stationaryIterations")
+	public int getStationaryIterations() {
+		return this.stationaryIterations;
+	}
+
+	@StringSetter("stationaryIterations")
+	public void setStationaryIterations(final int stationaryIterations) {
+		this.stationaryIterations = stationaryIterations;
+	}
+
 	// ---------- iterationReplications ----------
 
 	private int iterationReplications = 1;

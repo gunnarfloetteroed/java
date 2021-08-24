@@ -17,7 +17,7 @@
  * contact: gunnar.flotterod@gmail.com
  *
  */
-package org.matsim.utils;
+package utils;
 
 import java.util.LinkedHashSet;
 import java.util.Random;

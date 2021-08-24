@@ -3,6 +3,7 @@ package org.matsim.contrib.ier.emulator;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * The SimulationEmulator has the purpose to create events for an agent's plan.
@@ -15,5 +16,5 @@ import org.matsim.core.api.experimental.events.EventsManager;
  * @author shoerl
  */
 public interface SimulationEmulator {
-	void emulate(Person person, Plan plan, EventsManager eventsManager);
+	void emulate(Person person, Plan plan, EventsManager eventsManager, TravelTime overridingCarTravelTimes);
 }
