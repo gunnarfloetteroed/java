@@ -137,6 +137,20 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 
 	// ==========================================================================
 
+	private boolean randomize = true;
+
+	@StringGetter("randomize")
+	public boolean getRandomize() {
+		return this.randomize;
+	}
+
+	@StringSetter("randomize")
+	public void setRandomize(final boolean randomize) {
+		this.randomize = randomize;
+	}
+	
+	// 
+
 	private double initialReplanProba = 0.1;
 
 	@StringGetter("initialReplanProba")
@@ -204,7 +218,21 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	public void setTrustRegionReductionFactor(final double trustRegionReductionFactor) {
 		this.trustRegionReductionFactor = trustRegionReductionFactor;
 	}
-	
+
+	//
+
+	private int skipInitialGaps = 0;
+
+	@StringGetter("skipInitialGaps")
+	public int getSkipInitialGaps() {
+		return this.skipInitialGaps;
+	}
+
+	@StringSetter("skipInitialGaps")
+	public void setSkipInitialGaps(final int skipInitialGaps) {
+		this.skipInitialGaps = skipInitialGaps;
+	}
+
 	//
 
 	private int maxEvaluatedGaps = 100;
@@ -232,7 +260,6 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	public void setMaxEvaluatedNetstates(final int maxEvaluatedNetstates) {
 		this.maxEvaluatedNetstates = maxEvaluatedNetstates;
 	}
-
 
 	//
 
@@ -274,6 +301,20 @@ public class GreedoConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("penalizeDepartures")
 	public void setPenalizeDepartures(final boolean penalizeDepartures) {
 		this.penalizeDepartures = penalizeDepartures;
+	}
+
+	//
+
+	private boolean replanNegativeGaps = true;
+
+	@StringGetter("replanNegativeGaps")
+	public boolean getReplanNegativeGaps() {
+		return this.replanNegativeGaps;
+	}
+
+	@StringSetter("replanNegativeGaps")
+	public void setReplanNegativeGaps(final boolean replanNegativeGaps) {
+		this.replanNegativeGaps = replanNegativeGaps;
 	}
 
 	// ==========================================================================

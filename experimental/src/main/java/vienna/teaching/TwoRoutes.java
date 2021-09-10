@@ -17,7 +17,7 @@
  * contact: gunnar.flotterod@gmail.com
  *
  */
-package vienna;
+package vienna.teaching;
 
 /**
  *

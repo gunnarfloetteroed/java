@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.greedo.greedoreplanning.GreedoReplanningSequential;
+import org.matsim.contrib.greedo.greedoreplanning.GreedoReplanningWithMSA;
 import org.matsim.contrib.ier.emulator.AgentEmulator;
 import org.matsim.contrib.ier.emulator.SimulationEmulator;
 import org.matsim.contrib.ier.emulator.SimulationEmulatorImpl;
@@ -391,7 +391,7 @@ public class Greedo {
 		final AbstractModule greedoModule = new AbstractModule() {
 			@Override
 			public void install() {
-				bind(PlansReplanning.class).to(GreedoReplanningSequential.class);
+				bind(PlansReplanning.class).to(GreedoReplanningWithMSA.class);
 				// this.addControlerListenerBinding().to(GreedoReplanning.class);
 				bind(AgentEmulator.class);
 				bind(SimulationEmulator.class).to(SimulationEmulatorImpl.class);			

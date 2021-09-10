@@ -38,7 +38,13 @@ public class DickeyFullerTest {
 
 	public final double criticalValue;
 
-	public final double tStatistic;
+	public final double offsetCoeff;
+	public final double delta;
+	public final double trendCoeff;
+
+	public final double arCoeffTStatistic;
+
+	public final double trendCoeffTStatistic;
 
 	public final double mean;
 
@@ -64,10 +70,11 @@ public class DickeyFullerTest {
 		 * x(k + 1) - x(k) = (a - 1) x(k) + b + e(k)
 		 * y(k)            =   delta x(k) + b + e(k)
 		 */
-		final double[][] x = new double[data.length - 1][1];
+		final double[][] x = new double[data.length - 1][2];
 		final double[] y = new double[data.length - 1];
 		for (int k = 0; k < data.length - 1; k++) {
 			x[k][0] = data[k];
+			x[k][1] = k;
 			y[k] = data[k + 1] - data[k];
 		}
 
@@ -75,8 +82,13 @@ public class DickeyFullerTest {
 		regr.setNoIntercept(false);
 		regr.newSampleData(y, x);
 
-		final double delta = regr.estimateRegressionParameters()[1];
-		this.tStatistic = delta / regr.estimateRegressionParametersStandardErrors()[1];
+		this.offsetCoeff = regr.estimateRegressionParameters()[0];
+		this.delta = regr.estimateRegressionParameters()[1];
+		this.trendCoeff = regr.estimateRegressionParameters()[2];
+
+		this.arCoeffTStatistic = delta / regr.estimateRegressionParametersStandardErrors()[1];
+		this.trendCoeffTStatistic = regr.estimateRegressionParameters()[2]
+				/ regr.estimateRegressionParametersStandardErrors()[2];
 
 		this.mean = Arrays.stream(data).average().getAsDouble();
 		final int _K = data.length;
@@ -86,7 +98,8 @@ public class DickeyFullerTest {
 	}
 
 	public boolean getStationary() {
-		return (this.tStatistic < this.criticalValue);
+		return (this.arCoeffTStatistic < this.criticalValue)
+				&& (Math.abs(this.trendCoeffTStatistic) < Math.abs(this.criticalValue));
 	}
 
 	// -------------------- BELOW ONLY FOR TESTING --------------------
@@ -102,8 +115,10 @@ public class DickeyFullerTest {
 		for (int k = 1; k < data.length; k++) {
 			data[k] = rnd.nextGaussian();
 		}
+		System.out.println();
 		final DickeyFullerTest test = new DickeyFullerTest(data, critVal);
-		System.out.println("stationary: t = " + test.tStatistic + ", stationary = " + test.getStationary());
+		System.out.println("stationary: tAR = " + test.arCoeffTStatistic + ", tTrend = " + test.trendCoeffTStatistic
+				+ ", stationary = " + test.getStationary());
 	}
 
 	private static void randomWalkTest() {
@@ -113,8 +128,10 @@ public class DickeyFullerTest {
 		for (int k = 1; k < data.length; k++) {
 			data[k] = data[k - 1] + rnd.nextGaussian();
 		}
+		System.out.println();
 		final DickeyFullerTest test = new DickeyFullerTest(data, critVal);
-		System.out.println("randomWalk: t = " + test.tStatistic + ", stationary = " + test.getStationary());
+		System.out.println("randomWalk: tAR = " + test.arCoeffTStatistic + ", tTrend = " + test.trendCoeffTStatistic
+				+ ", stationary = " + test.getStationary());
 	}
 
 	private static void linearTrendTest(double slope) {
@@ -124,9 +141,25 @@ public class DickeyFullerTest {
 		for (int k = 1; k < data.length; k++) {
 			data[k] = slope * k + rnd.nextGaussian();
 		}
+		System.out.println();
 		final DickeyFullerTest test = new DickeyFullerTest(data, critVal);
-		System.out.println(
-				"lin.trend(slope=" + slope + "): t = " + test.tStatistic + ", stationary = " + test.getStationary());
+		System.out.println("lin.trend(slope=" + slope + "): tAR = " + test.arCoeffTStatistic + ", tTrend = "
+				+ test.trendCoeffTStatistic + ", stationary = " + test.getStationary());
+		System.out.println("offset / ar / trend = " + test.offsetCoeff + " / " + test.delta + " / " + test.trendCoeff);
+	}
+
+	private static void quadraticTrendTest(double slope) {
+		Random rnd = new Random();
+		double data[] = new double[size];
+		data[0] = rnd.nextGaussian();
+		for (int k = 1; k < data.length; k++) {
+			data[k] = slope * k * k + rnd.nextGaussian();
+		}
+		System.out.println();
+		final DickeyFullerTest test = new DickeyFullerTest(data, critVal);
+		System.out.println("quad.trend(coeff=" + slope + "): tAR = " + test.arCoeffTStatistic + ", tTrend = "
+				+ test.trendCoeffTStatistic + ", stationary = " + test.getStationary());
+		System.out.println("offset / ar / trend = " + test.offsetCoeff + " / " + test.delta + " / " + test.trendCoeff);
 	}
 
 	public static void main(String[] args) {
@@ -136,5 +169,9 @@ public class DickeyFullerTest {
 		linearTrendTest(0.01);
 		linearTrendTest(0.1);
 		linearTrendTest(1.0);
+		quadraticTrendTest(0);
+		quadraticTrendTest(0.01);
+		quadraticTrendTest(0.1);
+		quadraticTrendTest(1.0);
 	}
 }
