@@ -46,10 +46,11 @@ public class GreedoExample {
 		 */
 
 		// To emulate public transport according to schedule and not by teleportation.
+		// Allows to plug in custom emulators.
 		greedo.setEmulator("pt", ScheduleBasedTransitLegEmulator.class);
 
 		// Allows to emulate "complicated" modes (e.g. carsharing) where one leg
-		// consists of
+		// consists of multiple elements (e.g. walk to station, rent, drive, etc)
 		greedo.setDecomposer("mode to be decomposed", null /* put class for decomposition here */);
 	}
 
