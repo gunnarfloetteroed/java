@@ -11,15 +11,75 @@
 		<version>MASTER-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>cadyts</artifactId>
-	<name>cadyts</name>
+	<artifactId>greedo</artifactId>
+	<name>greedo</name>
 
-	<dependencies>
+	<properties>
+  		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  		<maven.compiler.source>11</maven.compiler.source>
+  		<maven.compiler.target>11</maven.compiler.target>
+  		<matsim.version>13.0</matsim.version>
+  		<geotools.version>20.5</geotools.version>	
+  	</properties>
+ 	
+	<repositories>
+	  <!--Note that in general repositories are not transitive, so they need to be repeated at every level where needed.-->
+		
+		<repository>
+			<!-- Geotools is not on Maven central -->
+			<id>osgeo</id>
+			<name>Geotools repository</name>
+			<!-- <url>http://download.osgeo.org/webdav/geotools</url> -->
+			<url>https://repo.osgeo.org/repository/release/</url>
+		</repository>
+
+		<repository>
+			<!-- Repository for MATSim (MATSim is not on Maven central, releases and snapshots) -->
+			<id>matsim</id>
+			<url>https://repo.matsim.org/repository/matsim</url>
+		</repository>
+		
+		<!-- for dependencies of osm-network-reader -->
+		<repository>
+			<id>topobyte</id>
+			<url>https://mvn.topobyte.de</url>
+		</repository>
+		
+		<!-- for dependencies of osm-network-reader -->
+		<repository>
+			<id>slimjars</id>
+			<url>https://mvn.slimjars.com</url>
+		</repository>
+		
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+		
+	</repositories>
+  
+  	<dependencies>
+ 
+		<!-- Attention, this is a local dependency -->
 		<dependency>
 			<groupId>gunnarfloetteroed</groupId>
 			<artifactId>utilities</artifactId>
 			<version>MASTER-SNAPSHOT</version>
 		</dependency>
-	</dependencies>
+ 		
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
 
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>roadpricing</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		
+	</dependencies> 	
+ 	
 </project>
