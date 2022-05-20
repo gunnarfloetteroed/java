@@ -109,6 +109,11 @@ public class CarsharingScoringFunctionFactory_JUSTFORTESTING implements ScoringF
 			@Override
 			public void handleEvent(Event event) {
 				scoringFunctionSum.handleEvent(event);
+			}
+
+			@Override
+			public void addScore(double amount) {
+				throw new UnsupportedOperationException("Added this when moving to matsim 13");
 			}			
 		};		
 	  }
